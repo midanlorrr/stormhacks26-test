@@ -4,6 +4,8 @@ A hackathon prototype that replays the Bald Range wildfire (BC Wildfire Service 
 
 > **Disclaimer:** this is an illustrative planning tool built from public data. It is **not official guidance**. For real evacuation decisions follow the BC Wildfire Service, EmergencyInfoBC and your local evacuation orders.
 
+**Read [CAVEATS.md](CAVEATS.md) before quoting any number from this project.**
+
 ## Setup
 
 You need **Python 3.12 or newer** (the pinned packages do not install on 3.11). Tested on 3.12 and 3.14.

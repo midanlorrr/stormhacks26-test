@@ -11,20 +11,44 @@ const map = new maplibregl.Map({
   container: "map",
   center: [-119.78, 49.63],
   zoom: 10.5,
+  // Basemap: dimmed Sentinel-2 cloudless satellite imagery (EOX). If its tiles fail, we switch to a plain OpenStreetMap fallback.
   style: {
     version: 8,
     sources: {
+      satellite: {
+        type: "raster",
+        tiles: ["https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2025_3857/default/g/{z}/{y}/{x}.jpg"],
+        tileSize: 256,
+        maxzoom: 14,
+        attribution: "EOxCloudless <a href='https://cloudless.eox.at' target='_blank'>cloudless.eox.at</a> by EOX IT Services GmbH " +
+          "(Contains modified Copernicus Sentinel data 2025). Non-commercial use (CC BY-NC-SA 4.0).",
+      },
       osm: {
         type: "raster",
         tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
         tileSize: 256,
-        attribution: "&copy; OpenStreetMap contributors",
+        attribution: "FALLBACK basemap: &copy; OpenStreetMap contributors",
       },
     },
-    layers: [{ id: "osm", type: "raster", source: "osm" }],
+    layers: [
+      // FALLBACK basemap, hidden unless the satellite tiles fail
+      { id: "basemap-fallback-osm", type: "raster", source: "osm", layout: { visibility: "none" } },
+      // Main basemap, dimmed so the overlays stand out (tweak these three numbers to taste)
+      { id: "basemap-satellite", type: "raster", source: "satellite",
+        paint: { "raster-brightness-max": 0.55, "raster-saturation": -0.45, "raster-contrast": 0.1 } },
+    ],
   },
 });
 map.addControl(new maplibregl.NavigationControl(), "top-right");
+
+// If the satellite tiles keep failing (for example, no internet), show the OpenStreetMap fallback instead
+let satelliteErrors = 0;
+map.on("error", (e) => {
+  if (e.sourceId !== "satellite" || ++satelliteErrors !== 3) return;
+  map.setLayoutProperty("basemap-satellite", "visibility", "none");
+  map.setLayoutProperty("basemap-fallback-osm", "visibility", "visible");
+  document.getElementById("basemap-note").hidden = false;
+});
 
 // Read a JSON file and stop with a visible message if it fails
 async function load(name) {
