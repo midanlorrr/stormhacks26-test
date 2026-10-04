@@ -48,6 +48,13 @@ Open http://localhost:8000. (Opening `index.html` directly will not work, becaus
 ## Design
 The look follows the Evacusense design handoff (direction 4a "Graphite") kept in `design/` (read `design/DESIGN.md`). `web/evacusense-theme.css` is a copy of the handoff stylesheet with one change: the Google Fonts import is replaced by local font files, so the page works offline. `web/style.css` holds the app's own layout on top of it, and the map colours are set in `web/app.js`. Set `ROAD_STYLE` near the top of `app.js` to `"typed"` or `"original"` for the earlier road looks.
 
+## Using the page
+- **Start the replay** (or **Skip intro**) flies to Summerland and opens a short guided tour. The replay does not play until you press Play.
+- Drag the playhead to move through time (this pauses playback). Click a line in **Key moments** to jump to that time.
+- **Tour** (top of the panel) shows the tour again; **Intro** goes back to the globe.
+- The briefing box can be dragged by its title bar and closed with the cross; the **Briefing** button brings it back.
+- During the replay the map is limited to about 100 km around Summerland (a flat map, not the globe).
+
 ## Known limits
 - FIRMS only sees fire when a satellite passes over, so the replay shows when detections appeared, not how the fire moved between passes. The data is near-real-time (NRT); standard-processing data was not yet available for these dates.
 - "Likely affected" roads are those within 100 m of a detection. This is a simple rule, not an official closure list.

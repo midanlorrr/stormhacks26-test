@@ -8,6 +8,10 @@ let areas = [];          // features of areas.geojson (1 km squares with estimat
 let timer = null;        // setInterval id while playing
 
 const SUMMERLAND = [-119.67, 49.6];     // lng, lat
+// The replay stays within about 100 km of Summerland (1 degree of latitude is 111 km; a degree of longitude is about 72 km here)
+const REPLAY_BOUNDS = [[-121.06, 48.7], [-118.28, 50.5]];
+const REPLAY_MIN_ZOOM = 7.5;
+let tourShown = false;           // the guided tour opens by itself the first time only
 const REPLAY_PADDING = { left: 440, top: 0, right: 0, bottom: 0 };   // keeps Summerland clear of the side panel (24 + 380 px + space)
 
 const map = new maplibregl.Map({
@@ -346,6 +350,7 @@ map.on("load", async () => {
 
   await loadBriefings();
   slider.max = steps.length - 1;
+  slider.addEventListener("pointerdown", stop);                    // grabbing the playhead pauses playback
   slider.addEventListener("input", () => show(Number(slider.value)));
   playBtn.addEventListener("click", togglePlay);
   show(0);
@@ -422,10 +427,38 @@ function startReplay(animate) {
 function arriveAtSummerland() {
   document.body.classList.replace("flying", "replay");
   summerlandMarker.remove();
+  map.setProjection({ type: "mercator" });                        // the map limit below does not work on the globe, and at zoom 10 the two look alike
+  map.setMinZoom(REPLAY_MIN_ZOOM);                                // keep the view within about 100 km of Summerland
+  map.setMaxBounds(REPLAY_BOUNDS);
   placeCallout();
-  show(0);
-  if (!timer && !reducedMotion.matches) togglePlay();             // auto-play (people who prefer less motion press Play themselves)
+  show(0);                                                        // the replay waits for the user to press Play
+  if (!tourShown) {
+    tourShown = true;
+    startTour();                                                  // guided tour (tour.js), with a Skip button
+  }
 }
+
+// Back to the intro globe
+function goToIntro() {
+  stop();
+  endTour();
+  document.body.classList.replace("replay", "landing");
+  document.getElementById("start").disabled = false;
+  setReplayVisible(false);
+  map.setMaxBounds(null);
+  map.setMinZoom(0);
+  map.setProjection({ type: "globe" });
+  summerlandMarker.addTo(map);
+  const globe = { center: [-125, 40], zoom: 1.8, pitch: 0, bearing: 0, padding: landingPadding() };
+  if (reducedMotion.matches) {
+    map.jumpTo(globe);
+  } else {
+    map.once("moveend", startSpin);
+    map.flyTo({ ...globe, duration: 3500 });
+  }
+}
+document.getElementById("intro-btn").addEventListener("click", goToIntro);
+document.getElementById("tour-btn").addEventListener("click", startTour);
 
 document.getElementById("start").addEventListener("click", () => startReplay(true));
 document.getElementById("skip").addEventListener("click", (e) => { e.preventDefault(); startReplay(false); });
@@ -437,21 +470,48 @@ document.getElementById("how-close").addEventListener("click", () => { how.hidde
 how.addEventListener("click", (e) => { if (e.target === how) how.hidden = true; });          // click outside the card
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") how.hidden = true; });
 
-// Update the map and side panel for one time step
-function show(i) {
-  const s = steps[i];
-  slider.value = i;
-  map.setFilter("fires", ["<=", ["get", "step"], i]);
-  map.setFilter("fires-glow", ["<=", ["get", "step"], i]);
-  const affected = ["<=", ["coalesce", ["get", "affected_step"], 999], i];   // roads likely affected by step i
-  map.setFilter("roads-affected", affected);
-  if (map.getLayer("roads-affected-glow")) map.setFilter("roads-affected-glow", affected);
-  map.setFilter("route", ["==", ["get", "step"], i]);
-  if (map.getLayer("route-casing")) map.setFilter("route-casing", ["==", ["get", "step"], i]);
+// Update the side panel and the map for one time step.
+// The panel text changes at once. The map is slower (each filter change makes MapLibre rebuild tiles in the background),
+// so while you drag the slider it only ever draws the latest step, one at a time. That keeps the drag smooth and stops a backlog.
+let wantedStep = 0;
+let drawnStep = -1;
+let mapBusy = false;
 
+function show(i) {
+  slider.value = i;
+  wantedStep = i;
+  showPanel(i);
+  if (!mapBusy) drawMap();
+}
+
+function drawMap() {
+  const i = wantedStep;
+  drawnStep = i;
+  mapBusy = true;
+  map.setFilter("fires", ["<=", ["get", "step"], i], { validate: false });
+  map.setFilter("fires-glow", ["<=", ["get", "step"], i], { validate: false });
+  const affected = ["<=", ["coalesce", ["get", "affected_step"], 999], i];   // roads likely affected by step i
+  map.setFilter("roads-affected", affected, { validate: false });
+  if (map.getLayer("roads-affected-glow")) map.setFilter("roads-affected-glow", affected, { validate: false });
+  map.setFilter("route", ["==", ["get", "step"], i], { validate: false });
+  if (map.getLayer("route-casing")) map.setFilter("route-casing", ["==", ["get", "step"], i], { validate: false });
+  let released = false;
+  const release = () => {                                  // the map has finished this step: draw the newest one if it changed
+    if (released) return;
+    released = true;
+    mapBusy = false;
+    if (wantedStep !== drawnStep) drawMap();
+  };
+  map.once("idle", release);
+  setTimeout(release, 600);                                // never wait longer than this
+}
+
+function showPanel(i) {
+  const s = steps[i];
   const when = new Date(s.time);                                        // the data covers everything detected up to this time
-  document.getElementById("clock").textContent = when.toLocaleTimeString("en-GB", { timeZone: "America/Vancouver", hour: "2-digit", minute: "2-digit", hour12: false });
-  document.getElementById("clock-date").textContent = when.toLocaleDateString("en-CA", { timeZone: "America/Vancouver", month: "short", day: "numeric", year: "numeric" });
+  const zone = { timeZone: "America/Vancouver" };
+  document.getElementById("clock").textContent = when.toLocaleTimeString("en-GB", { ...zone, hour: "2-digit", minute: "2-digit", hour12: false });
+  document.getElementById("clock-date").textContent = when.toLocaleDateString("en-CA", { ...zone, weekday: "short", month: "short", day: "numeric" });
   const fraction = Number(slider.max) > 0 ? i / Number(slider.max) : 0;   // orange slider fill ends at the middle of the thumb
   document.getElementById("slider-fill").style.width = "calc(7px + (100% - 14px) * " + fraction + ")";
   document.getElementById("s-fires").textContent = s.fires_so_far.toLocaleString("en-CA");
@@ -525,9 +585,8 @@ async function showBriefing(i) {
   }
   const note = document.createElement("p");
   note.className = "es-note";
-  note.textContent = "Written by " + data.model + " for " +
-    new Date(data.time).toLocaleString("en-CA", { timeZone: "America/Vancouver", weekday: "short", hour: "numeric", minute: "2-digit" }) +
-    " PDT. Not official guidance.";
+  const written = new Date(data.time).toLocaleString("en-CA", { timeZone: "America/Vancouver", weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+  note.textContent = (pick.step < i ? "Latest available briefing, written for " : "Written for ") + written + " PDT by " + data.model + ". Not official guidance.";
   box.append(summary, more, note);
 }
 
@@ -536,7 +595,7 @@ const callout = document.getElementById("callout");
 const calloutLine = document.getElementById("callout-line");
 
 function placeCallout() {
-  if (!document.body.classList.contains("replay")) return;
+  if (!document.body.classList.contains("replay") || callout.classList.contains("is-closed")) return;
   const point = map.project(SUMMERLAND);                                  // where Summerland is on screen right now
   const box = callout.getBoundingClientRect();
   const onScreen = point.x > 0 && point.y > 0 && point.x < innerWidth && point.y < innerHeight;
@@ -554,11 +613,40 @@ map.on("move", placeCallout);
 window.addEventListener("resize", placeCallout);
 new ResizeObserver(placeCallout).observe(callout);                         // the callout grows when "More" opens
 
-document.getElementById("callout-toggle").addEventListener("click", (e) => {
-  const collapsed = callout.classList.toggle("is-collapsed");
-  e.currentTarget.textContent = collapsed ? "\u25be" : "\u25b4";
-  e.currentTarget.setAttribute("aria-expanded", String(!collapsed));
+const calloutOpenButton = document.getElementById("callout-open");
+function openCallout() {
+  callout.classList.remove("is-closed");
+  calloutOpenButton.hidden = true;
   placeCallout();
+}
+function closeCallout() {
+  callout.classList.add("is-closed");
+  calloutOpenButton.hidden = false;
+  calloutLine.style.visibility = "hidden";
+}
+window.openCallout = openCallout;                                          // the tour opens it too
+document.getElementById("callout-close").addEventListener("click", closeCallout);
+calloutOpenButton.addEventListener("click", openCallout);
+
+// Drag the briefing by its title bar; the thin line follows
+const calloutHead = document.getElementById("callout-head");
+calloutHead.addEventListener("pointerdown", (e) => {
+  if (e.target.closest("select, button") || innerWidth <= 700) return;
+  const box = callout.getBoundingClientRect();
+  const offsetX = e.clientX - box.left, offsetY = e.clientY - box.top;
+  calloutHead.setPointerCapture(e.pointerId);
+  const move = (ev) => {
+    callout.style.left = Math.max(0, Math.min(innerWidth - box.width, ev.clientX - offsetX)) + "px";
+    callout.style.top = Math.max(0, Math.min(innerHeight - 48, ev.clientY - offsetY)) + "px";
+    callout.style.right = "auto";
+    placeCallout();
+  };
+  const up = () => {
+    calloutHead.removeEventListener("pointermove", move);
+    calloutHead.removeEventListener("pointerup", up);
+  };
+  calloutHead.addEventListener("pointermove", move);
+  calloutHead.addEventListener("pointerup", up);
 });
 
 // ----- Cross-check note under the headline numbers -----
@@ -568,8 +656,8 @@ async function showCrosscheck() {
     const res = await fetch("data/crosschecks.json");
     const data = res.ok ? await res.json() : null;
     if (!data || !data.official_boundary_residents) return;
-    note.textContent = "Range: roads within 50 m (low) or 100 m (high) of a detection. Closing only roads inside the official fire boundary " +
-      "leaves about " + data.official_boundary_residents.toLocaleString("en-CA") + " cut off at the end of the replay.";
+    note.textContent = "Range = 50 m rule to 100 m rule. Counting only roads inside the official fire boundary gives about " +
+      data.official_boundary_residents.toLocaleString("en-CA") + " at the end.";
     note.hidden = false;
   } catch (err) {
     // the note is optional
@@ -582,6 +670,37 @@ const KNOWN_MOMENTS = [
   { time: "2026-08-08T12:45:00-07:00", text: "BC Emergency Alert: evacuate immediately; Highway 97 closed", source: "Official" },
 ];
 
+// Day names under the slider, a small mark at each midnight, and a taller mark for every key moment
+function buildTimeline(moments) {
+  const last = steps.length - 1;
+  const first = new Date(steps[0].time).getTime(), span = new Date(steps[last].time).getTime() - first;
+  const left = (fraction) => "calc(7px + (100% - 14px) * " + fraction + ")";
+  const days = document.getElementById("slider-days"), ticks = document.getElementById("slider-ticks");
+  const hourOf = (step) => Number(new Date(step.time).toLocaleTimeString("en-GB", { timeZone: "America/Vancouver", hour: "2-digit", hour12: false }));
+  const starts = steps.map((step, k) => k).filter((k) => k === 0 || hourOf(steps[k]) === 0);      // the first step and every midnight
+  starts.forEach((k, n) => {
+    const end = n + 1 < starts.length ? starts[n + 1] : last;                                      // each day runs until the next midnight
+    const label = document.createElement("span");
+    label.className = "es-day" + (n === 0 ? " es-day--first" : "");
+    label.style.left = left(n === 0 ? 0 : (k + end) / 2 / last);                                  // the first (partial) day starts at the left edge; others are centred
+    label.textContent = new Date(steps[k].time).toLocaleDateString("en-CA", { timeZone: "America/Vancouver", month: "short", day: "numeric" });
+    days.appendChild(label);
+    if (k !== 0) {
+      const tick = document.createElement("span");
+      tick.className = "es-tick es-tick--day";
+      tick.style.left = left(k / last);
+      ticks.appendChild(tick);
+    }
+  });
+  for (const m of moments) {
+    const fraction = Math.max(0, Math.min(1, (new Date(m.time).getTime() - first) / span));
+    const tick = document.createElement("span");
+    tick.className = "es-tick es-tick--moment";
+    tick.style.left = left(fraction);
+    ticks.appendChild(tick);
+  }
+}
+
 function buildMoments(roadFeatures) {
   const moments = [{ time: steps[0].first_detection, text: "First satellite detection", source: "Satellite" }, ...KNOWN_MOMENTS];
   const hwyTimes = roadFeatures.filter((f) => (f.properties.ref === "BC 97" || f.properties.ref === "97") && f.properties.affected_time)
@@ -590,6 +709,7 @@ function buildMoments(roadFeatures) {
   if (areas.length) moments.push({ time: new Date(Math.min(...areas.map((a) => new Date(a.cut_time)))).toISOString(), text: "First area cut off from every exit (est.)", source: "Model" });
   moments.sort((a, b) => new Date(a.time) - new Date(b.time));
 
+  buildTimeline(moments);
   const list = document.getElementById("moments-list");
   for (const m of moments) {
     const found = steps.findIndex((s) => new Date(s.time) >= new Date(m.time));      // first step that includes this moment

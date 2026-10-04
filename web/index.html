@@ -69,32 +69,52 @@
 
   <!-- Replay panel: appears once the replay starts -->
   <aside id="panel" class="es-panel es-sidebar">
-    <div class="es-brand es-brand--small"><img src="img/evacusense-icon.svg" alt="" width="22" height="22"><span>EVACUSENSE</span></div>
+    <div class="es-panel-head">
+      <div class="es-brand es-brand--small"><img src="img/evacusense-icon.svg" alt="" width="22" height="22"><span>EVACUSENSE</span></div>
+      <span class="es-panel-actions">
+        <button id="tour-btn" class="es-link" type="button" title="Show the guided tour again">Tour</button>
+        <button id="intro-btn" class="es-link" type="button" title="Go back to the intro globe">Intro</button>
+      </span>
+    </div>
     <p id="basemap-note" class="es-note" hidden>Satellite imagery could not load, so the Streets map is showing. Press Satellite to try again.</p>
 
-    <div>
-      <div class="es-label">Replay time &middot; Pacific</div>
-      <div class="es-time-row"><span id="clock" class="es-readout">&ndash;</span><span id="clock-date" class="es-readout-date"></span></div>
+    <div id="tour-time">
+      <div class="es-label">Replay date and time &middot; Pacific</div>
+      <div id="clock-date" class="es-date">&ndash;</div>
+      <div class="es-time-row"><span id="clock" class="es-clock">&ndash;</span><span class="es-clock-note">2026 &middot; counts are up to this moment</span></div>
     </div>
 
-    <div class="es-controls">
+    <div id="tour-controls" class="es-controls">
       <button id="play" class="es-play" type="button" data-state="paused">Play</button>
-      <div class="es-slider-wrap">
-        <div id="slider-fill" class="es-slider-fill"></div>
-        <input id="slider" class="es-slider-native" type="range" min="0" max="0" value="0" step="1" aria-label="Time step">
+      <div class="es-slider-block">
+        <div class="es-slider-wrap">
+          <div id="slider-ticks" class="es-ticks"></div>
+          <div id="slider-fill" class="es-slider-fill"></div>
+          <input id="slider" class="es-slider-native" type="range" min="0" max="0" value="0" step="1" aria-label="Time step">
+        </div>
+        <div id="slider-days" class="es-days"></div>
       </div>
     </div>
 
-    <div class="es-stats">
-      <div class="es-stat"><span class="es-label">Detections</span><span id="s-fires" class="es-number">&ndash;</span></div>
-      <div class="es-stat"><span class="es-label" title="Road segments likely affected (estimated)">Roads</span><span class="es-number"><span id="s-roads" class="es-est">&ndash;</span></span><span class="es-est-tag">est.</span></div>
-      <div class="es-stat es-stat--range"><span class="es-label">Cut off</span><span class="es-number"><span id="s-res" class="es-est">&ndash;</span></span><span class="es-est-tag">est.</span></div>
+    <div id="tour-stats" class="es-stat-list">
+      <div class="es-stat-row">
+        <div><div class="es-stat-title">Fire detections</div><div class="es-stat-desc">Hot spots seen by satellites</div></div>
+        <span id="s-fires" class="es-number">&ndash;</span>
+      </div>
+      <div class="es-stat-row">
+        <div><div class="es-stat-title">Roads affected</div><div class="es-stat-desc">Segments within 100 m of a detection</div></div>
+        <span class="es-number"><span id="s-roads" class="es-est">&ndash;</span><span class="es-est-tag">est.</span></span>
+      </div>
+      <div class="es-stat-row">
+        <div><div class="es-stat-title">Residents cut off</div><div class="es-stat-desc">No drivable route to any exit</div></div>
+        <span class="es-number"><span id="s-res" class="es-est">&ndash;</span><span class="es-est-tag">est.</span></span>
+      </div>
     </div>
 
     <p id="crosscheck-note" class="es-note" hidden></p>
 
     <div class="es-scroll">
-      <section class="es-section">
+      <section id="tour-moments" class="es-section">
         <div class="es-section-head" data-toggle role="button" tabindex="0" aria-expanded="true">
           <span>Key moments</span><span class="es-section-meta"><span class="es-chev">&#9652;</span></span>
         </div>
@@ -149,12 +169,13 @@
 
   <!-- Briefing callout: pinned to Summerland on the map with a thin line -->
   <svg id="callout-line" aria-hidden="true"><line x1="0" y1="0" x2="0" y2="0"></line><circle r="4" cx="0" cy="0"></circle></svg>
+  <button id="callout-open" class="es-link callout-open" type="button" hidden>Briefing</button>
   <aside id="callout" class="es-panel" aria-label="Briefing">
-    <div class="callout-head">
+    <div id="callout-head" class="callout-head" title="Drag to move">
       <span class="es-label">Briefing &middot; AI-written, not official</span>
       <span class="es-section-meta">
         <select id="lang" class="es-select" aria-label="Briefing language" disabled></select>
-        <button id="callout-toggle" class="callout-toggle" type="button" aria-expanded="true" aria-label="Collapse the briefing">&#9652;</button>
+        <button id="callout-close" class="callout-toggle" type="button" aria-label="Close the briefing" title="Close">&times;</button>
       </span>
     </div>
     <div id="callout-body">
@@ -163,6 +184,7 @@
   </aside>
 
   <script src="vendor/maplibre-gl.js"></script>
+  <script src="tour.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

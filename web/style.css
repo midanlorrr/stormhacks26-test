@@ -207,3 +207,63 @@ body:not(.replay) #callout, body:not(.replay) #callout-line { opacity: 0; visibi
   #callout { left: 12px; right: 12px; top: 12px; width: auto; max-height: 40vh; }
   #callout-line { display: none; }
 }
+
+/* ----- Panel header: brand on the left, small buttons on the right ----- */
+.es-panel-head { display: flex; align-items: center; justify-content: space-between; }
+.es-panel-actions { display: flex; gap: 6px; }
+.es-link { padding: 3px 9px; font: 400 11px var(--es-mono); letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer;
+           color: var(--es-text-soft); background: transparent; border: 1px solid var(--es-line-strong); border-radius: var(--es-radius); }
+.es-link:hover { color: var(--es-text); border-color: var(--es-muted); background: rgba(236, 235, 232, 0.06); }
+.es-link:focus-visible { outline: 2px solid var(--es-fire); outline-offset: 2px; }
+
+/* ----- Date first, then time ----- */
+.es-date { font: 600 40px/1.1 var(--es-font); letter-spacing: -0.02em; margin-top: 4px; }
+.es-clock { font: 400 26px var(--es-mono); color: var(--es-text-soft); }
+.es-clock-note { font: 400 11px var(--es-mono); color: var(--es-muted); }
+.es-time-row { gap: 12px; margin-top: 4px; }
+
+/* ----- Slider with day names and marks ----- */
+.es-controls { align-items: flex-start; }
+.es-slider-block { flex: 1; margin-top: 12px; min-width: 0; }
+.es-ticks { position: absolute; left: 0; right: 0; top: 0; height: 14px; pointer-events: none; }
+.es-tick { position: absolute; width: 1px; background: var(--es-muted); }
+.es-tick--day { top: 3px; height: 8px; background: var(--es-line-strong); }
+.es-tick--moment { top: 0; height: 14px; width: 2px; margin-left: -1px; background: var(--es-text-soft); opacity: 0.8; }
+.es-days { position: relative; height: 14px; margin-top: 8px; }
+.es-day { position: absolute; top: 0; font: 400 10px var(--es-mono); letter-spacing: 0.04em; color: var(--es-muted); transform: translateX(-50%); white-space: nowrap; }
+.es-day--first { transform: translateX(-7px); }
+
+/* ----- The three counts, one per row, each with a plain-language explanation ----- */
+.es-stat-list { display: flex; flex-direction: column; border-top: 1px solid var(--es-line); }
+.es-stat-row { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 8px 0; border-bottom: 1px solid var(--es-line); }
+.es-stat-title { font: 600 13px var(--es-font); }
+.es-stat-desc { font-size: 11px; line-height: 1.35; color: var(--es-muted); margin-top: 2px; }
+.es-stat-row .es-number { font-size: 22px; white-space: nowrap; text-align: right; flex: none; }
+.es-stat-row .es-est-tag { margin-left: 4px; }
+
+/* ----- Briefing: draggable by its title bar, closable, with a button to open it again ----- */
+.callout-head { cursor: grab; touch-action: none; user-select: none; }
+.callout-head:active { cursor: grabbing; }
+#callout.is-closed { display: none; }
+.callout-open { position: fixed; right: 24px; top: 160px; z-index: 7; padding: 6px 12px; background: #0c0e12; }
+.callout-open[hidden] { display: none; }
+body:not(.replay) .callout-open { display: none; }
+.callout-toggle { font-size: 18px; line-height: 1; }
+
+/* ----- Guided tour ----- */
+#tour { position: fixed; inset: 0; z-index: 80; pointer-events: none; }      /* only the dark panels, outline and card catch clicks */
+.tour-dim, .tour-ring, .tour-card { pointer-events: auto; }
+.tour-dim { position: fixed; background: rgba(10, 11, 13, 0.78); }
+.tour-ring { position: fixed; border: 1px solid var(--es-text-soft); border-radius: var(--es-radius); }
+.tour-card { position: fixed; width: 320px; z-index: 81; padding: 18px 20px; background: #0c0e12; }
+.tour-count { font: 400 10px var(--es-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--es-muted); }
+.tour-title { font: 600 16px var(--es-font); margin: 6px 0; }
+.tour-text { margin: 0 0 14px; font-size: 13px; line-height: 1.55; color: var(--es-text-soft); }
+.tour-actions { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.tour-actions .es-btn { padding: 8px 14px; font-size: 13px; }
+.tour-actions [hidden] { display: none; }
+
+/* A little tighter, so the scrolling part of the panel keeps room for Key moments */
+#panel.es-sidebar { gap: 12px; }
+.es-date { font-size: 38px; }
+.es-stat-row { padding: 6px 0; }
