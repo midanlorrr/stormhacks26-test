@@ -161,3 +161,6 @@ body:not(.replay) #panel, body:not(.replay) .maplibregl-ctrl-top-right { opacity
   .pulse::before, .pulse::after, #loading img { animation: none; }
   #landing, #loading, #panel { transition: none; }
 }
+
+/* While the camera flies to Summerland the map ignores the mouse, so a stray drag cannot cut the flight short */
+body.flying #map { pointer-events: none; }

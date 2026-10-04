@@ -338,20 +338,68 @@ function setReplayVisible(visible) {
 }
 
 function setReady() {
+  if (!document.body.classList.contains("loading")) return;       // already ready
   document.body.classList.remove("loading");
   document.getElementById("start").disabled = false;
+  startSpin();
 }
 
-// Leave the landing page and show the replay. (Step 4 adds the fly-in; for now this jumps straight there.)
-function enterReplay() {
-  document.body.classList.replace("landing", "replay");
-  setReplayVisible(true);
+// ----- Spinning globe: turn it slowly with requestAnimationFrame until the user touches it or presses Start -----
+const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");   // people who ask their system for less motion
+const SPIN_DEGREES_PER_SECOND = 4;
+let spinning = false;
+let lastFrame = 0;
+
+function spinFrame(now) {
+  if (!spinning) return;
+  const seconds = Math.min((now - lastFrame) / 1000, 0.1);     // cap the step, so a slow frame never causes a jump
+  lastFrame = now;
+  const centre = map.getCenter();
+  const lng = ((centre.lng - SPIN_DEGREES_PER_SECOND * seconds + 540) % 360) - 180;   // minus = surface moves left to right
+  map.jumpTo({ center: [lng, centre.lat] });
+  requestAnimationFrame(spinFrame);
+}
+
+function startSpin() {
+  if (spinning || reducedMotion.matches || !document.body.classList.contains("landing")) return;
+  spinning = true;
+  lastFrame = performance.now();
+  requestAnimationFrame(spinFrame);
+}
+
+function stopSpin() {
+  spinning = false;
+}
+for (const type of ["mousedown", "touchstart", "wheel"]) map.on(type, stopSpin);   // the user took control
+
+// ----- Start / Skip -----
+// Start: fade out the landing overlay and fly to Summerland. Skip (or reduced motion): jump there.
+function startReplay(animate) {
+  stopSpin();
+  document.getElementById("start").disabled = true;               // no double clicks
+  document.body.classList.replace("landing", "flying");           // fades the landing overlay out; the map ignores the mouse while flying
+  setReplayVisible(true);                                         // switch the data layers on now: MapLibre only prepares visible layers,
+                                                                  // so they are ready when the camera arrives (they are tiny while far away)
+  const view = { center: SUMMERLAND, zoom: 10, pitch: 45, bearing: -20, padding: REPLAY_PADDING };
+  if (animate && !reducedMotion.matches) {
+    map.once("moveend", arriveAtSummerland);
+    map.flyTo({ ...view, duration: 7000 });
+  } else {
+    map.jumpTo(view);
+    arriveAtSummerland();
+  }
+}
+
+// The camera has arrived: show the panel and the fire and road layers, and start playing the replay
+function arriveAtSummerland() {
+  document.body.classList.replace("flying", "replay");
   summerlandMarker.remove();
-  map.jumpTo({ center: SUMMERLAND, zoom: 10, pitch: 45, bearing: -20, padding: REPLAY_PADDING });
+  show(0);
+  if (!timer && !reducedMotion.matches) togglePlay();             // auto-play (people who prefer less motion press Play themselves)
 }
 
-document.getElementById("start").addEventListener("click", enterReplay);
-document.getElementById("skip").addEventListener("click", (e) => { e.preventDefault(); enterReplay(); });
+document.getElementById("start").addEventListener("click", () => startReplay(true));
+document.getElementById("skip").addEventListener("click", (e) => { e.preventDefault(); startReplay(false); });
 
 // "How it works" panel
 const how = document.getElementById("how");
