@@ -3,13 +3,13 @@
 
 const TOUR_STEPS = [
   { target: "#tour-time", title: "Date and time",
-    text: "The fire is replayed from Aug 7 to Aug 10, 2026 in 3-hour steps. The big date and time show the moment you are looking at. All counts are up to that moment." },
+    text: "The replay moves through the fire in 3-hour steps. The big date and time show the moment you are looking at. All counts are up to that moment." },
   { target: "#tour-controls", title: "Playback",
     text: "Press play to watch it unfold, or drag the playhead. Dragging pauses playback. The marks on the line are key moments, and the day names sit underneath." },
   { target: "#tour-stats", title: "What is counted",
     text: "Fire detections are hot spots seen by satellites. Roads affected are road segments within 100 m of a detection, treated as closed. Residents cut off have no drivable route to any exit. \"est.\" means estimated." },
-  { target: "#tour-moments", title: "Key moments",
-    text: "Real events (satellite, news, officials) next to the model's own milestones. Click one to jump the replay to that time." },
+  { target: "#tour-data", title: "Data tabs", before: () => window.selectDataTab?.("moments"),
+    text: "Use the tabs on the side. Moments: real events and the model's milestones (click one to jump there). Areas: 1 km squares that were cut off. Drive: estimated minimum drive to an exit. About: how the figures are made." },
   { target: "#legend", title: "Map key",
     text: "Orange dots are fire detections, red lines are affected roads, and the pale blue line is the longest estimated drive out. Zoom in for road names and places." },
   { target: "#callout", title: "Briefing",
@@ -62,6 +62,7 @@ function showTourStep(i) {
   tourIndex = Math.max(0, Math.min(TOUR_STEPS.length - 1, i));
   const step = TOUR_STEPS[tourIndex];
   const last = tourIndex === TOUR_STEPS.length - 1;
+  step.before?.();                                                                // e.g. open the right tab
   if (step.target === "#callout") window.openCallout?.();                          // make sure the briefing is on screen
   tourEl.querySelector(".tour-count").textContent = "Step " + (tourIndex + 1) + " of " + TOUR_STEPS.length;
   tourEl.querySelector(".tour-title").textContent = step.title;

@@ -267,3 +267,29 @@ body:not(.replay) .callout-open { display: none; }
 #panel.es-sidebar { gap: 12px; }
 .es-date { font-size: 38px; }
 .es-stat-row { padding: 6px 0; }
+
+/* ----- Example label (landing and panel) ----- */
+.es-example { font: 400 12px var(--es-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--es-muted); margin: 0 0 24px; }
+.es-example--small { font-size: 10px; margin: -6px 0 0; letter-spacing: 0.1em; }
+#landing .es-lede { margin-bottom: 20px; }
+
+/* ----- Data section: tabs down the side, one pane at a time (no long scroll) ----- */
+.es-data { flex: 1; min-height: 0; display: flex; gap: 12px; border-top: 1px solid var(--es-line); padding-top: 10px; }
+.es-tabs { display: flex; flex-direction: column; gap: 2px; width: 82px; flex: none; }
+.es-tabs-title { font: 400 10px var(--es-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--es-muted); padding: 0 8px 6px; }
+.es-tab { text-align: left; padding: 7px 8px; background: none; border: 0; border-left: 2px solid transparent; border-radius: 0;
+          font: 400 11px var(--es-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--es-muted); cursor: pointer; }
+.es-tab:hover { color: var(--es-text); background: rgba(236, 235, 232, 0.04); }
+.es-tab[aria-selected="true"] { color: var(--es-text); border-left-color: var(--es-text); background: rgba(236, 235, 232, 0.07); }
+.es-tab:focus-visible { outline: 2px solid var(--es-fire); outline-offset: -2px; }
+.es-tab-count { margin-left: 4px; color: var(--es-text-soft); }
+.es-panes { flex: 1; min-width: 0; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--es-line-strong) transparent; }
+.es-pane[hidden] { display: none; }
+.es-pane-title { font: 600 14px var(--es-font); margin: 0 0 6px; }
+.es-pane-sub { margin: 0 0 6px; }
+/* the moments list is narrower now: put each time above its text */
+.es-moment { grid-template-columns: 1fr; gap: 1px; }
+
+.es-date-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-top: 4px; }
+.es-date-row .es-date { margin-top: 0; }
+.es-moment { padding: 5px 0; }

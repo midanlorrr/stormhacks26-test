@@ -1,6 +1,8 @@
-# Summerland wildfire evacuation replay
+# Evacusense
 
-A hackathon prototype that replays the Bald Range wildfire (BC Wildfire Service fire K51490, Aug 7–10, 2026) on a map. Real NASA FIRMS satellite fire detections are laid over the real OpenStreetMap road network. Roads near detections are marked as likely affected, and estimated drive times to exits are recomputed at each 3-hour step.
+A hackathon prototype for seeing what a wildfire does to roads and people. It replays real wildfires from open NASA satellite data (FIRMS) over the real OpenStreetMap road network, marks roads near detections as likely affected, and estimates how many residents were cut off from every exit and how long the drive to an exit takes, step by step (every 3 hours).
+
+**First example:** the Bald Range wildfire (BC Wildfire Service fire K51490, Aug 7–10, 2026) near Summerland, BC. The example's name, place, dates and map area are described in one place (`EXAMPLE` near the top of `web/app.js`). Adding another nearby area still means running the data scripts for a new bounding box (`data_prep/config.py`) and giving the page an example picker; neither exists yet.
 
 > **Disclaimer:** this is an illustrative planning tool built from public data. It is **not official guidance**. For real evacuation decisions follow the BC Wildfire Service, EmergencyInfoBC and your local evacuation orders.
 
@@ -96,4 +98,5 @@ NASA FIRMS (VIIRS and MODIS active fire), WorldPop (population, CC BY 4.0: Bonda
 - The free Gemini tier allows about 20 calls per day per model; keep test runs to one call until things are confirmed.
 - ElevenLabs spoken briefings: tabled for now.
 - Highway 97: confirm when the official closure began and whether evacuees could use it (see `06_sensitivity_hwy97.py`).
+- More examples: parameterize `data_prep/config.py` and the `web/data` paths per area, and add an example picker to the landing page.
 - Layer 2 fire-spread hindcast: design only, see `docs/superpowers/specs/`.

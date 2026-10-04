@@ -7,9 +7,19 @@ let briefings = [];      // list from briefings/index.json (made by data_prep/07
 let areas = [];          // features of areas.geojson (1 km squares with estimated residents)
 let timer = null;        // setInterval id while playing
 
-const SUMMERLAND = [-119.67, 49.6];     // lng, lat
+// The example shown now. Its name, place, dates and map area live here so another nearby area can be described the same way later.
+const EXAMPLE = {
+  number: 1,
+  name: "Bald Range fire",
+  place: "Summerland, BC",
+  markerLabel: "SUMMERLAND, BC",
+  dates: "Aug 7\u201310, 2026",
+  center: [-119.67, 49.6],                                        // lng, lat
+  bounds: [[-121.06, 48.7], [-118.28, 50.5]],                     // the replay map stays within about 100 km of the centre
+};
+const SUMMERLAND = EXAMPLE.center;
 // The replay stays within about 100 km of Summerland (1 degree of latitude is 111 km; a degree of longitude is about 72 km here)
-const REPLAY_BOUNDS = [[-121.06, 48.7], [-118.28, 50.5]];
+const REPLAY_BOUNDS = EXAMPLE.bounds;
 const REPLAY_MIN_ZOOM = 7.5;
 let tourShown = false;           // the guided tour opens by itself the first time only
 const REPLAY_PADDING = { left: 440, top: 0, right: 0, bottom: 0 };   // keeps Summerland clear of the side panel (24 + 380 px + space)
@@ -70,8 +80,35 @@ map.on("style.load", () => {
 });
 const markerElement = document.createElement("div");           // fire dot with soft halos, and its label (styled in style.css)
 markerElement.className = "es-marker";
-markerElement.innerHTML = '<span class="es-marker-core"></span><span class="es-marker-label">SUMMERLAND, BC</span>';
+markerElement.innerHTML = '<span class="es-marker-core"></span><span class="es-marker-label"></span>';
+markerElement.querySelector(".es-marker-label").textContent = EXAMPLE.markerLabel;
 const summerlandMarker = new maplibregl.Marker({ element: markerElement }).setLngLat(SUMMERLAND).addTo(map);
+
+// Say which example is showing
+document.getElementById("example-landing").textContent = "Example " + EXAMPLE.number + " \u00b7 " + EXAMPLE.name + " \u00b7 " + EXAMPLE.place + " \u00b7 " + EXAMPLE.dates;
+document.getElementById("example-panel").textContent = "Example " + EXAMPLE.number + " \u00b7 " + EXAMPLE.name + " \u00b7 " + EXAMPLE.place;
+
+// ----- Data tabs in the panel (Moments, Areas, Drive, About) -----
+function selectDataTab(name) {
+  for (const tab of document.querySelectorAll(".es-tab")) {
+    const on = tab.dataset.tab === name;
+    tab.setAttribute("aria-selected", String(on));
+    tab.tabIndex = on ? 0 : -1;
+    document.getElementById("pane-" + tab.dataset.tab).hidden = !on;
+  }
+}
+window.selectDataTab = selectDataTab;                                       // the tour opens the right tab
+for (const tab of document.querySelectorAll(".es-tab")) {
+  tab.addEventListener("click", () => selectDataTab(tab.dataset.tab));
+  tab.addEventListener("keydown", (e) => {                                  // up / down arrows move between tabs
+    if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+    e.preventDefault();
+    const tabs = [...document.querySelectorAll(".es-tab")];
+    const next = tabs[(tabs.indexOf(tab) + (e.key === "ArrowDown" ? 1 : tabs.length - 1)) % tabs.length];
+    selectDataTab(next.dataset.tab);
+    next.focus();
+  });
+}
 
 // ----- Basemap toggle: Satellite / Streets (top-right, under the zoom buttons) -----
 let satelliteErrors = 0;
@@ -666,8 +703,8 @@ async function showCrosscheck() {
 
 // ----- Key moments: real events next to the model's own milestones. Click one to jump the replay there. -----
 const KNOWN_MOMENTS = [
-  { time: "2026-08-08T00:00:00-07:00", text: "District of Summerland ordered to evacuate (just after midnight)", source: "News" },     // CBC, Aug 8
-  { time: "2026-08-08T12:45:00-07:00", text: "BC Emergency Alert: evacuate immediately; Highway 97 closed", source: "Official" },
+  { time: "2026-08-08T00:00:00-07:00", text: "Whole district ordered out (just after midnight)", source: "News" },     // CBC, Aug 8
+  { time: "2026-08-08T12:45:00-07:00", text: "Emergency alert: Highway 97 closed", source: "Official" },
 ];
 
 // Day names under the slider, a small mark at each midnight, and a taller mark for every key moment
@@ -705,8 +742,8 @@ function buildMoments(roadFeatures) {
   const moments = [{ time: steps[0].first_detection, text: "First satellite detection", source: "Satellite" }, ...KNOWN_MOMENTS];
   const hwyTimes = roadFeatures.filter((f) => (f.properties.ref === "BC 97" || f.properties.ref === "97") && f.properties.affected_time)
                                .map((f) => new Date(f.properties.affected_time));
-  if (hwyTimes.length) moments.push({ time: new Date(Math.min(...hwyTimes)).toISOString(), text: "First Highway 97 stretch near town marked affected", source: "Model" });
-  if (areas.length) moments.push({ time: new Date(Math.min(...areas.map((a) => new Date(a.cut_time)))).toISOString(), text: "First area cut off from every exit (est.)", source: "Model" });
+  if (hwyTimes.length) moments.push({ time: new Date(Math.min(...hwyTimes)).toISOString(), text: "Highway 97 first marked affected", source: "Model" });
+  if (areas.length) moments.push({ time: new Date(Math.min(...areas.map((a) => new Date(a.cut_time)))).toISOString(), text: "First area cut off (est.)", source: "Model" });
   moments.sort((a, b) => new Date(a.time) - new Date(b.time));
 
   buildTimeline(moments);
@@ -740,7 +777,7 @@ function showAreas(i) {
   list.replaceChildren();
   const cutNow = areas.filter((a) => a.cut_step <= i);
   document.getElementById("areas-count").textContent = cutNow.length;
-  const top = cutNow.sort((a, b) => b.residents - a.residents).slice(0, 3);     // the three largest; the rest are counted in the heading
+  const top = cutNow.sort((a, b) => b.residents - a.residents).slice(0, 6);     // the six largest; the rest are counted in the tab
   if (top.length === 0) {
     const none = document.createElement("p");
     none.className = "es-note";

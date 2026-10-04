@@ -5,6 +5,7 @@ Everything below applies to this project as of Oct 4, 2026. Read this before quo
 ## What this is
 - An **illustrative planning tool** built from public data. It is **not official guidance** and was not made or reviewed by the BC Wildfire Service, EmergencyInfoBC or any evacuation authority. For real decisions follow them and local evacuation orders.
 - It is a **replay of real satellite detections**, not a fire-spread simulation or forecast. The Layer 2 simulation is a design document only.
+- Evacusense is meant to show different wildfires, but today it has **one example**: the Bald Range fire near Summerland, BC (Aug 2026). Every figure and caveat below is about that example.
 
 ## Fire data (NASA FIRMS)
 - Satellites only see fire when they pass overhead, hours apart. The replay shows **when detections appeared**, not how the fire moved between passes. True road or area effects may have happened earlier than shown.

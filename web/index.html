@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Evacusense: Summerland wildfire replay</title>
+  <title>Evacusense: wildfire effects replay</title>
   <link rel="icon" type="image/svg+xml" href="img/evacusense-icon.svg">
   <meta name="theme-color" content="#0a0b0d">
   <link rel="stylesheet" href="vendor/maplibre-gl.css">
@@ -23,9 +23,10 @@
   <section id="landing">
     <div class="es-brand"><img src="img/evacusense-icon.svg" alt="" width="40" height="40"><span>EVACUSENSE</span></div>
     <div class="es-copy">
-      <p class="es-eyebrow">Bald Range fire &middot; Summerland, BC &middot; August 2026</p>
-      <h1 class="es-title">See how the Bald Range fire unfolded.</h1>
-      <p class="es-lede">A replay of the August 2026 fire near Summerland, built from open NASA satellite data.</p>
+      <p class="es-eyebrow">Wildfire effects &middot; open satellite data</p>
+      <h1 class="es-title">See how a wildfire cuts off roads and communities.</h1>
+      <p class="es-lede">Evacusense replays real wildfires from open NASA satellite data and estimates which roads, and how many residents, were cut off.</p>
+      <p id="example-landing" class="es-example"></p>
       <div class="es-actions">
         <button id="start" class="es-btn" type="button" disabled>Start the replay</button>
         <button id="how-btn" class="es-btn es-btn--secondary" type="button">How it works</button>
@@ -41,7 +42,8 @@
     <div class="how-card es-panel" role="dialog" aria-modal="true" aria-labelledby="how-title">
       <h2 id="how-title">How it works</h2>
       <p class="es-body">Evacusense lays real satellite fire detections over the real road network, step by step (every 3 hours), and
-        estimates which roads and how many residents were likely cut off from every exit.</p>
+        estimates which roads and how many residents were likely cut off from every exit. The first example is the Bald Range fire near
+        Summerland, BC (August 2026). More areas can be added.</p>
       <h3 class="es-label">Data</h3>
       <ul class="es-body">
         <li>Fire detections: NASA FIRMS (VIIRS and MODIS satellites)</li>
@@ -57,8 +59,8 @@
       <ul class="es-body">
         <li>Satellites only see fire when they pass overhead, hours apart.</li>
         <li>&ldquo;Likely affected&rdquo; means within 100 m of a detection. It is not an official closure list.</li>
-        <li>Drive times are estimated minimums (free-flow, no congestion) from sample points.</li>
-        <li>The official Highway 97 closure was longer than what the map marks. No detections were found near Peachland.</li>
+        <li>Drive times are estimated minimums (free-flow, no congestion) from sample points in the example area.</li>
+        <li>In the Summerland example, the official Highway 97 closure was longer than what the map marks, and no detections were found near Peachland.</li>
         <li>The AI briefings have not been reviewed by native speakers.</li>
       </ul>
       <p class="es-disclaimer"><strong>Not official guidance.</strong> This is an illustrative planning tool built from public data.
@@ -76,12 +78,12 @@
         <button id="intro-btn" class="es-link" type="button" title="Go back to the intro globe">Intro</button>
       </span>
     </div>
+    <p id="example-panel" class="es-example es-example--small"></p>
     <p id="basemap-note" class="es-note" hidden>Satellite imagery could not load, so the Streets map is showing. Press Satellite to try again.</p>
 
     <div id="tour-time">
-      <div class="es-label">Replay date and time &middot; Pacific</div>
-      <div id="clock-date" class="es-date">&ndash;</div>
-      <div class="es-time-row"><span id="clock" class="es-clock">&ndash;</span><span class="es-clock-note">2026 &middot; counts are up to this moment</span></div>
+      <div class="es-label">Replay date and time &middot; Pacific &middot; 2026</div>
+      <div class="es-date-row"><span id="clock-date" class="es-date">&ndash;</span><span id="clock" class="es-clock">&ndash;</span></div>
     </div>
 
     <div id="tour-controls" class="es-controls">
@@ -113,46 +115,41 @@
 
     <p id="crosscheck-note" class="es-note" hidden></p>
 
-    <div class="es-scroll">
-      <section id="tour-moments" class="es-section">
-        <div class="es-section-head" data-toggle role="button" tabindex="0" aria-expanded="true">
-          <span>Key moments</span><span class="es-section-meta"><span class="es-chev">&#9652;</span></span>
-        </div>
-        <div class="es-section-body">
+    <section id="tour-data" class="es-data" aria-label="Data">
+      <div class="es-tabs" role="tablist" aria-orientation="vertical" aria-label="Data">
+        <span class="es-tabs-title">Data</span>
+        <button class="es-tab" role="tab" id="tab-moments" data-tab="moments" aria-selected="true" aria-controls="pane-moments" type="button">Moments</button>
+        <button class="es-tab" role="tab" id="tab-areas" data-tab="areas" aria-selected="false" aria-controls="pane-areas" tabindex="-1" type="button">Areas <span id="areas-count" class="es-tab-count">0</span></button>
+        <button class="es-tab" role="tab" id="tab-drive" data-tab="drive" aria-selected="false" aria-controls="pane-drive" tabindex="-1" type="button">Drive</button>
+        <button class="es-tab" role="tab" id="tab-about" data-tab="about" aria-selected="false" aria-controls="pane-about" tabindex="-1" type="button">About</button>
+      </div>
+      <div class="es-panes">
+        <div id="pane-moments" class="es-pane" role="tabpanel" aria-labelledby="tab-moments">
+          <h3 class="es-pane-title">Key moments</h3>
           <div id="moments-list"></div>
-          <p class="es-note">Click a moment to jump the replay there.</p>
         </div>
-      </section>
-
-      <section class="es-section">
-        <div class="es-section-head" data-toggle role="button" tabindex="0" aria-expanded="true">
-          <span>Areas cut off</span><span class="es-section-meta"><span id="areas-count">0</span><span class="es-chev">&#9652;</span></span>
-        </div>
-        <div class="es-section-body">
+        <div id="pane-areas" class="es-pane" role="tabpanel" aria-labelledby="tab-areas" hidden>
+          <h3 class="es-pane-title">Areas cut off</h3>
+          <p class="es-note es-pane-sub">1 km squares where most residents have lost every route to an exit. Time is counted from the first satellite detection.</p>
           <div id="areas-list"></div>
         </div>
-      </section>
-
-      <section class="es-section">
-        <div class="es-label es-block-label">Minimum drive to an exit</div>
-        <div class="es-row"><span>Longest</span><span><span id="s-longest" class="es-est">&ndash;</span><span class="es-est-tag">est.</span></span></div>
-        <div class="es-row"><span>Average</span><span><span id="s-mean" class="es-est">&ndash;</span><span class="es-est-tag">est.</span></span></div>
-      </section>
-
-      <section class="es-section is-closed">
-        <div class="es-section-head" data-toggle role="button" tabindex="0" aria-expanded="false">
-          <span>About these figures</span><span class="es-section-meta"><span class="es-chev">&#9662;</span></span>
+        <div id="pane-drive" class="es-pane" role="tabpanel" aria-labelledby="tab-drive" hidden>
+          <h3 class="es-pane-title">Minimum drive to an exit</h3>
+          <div class="es-row"><span>Longest</span><span><span id="s-longest" class="es-est">&ndash;</span><span class="es-est-tag">est.</span></span></div>
+          <div class="es-row"><span>Average</span><span><span id="s-mean" class="es-est">&ndash;</span><span class="es-est-tag">est.</span></span></div>
+          <p class="es-note">Free-flow, no congestion, from 74 sample points in the example area.</p>
         </div>
-        <div class="es-section-body">
+        <div id="pane-about" class="es-pane" role="tabpanel" aria-labelledby="tab-about" hidden>
+          <h3 class="es-pane-title">About these figures</h3>
           <p class="es-note">Residents come from WorldPop 100 m gridded population (2025 estimate, approximate), with each cell&rsquo;s people
             assigned to the nearest road node; &ldquo;cut off&rdquo; means no drivable route to an exit once likely-affected roads are removed.
-            Drive times are estimated minimum times (free-flow, no congestion) using OSM speed limits where tagged (about 15% of roads) and
-            default speeds otherwise (from 74 sample points in Summerland). Areas are 1 km squares: &ldquo;cut off +9.4 h&rdquo; means that many hours after the first
-            satellite detection, most of the area&rsquo;s residents had lost every route to an exit. Satellites only see fire when they pass over,
-            and no detections were found near Peachland.</p>
+            Drive times are estimated minimums (free-flow, no congestion) using OSM speed limits where tagged (about 15% of roads) and default
+            speeds otherwise. &ldquo;Cut off +9.4 h&rdquo; means that many hours after the first satellite detection, most of an area&rsquo;s
+            residents had lost every route to an exit. Satellites only see fire when they pass over. In the Summerland example, no detections
+            were found near Peachland.</p>
         </div>
-      </section>
-    </div>
+      </div>
+    </section>
 
     <p class="es-disclaimer">Figures are estimates from public data, not an official evacuation order or guidance.
       Follow BC Wildfire Service, EmergencyInfoBC and local authorities.</p>
