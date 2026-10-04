@@ -5,129 +5,146 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Evacusense: Summerland wildfire replay</title>
   <link rel="icon" type="image/svg+xml" href="img/evacusense-icon.svg">
-  <meta name="theme-color" content="#0b0f14">
+  <meta name="theme-color" content="#0a0b0d">
   <link rel="stylesheet" href="vendor/maplibre-gl.css">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="evacusense-theme.css">   <!-- design handoff (tokens + components) -->
+  <link rel="stylesheet" href="style.css">              <!-- app layout and behaviour on top of it -->
 </head>
 <body class="loading landing">
-  <div id="map"></div>
+  <div id="map" class="es-map"></div>
 
   <!-- Loading screen: shown until the map and the data are ready -->
   <div id="loading" role="status">
-    <img src="img/evacusense-icon.svg" alt="" width="64" height="64">
+    <img src="img/evacusense-icon.svg" alt="" width="48" height="48">
     <p id="loading-text">Loading map and data&hellip;</p>
   </div>
 
-  <!-- Landing: shown until you press Start or Skip intro -->
+  <!-- Landing: shown until you press Start or Skip intro. The globe is the map itself, on the right. -->
   <section id="landing">
-    <div class="landing-inner">
-      <div class="landing-brand"><img src="img/evacusense-icon.svg" alt="" width="52" height="52"><span>Evacusense</span></div>
-      <h1 class="landing-title">Summerland wildfire replay</h1>
-      <p class="landing-lead">Replay how the Bald Range wildfire (Aug 7&ndash;10, 2026) closed in on Summerland, BC: real NASA satellite
-        fire detections over real roads, with estimates of who could be cut off.</p>
-      <div class="landing-actions">
-        <button id="start" type="button" disabled>Watch the Summerland replay</button>
-        <button id="how-btn" type="button">How it works</button>
+    <div class="es-brand"><img src="img/evacusense-icon.svg" alt="" width="40" height="40"><span>EVACUSENSE</span></div>
+    <div class="es-copy">
+      <p class="es-eyebrow">Bald Range fire &middot; Summerland, BC &middot; August 2026</p>
+      <h1 class="es-title">See how the Bald Range fire unfolded.</h1>
+      <p class="es-lede">A replay of the August 2026 fire near Summerland, built from open NASA satellite data.</p>
+      <div class="es-actions">
+        <button id="start" class="es-btn" type="button" disabled>Start the replay</button>
+        <button id="how-btn" class="es-btn es-btn--secondary" type="button">How it works</button>
       </div>
-      <a href="#" id="skip">Skip intro</a>
+      <a href="#" id="skip" class="es-skip">Skip intro</a>
     </div>
-    <p id="credits">Data and imagery: NASA FIRMS fire detections &middot; Copernicus Sentinel-2 imagery by EOX &middot;
+    <p id="credits" class="es-credits">Data and imagery: NASA FIRMS fire detections &middot; Copernicus Sentinel-2 imagery by EOX &middot;
       &copy; OpenStreetMap contributors &middot; WorldPop (University of Southampton)</p>
   </section>
 
   <!-- How it works: opened from the landing page -->
   <div id="how" hidden>
-    <div class="how-card" role="dialog" aria-modal="true" aria-labelledby="how-title">
+    <div class="how-card es-panel" role="dialog" aria-modal="true" aria-labelledby="how-title">
       <h2 id="how-title">How it works</h2>
-      <p>Evacusense lays real satellite fire detections over the real road network, step by step (every 3 hours), and
+      <p class="es-body">Evacusense lays real satellite fire detections over the real road network, step by step (every 3 hours), and
         estimates which roads and how many residents were likely cut off from every exit.</p>
-      <h3>Data</h3>
-      <ul>
+      <h3 class="es-label">Data</h3>
+      <ul class="es-body">
         <li>Fire detections: NASA FIRMS (VIIRS and MODIS satellites)</li>
         <li>Satellite imagery: Copernicus Sentinel-2 cloudless, from EOX (2025 version, so it shows the land before the fire)</li>
         <li>Roads and places: OpenStreetMap</li>
         <li>Population: WorldPop 100 m grid (2025 estimate, modelled, not a census)</li>
         <li>Briefings: written by an AI model from the numbers above</li>
       </ul>
-      <h3>How well it matches</h3>
-      <p>Checked against the official BC Wildfire Service fire perimeter: <strong>97%</strong> of detections fall inside it, and
+      <h3 class="es-label">How well it matches</h3>
+      <p class="es-body">Checked against the official BC Wildfire Service fire perimeter: <strong>97%</strong> of detections fall inside it, and
         <strong>87%</strong> of its area has a detection within 1 km. Road closures and drive times are <em>not</em> validated.</p>
-      <h3>Limits</h3>
-      <ul>
+      <h3 class="es-label">Limits</h3>
+      <ul class="es-body">
         <li>Satellites only see fire when they pass overhead, hours apart.</li>
         <li>&ldquo;Likely affected&rdquo; means within 100 m of a detection. It is not an official closure list.</li>
         <li>Drive times are estimated minimums (free-flow, no congestion) from sample points.</li>
         <li>The official Highway 97 closure was longer than what the map marks. No detections were found near Peachland.</li>
         <li>The AI briefings have not been reviewed by native speakers.</li>
       </ul>
-      <p class="disclaimer"><strong>Not official guidance.</strong> This is an illustrative planning tool built from public data.
+      <p class="es-disclaimer"><strong>Not official guidance.</strong> This is an illustrative planning tool built from public data.
         For real evacuations follow BC Wildfire Service, EmergencyInfoBC and local evacuation orders.</p>
-      <button id="how-close" type="button">Close</button>
+      <button id="how-close" class="es-btn es-btn--secondary" type="button">Close</button>
     </div>
   </div>
 
-  <aside id="panel">
-    <header class="brand">
-      <img src="img/evacusense-icon.svg" alt="" width="32" height="32">
-      <div>
-        <h1>Evacusense</h1>
-        <p class="tagline">Summerland wildfire replay</p>
-      </div>
-    </header>
-    <p class="sub">Satellite fire detections, Aug 7&ndash;10, 2026 (Pacific time)</p>
-    <p id="basemap-note" class="small" hidden>Satellite imagery could not load, so the Streets map is showing. Press Satellite to try again.</p>
+  <!-- Replay panel: appears once the replay starts -->
+  <aside id="panel" class="es-panel es-sidebar">
+    <div class="es-brand es-brand--small"><img src="img/evacusense-icon.svg" alt="" width="22" height="22"><span>EVACUSENSE</span></div>
+    <p id="basemap-note" class="es-note" hidden>Satellite imagery could not load, so the Streets map is showing. Press Satellite to try again.</p>
 
-    <div id="clock">&ndash;</div>
-    <div class="controls">
-      <button id="play" type="button">Play</button>
-      <input id="slider" type="range" min="0" max="0" value="0" step="1" aria-label="Time step">
+    <div>
+      <div class="es-label">Replay time &middot; Pacific</div>
+      <div class="es-time-row"><span id="clock" class="es-readout">&ndash;</span><span id="clock-date" class="es-readout-date"></span></div>
     </div>
 
-    <table>
-      <tr><td>Fire detections so far</td><td id="s-fires">&ndash;</td></tr>
-      <tr><td>Road segments likely affected</td><td id="s-roads">&ndash;</td></tr>
-      <tr><td>Residents cut off from all exits <span class="est">estimated</span></td><td id="s-res">&ndash;</td></tr>
-      <tr><td>Longest estimated minimum drive time to an exit <span class="est">estimated</span></td><td id="s-longest">&ndash;</td></tr>
-      <tr><td>Average estimated minimum drive time to an exit <span class="est">estimated</span></td><td id="s-mean">&ndash;</td></tr>
-    </table>
+    <div class="es-controls">
+      <button id="play" class="es-play" type="button" data-state="paused">Play</button>
+      <div class="es-slider-wrap">
+        <div id="slider-fill" class="es-slider-fill"></div>
+        <input id="slider" class="es-slider-native" type="range" min="0" max="0" value="0" step="1" aria-label="Time step">
+      </div>
+    </div>
 
-    <h2>Areas cut off so far <span class="est">estimated</span></h2>
-    <ol id="areas-list"></ol>
-    <p class="small">Time = from the first satellite detection to when most residents of a 1 km square lost every route to an exit.
-      &ldquo;Drive&rdquo; = estimated minimum drive time to an exit before the fire.</p>
+    <div class="es-stats">
+      <div class="es-stat"><span class="es-label">Detections</span><span id="s-fires" class="es-number">&ndash;</span></div>
+      <div class="es-stat"><span class="es-label">Road segments</span><span class="es-number"><span id="s-roads" class="es-est">&ndash;</span></span><span class="es-est-tag">est.</span></div>
+      <div class="es-stat"><span class="es-label">Cut off</span><span class="es-number"><span id="s-res" class="es-est">&ndash;</span></span><span class="es-est-tag">est.</span></div>
+    </div>
 
-    <h2>Briefing <span class="est">AI-written, illustrative</span></h2>
-    <select id="lang" aria-label="Briefing language" disabled></select>
-    <div id="briefing"><p class="small">No briefings found. Run data_prep/07_briefings.py (see README).</p></div>
+    <div class="es-scroll">
+      <section class="es-section">
+        <div class="es-label es-block-label">Minimum drive to an exit</div>
+        <div class="es-row"><span>Longest</span><span><span id="s-longest" class="es-est">&ndash;</span><span class="es-est-tag">est.</span></span></div>
+        <div class="es-row"><span>Average</span><span><span id="s-mean" class="es-est">&ndash;</span><span class="es-est-tag">est.</span></span></div>
+      </section>
 
-    <ul class="legend">
-      <li><span class="dot fire"></span> Fire detection (NASA FIRMS)</li>
-      <li><span class="line cut"></span> Road within 100 m of a detection (likely affected, treated as impassable)</li>
-      <li><span class="line route"></span> Route for the longest drive (estimated)</li>
-      <li><span class="dot exit"></span> Exit &nbsp; <span class="dot origin"></span> Sample origin</li>
-      <li class="places">Places (zoom in):
-        <span class="dot" style="background:#ff7eb6"></span>hospital
-        <span class="dot" style="background:#ffd166"></span>fire
-        <span class="dot" style="background:#6ea8ff"></span>police
-        <span class="dot" style="background:#b69cff"></span>school
-        <span class="dot" style="background:#3ec9b6"></span>community
-        <span class="dot" style="background:#89c26a"></span>park
-        <span class="dot" style="background:#f2d28b"></span>beach</li>
-    </ul>
+      <section class="es-section">
+        <div class="es-section-head" data-toggle role="button" tabindex="0" aria-expanded="true">
+          <span>Areas cut off</span><span class="es-section-meta"><span id="areas-count">0</span><span class="es-chev">&#9652;</span></span>
+        </div>
+        <div class="es-section-body">
+          <div id="areas-list"></div>
+        </div>
+      </section>
 
-    <p class="note">
-      Residents come from WorldPop 100 m gridded population (2025 estimate, approximate), with each cell&rsquo;s people
-      assigned to the nearest road node; &ldquo;cut off&rdquo; means no drivable route to an exit once likely-affected
-      roads are removed. Drive times are estimated minimum times (free-flow, no congestion) from 74 sample points in
-      Summerland, using OSM speed limits where tagged (about 15% of roads) and default speeds otherwise.
-      Satellites only see fire when they pass over, and no detections were found near Peachland.
-    </p>
+      <section class="es-section">
+        <div class="es-section-head" data-toggle role="button" tabindex="0" aria-expanded="true">
+          <span>Briefing</span>
+          <span class="es-section-meta"><select id="lang" class="es-select" aria-label="Briefing language" disabled></select><span class="es-chev">&#9652;</span></span>
+        </div>
+        <div class="es-section-body">
+          <p class="es-note">AI-written from the figures above. Illustrative.</p>
+          <div id="briefing" class="es-body"><p class="es-note">No briefings found. Run data_prep/07_briefings.py (see README).</p></div>
+        </div>
+      </section>
 
-    <p class="disclaimer">
-      <strong>Not official guidance.</strong> This is an illustrative planning tool built from public data.
-      For real evacuations follow BC Wildfire Service and EmergencyInfoBC.
-    </p>
+      <section class="es-section is-closed">
+        <div class="es-section-head" data-toggle role="button" tabindex="0" aria-expanded="false">
+          <span>About these figures</span><span class="es-section-meta"><span class="es-chev">&#9662;</span></span>
+        </div>
+        <div class="es-section-body">
+          <p class="es-note">Residents come from WorldPop 100 m gridded population (2025 estimate, approximate), with each cell&rsquo;s people
+            assigned to the nearest road node; &ldquo;cut off&rdquo; means no drivable route to an exit once likely-affected roads are removed.
+            Drive times are estimated minimum times (free-flow, no congestion) using OSM speed limits where tagged (about 15% of roads) and
+            default speeds otherwise (from 74 sample points in Summerland). Areas are 1 km squares: &ldquo;cut off +9.4 h&rdquo; means that many hours after the first
+            satellite detection, most of the area&rsquo;s residents had lost every route to an exit. Satellites only see fire when they pass over,
+            and no detections were found near Peachland.</p>
+        </div>
+      </section>
+    </div>
+
+    <p class="es-disclaimer">Figures are estimates from public data, not an official evacuation order or guidance.
+      Follow BC Wildfire Service, EmergencyInfoBC and local authorities.</p>
   </aside>
+
+  <!-- Map legend, bottom-right -->
+  <div id="legend" class="es-legend">
+    <div><span class="es-swatch es-swatch--fire"></span>Fire detection</div>
+    <div><span class="es-swatch es-swatch--road"></span>Affected road</div>
+    <div><span class="es-swatch es-swatch--exit"></span>Exit route</div>
+    <div><span class="es-swatch es-swatch--point"></span>Exit and sample points</div>
+    <div class="es-legend-note">Places appear when zoomed in</div>
+  </div>
 
   <script src="vendor/maplibre-gl.js"></script>
   <script src="app.js"></script>

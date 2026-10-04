@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,wght@0,400;0,500;1,400&family=Hanken+Grotesk:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#07080a}a{color:#ff6a2b}a:hover{color:#ff9060}</style>
+</helmet>
+<section style="padding:64px;font-family:Sora,sans-serif;color:#ecebe8;background:#07080a;width:1448px">
+<div style="font:400 12px 'JetBrains Mono',monospace;color:#8a8d93;letter-spacing:.12em;margin-bottom:8px">EVACUSENSE / BRAND + LAYOUT DIRECTIONS / TURN 4</div>
+<div style="font:400 14px 'JetBrains Mono',monospace;color:#8a8d93;margin-bottom:40px;max-width:900px;line-height:1.6">Logo 2a is used unchanged in all three. Map, globe and numbers are placeholders. Mocks are 1280×800 screens shown at 53%.</div>
+
+<sc-for list="{{ dirs }}" as="d" hint-placeholder-count="3">
+<div id="{{ d.id }}" style="width:1448px;box-sizing:border-box;padding:32px;background:#0d0f13;border:1px solid #23262e;margin-bottom:56px;color:#ecebe8">
+<div style="display:flex;align-items:baseline;gap:16px;margin-bottom:8px">
+<span style="font:400 12px 'JetBrains Mono',monospace;background:#ff6a2b;color:#0a0b0d;padding:2px 8px">{{ d.id }}</span>
+<span style="font:600 26px Sora,sans-serif;letter-spacing:.02em">{{ d.name }}</span></div>
+<div style="font:400 14px 'JetBrains Mono',monospace;color:#8a8d93;margin-bottom:28px;max-width:1000px;line-height:1.6">{{ d.concept }}</div>
+
+<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:32px;margin-bottom:32px">
+<div>
+<div style="font:400 11px 'JetBrains Mono',monospace;color:#8a8d93;letter-spacing:.12em;margin-bottom:12px">PALETTE</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+<sc-for list="{{ d.swatches }}" as="s" hint-placeholder-count="8">
+<div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;flex:none;border:1px solid #3a3e47;background:{{ s.hex }}"></div>
+<div style="font:400 11px 'JetBrains Mono',monospace;line-height:1.4;color:#ecebe8">{{ s.hex }}<br><span style="color:#8a8d93">{{ s.role }}</span></div></div>
+</sc-for></div></div>
+
+<div>
+<div style="font:400 11px 'JetBrains Mono',monospace;color:#8a8d93;letter-spacing:.12em;margin-bottom:12px">TYPE</div>
+<sc-for list="{{ d.types }}" as="t" hint-placeholder-count="3">
+<div style="margin-bottom:12px">
+<div style="font-family:{{ t.family }};font-weight:{{ t.weight }};font-size:22px;line-height:1.2">{{ t.sample }}</div>
+<div style="font:400 11px 'JetBrains Mono',monospace;color:#8a8d93;margin-top:4px;line-height:1.5">{{ t.role }}: {{ t.name }}<br>System: {{ t.sys }}</div></div>
+</sc-for></div>
+
+<div>
+<div style="font:400 11px 'JetBrains Mono',monospace;color:#8a8d93;letter-spacing:.12em;margin-bottom:12px">BUTTONS + PANEL</div>
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+<div style="padding:12px 18px;background:{{ d.pBg }};color:{{ d.pFg }};border:{{ d.pBorder }};border-radius:{{ d.radius }};font-family:{{ d.btnFam }};font-weight:{{ d.btnWeight }};font-size:14px;text-transform:{{ d.btnCase }};letter-spacing:{{ d.btnTrack }}">Start the replay</div>
+<div style="padding:12px 18px;background:{{ d.sBg }};color:{{ d.sFg }};border:{{ d.sBorder }};border-radius:{{ d.radius }};font-family:{{ d.btnFam }};font-weight:{{ d.btnWeight }};font-size:14px;text-transform:{{ d.btnCase }};letter-spacing:{{ d.btnTrack }}">How it works</div></div>
+<div style="font:400 12px 'JetBrains Mono',monospace;color:#b9bbbf;line-height:1.6">{{ d.buttonNote }}</div></div>
+
+<div>
+<div style="font:400 11px 'JetBrains Mono',monospace;color:#8a8d93;letter-spacing:.12em;margin-bottom:12px">"ESTIMATED" LABEL</div>
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;background:{{ d.bg }};padding:16px;border:1px solid {{ d.line }}">
+<span style="font-family:{{ d.numFam }};font-weight:{{ d.numWeight }};font-size:30px;text-decoration:{{ d.estDeco }};text-underline-offset:6px">{{ d.estPrefix }}1,240</span>
+<span style="font-family:{{ d.tagFam }};font-style:{{ d.tagStyle }};font-size:{{ d.tagSize }};color:{{ d.estColor }};border:{{ d.estBorder }};padding:{{ d.estPad }};border-radius:{{ d.estRadius }};text-transform:{{ d.tagCase }};letter-spacing:{{ d.tagTrack }}">{{ d.estTag }}</span></div>
+<div style="font:400 12px 'JetBrains Mono',monospace;color:#b9bbbf;line-height:1.6">{{ d.estNote }}</div></div>
+</div>
+
+<div style="display:flex;gap:24px">
+
+<div style="width:680px;height:425px;position:relative;overflow:hidden;border:1px solid #23262e;flex:none">
+<div style="position:absolute;left:0;top:0;width:1280px;height:800px;transform:scale(.53125);transform-origin:0 0;background:{{ d.bg }};font-family:{{ d.bodyFam }};color:#ecebe8">
+<div style="position:absolute;left:64px;top:40px;display:flex;align-items:center;gap:16px">
+<svg width="40" height="40" viewBox="0 0 100 100"><rect x="12" y="12" width="14" height="76" fill="#ecebe8"/><path d="M26 12H70L88 21L70 30H26Z" fill="#ecebe8"/><path d="M26 43H62L80 52L62 61H26Z" fill="#ff6a2b"/><path d="M26 70H70L88 79L70 88H26Z" fill="#ecebe8"/></svg>
+<span style="font:600 20px Sora,sans-serif;letter-spacing:.14em">EVACUSENSE</span></div>
+<div style="position:absolute;left:64px;top:210px;width:600px">
+<div style="font-family:{{ d.monoFam }};font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:{{ d.muted }};margin-bottom:28px">Bald Range fire · Summerland, BC · August 2026</div>
+<div style="font-family:{{ d.headFam }};font-weight:{{ d.headWeight }};font-size:{{ d.headSize }};line-height:1.06;letter-spacing:{{ d.headTrack }};margin-bottom:28px">See how the Bald Range fire unfolded.</div>
+<div style="font-size:21px;line-height:1.55;color:{{ d.muted }};max-width:500px;margin-bottom:44px">A replay of the August 2026 fire near Summerland, built from open NASA satellite data.</div>
+<div style="display:flex;gap:16px">
+<div style="padding:18px 30px;background:{{ d.pBg }};color:{{ d.pFg }};border:{{ d.pBorder }};border-radius:{{ d.radius }};font-family:{{ d.btnFam }};font-weight:{{ d.btnWeight }};font-size:17px;text-transform:{{ d.btnCase }};letter-spacing:{{ d.btnTrack }}">Start the replay</div>
+<div style="padding:18px 30px;background:{{ d.sBg }};color:{{ d.sFg }};border:{{ d.sBorder }};border-radius:{{ d.radius }};font-family:{{ d.btnFam }};font-weight:{{ d.btnWeight }};font-size:17px;text-transform:{{ d.btnCase }};letter-spacing:{{ d.btnTrack }}">How it works</div></div></div>
+<svg style="position:absolute;right:48px;top:100px" width="640" height="640" viewBox="0 0 640 640" fill="none">
+<circle cx="320" cy="320" r="300" fill="{{ d.map }}" stroke="{{ d.line }}" stroke-width="2"/>
+<ellipse cx="320" cy="320" rx="100" ry="300" stroke="{{ d.line }}" stroke-width="1.5"/><ellipse cx="320" cy="320" rx="200" ry="300" stroke="{{ d.line }}" stroke-width="1.5"/><path d="M320 20V620" stroke="{{ d.line }}" stroke-width="1.5"/>
+<path d="M20 320H620" stroke="{{ d.line }}" stroke-width="1.5"/>
+<path d="M37 220Q320 270 603 220" stroke="{{ d.line }}" stroke-width="1.5"/><path d="M37 420Q320 470 603 420" stroke="{{ d.line }}" stroke-width="1.5"/>
+<path d="M97 120Q320 160 543 120" stroke="{{ d.line }}" stroke-width="1.5"/><path d="M97 520Q320 560 543 520" stroke="{{ d.line }}" stroke-width="1.5"/>
+<circle cx="400" cy="200" r="34" fill="#ff6a2b" opacity=".12"/><circle cx="400" cy="200" r="18" fill="#ff6a2b" opacity=".25"/><circle cx="400" cy="200" r="6" fill="#ff6a2b"/>
+<text x="422" y="190" font-family="monospace" font-size="14" fill="{{ d.muted }}">SUMMERLAND, BC</text></svg>
+</div></div>
+
+<div style="width:680px;height:425px;position:relative;overflow:hidden;border:1px solid #23262e;flex:none">
+<div style="position:absolute;left:0;top:0;width:1280px;height:800px;transform:scale(.53125);transform-origin:0 0;background:{{ d.map }};font-family:{{ d.bodyFam }};color:#ecebe8">
+<svg style="position:absolute;left:0;top:0" width="1280" height="800" viewBox="0 0 1280 800" fill="none">
+<path d="M470 0C520 150 480 300 520 450S470 650 500 800L400 800L400 0Z" fill="{{ d.lake }}"/>
+<g stroke="{{ d.road }}" stroke-width="1.5"><path d="M420 640C600 600 760 560 900 500S1150 380 1260 350"/><path d="M520 780C600 650 700 500 760 380S900 120 940 0"/><path d="M440 300C600 330 800 300 1000 260S1200 200 1280 180"/><path d="M900 500C940 600 960 700 1000 800"/><path d="M600 120C700 160 780 200 860 230"/><path d="M1000 260C1040 160 1100 80 1160 0"/></g>
+<g stroke="{{ d.red }}" stroke-width="3.5" stroke-linecap="round"><path d="M770 360C820 250 890 130 940 0"/><path d="M780 548C840 525 880 510 900 500S1000 440 1060 410"/><path d="M900 500C940 600 960 700 1000 800"/></g>
+<path d="M700 800C760 700 860 640 1000 620S1200 640 1280 600" stroke="{{ d.exit }}" stroke-width="4" stroke-linecap="round"/>
+<g fill="#ff6a2b"><circle cx="820" cy="380" r="26" opacity=".12"/><circle cx="880" cy="340" r="30" opacity=".12"/><circle cx="780" cy="440" r="22" opacity=".12"/><circle cx="850" cy="450" r="24" opacity=".12"/>
+<circle cx="820" cy="380" r="12" opacity=".28"/><circle cx="880" cy="340" r="14" opacity=".28"/><circle cx="780" cy="440" r="10" opacity=".28"/><circle cx="850" cy="450" r="11" opacity=".28"/>
+<circle cx="820" cy="380" r="4"/><circle cx="836" cy="398" r="3"/><circle cx="880" cy="340" r="4"/><circle cx="896" cy="356" r="3"/><circle cx="866" cy="322" r="3"/><circle cx="780" cy="440" r="3"/><circle cx="800" cy="420" r="3"/><circle cx="850" cy="450" r="4"/><circle cx="870" cy="432" r="3"/><circle cx="812" cy="470" r="3"/><circle cx="910" cy="312" r="3"/><circle cx="760" cy="462" r="3"/></g></svg>
+
+<div style="position:absolute;right:24px;bottom:24px;background:{{ d.panel }};border:1px solid {{ d.line }};border-radius:{{ d.radius }};padding:16px 20px;display:flex;flex-direction:column;gap:10px;font-family:{{ d.monoFam }};font-size:13px;color:{{ d.muted }}">
+<div style="display:flex;align-items:center;gap:12px"><span style="width:10px;height:10px;border-radius:50%;background:#ff6a2b"></span>Fire detection</div>
+<div style="display:flex;align-items:center;gap:12px"><span style="width:22px;height:4px;background:{{ d.red }}"></span>Affected road</div>
+<div style="display:flex;align-items:center;gap:12px"><span style="width:22px;height:4px;background:{{ d.exit }}"></span>Exit route</div></div>
+
+<div style="position:absolute;left:24px;top:24px;bottom:24px;width:380px;box-sizing:border-box;padding:24px;background:{{ d.panel }};backdrop-filter:blur({{ d.blur }});border:1px solid {{ d.line }};border-top:{{ d.panelTop }};border-radius:{{ d.radius }};display:flex;flex-direction:column;gap:16px;overflow:hidden">
+<div style="display:flex;align-items:center;gap:10px"><svg width="22" height="22" viewBox="0 0 100 100"><rect x="12" y="12" width="14" height="76" fill="#ecebe8"/><path d="M26 12H70L88 21L70 30H26Z" fill="#ecebe8"/><path d="M26 43H62L80 52L62 61H26Z" fill="#ff6a2b"/><path d="M26 70H70L88 79L70 88H26Z" fill="#ecebe8"/></svg><span style="font:600 12px Sora,sans-serif;letter-spacing:.14em">EVACUSENSE</span></div>
+
+<div>
+<div style="font-family:{{ d.monoFam }};font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:{{ d.muted }}">Replay time</div>
+<div style="display:flex;align-items:baseline;gap:14px"><span style="font-family:{{ d.numFam }};font-weight:{{ d.numWeight }};font-size:60px;line-height:1.1;letter-spacing:-.01em">18:40</span><span style="font-size:16px;color:{{ d.muted }}">Aug 14, 2026</span></div></div>
+
+<div style="display:flex;align-items:center;gap:14px">
+<div style="width:38px;height:38px;flex:none;background:{{ d.pBg }};border:{{ d.pBorder }};border-radius:{{ d.radius }};display:flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M3 1L12 7L3 13Z" fill="{{ d.pFg }}"/></svg></div>
+<div style="flex:1;height:{{ d.trackH }};background:{{ d.line }};border-radius:{{ d.thumbR }};position:relative"><div style="width:58%;height:100%;background:#ff6a2b;border-radius:{{ d.thumbR }}"></div><div style="position:absolute;left:58%;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;background:#ecebe8;border-radius:{{ d.thumbR }}"></div></div></div>
+
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:{{ d.cellGap }}">
+<div style="border:{{ d.cellBorder }};border-left:{{ d.cellLeft }};padding:{{ d.cellPad }};border-radius:{{ d.radius }}"><div style="font-family:{{ d.monoFam }};font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:{{ d.muted }};margin-bottom:6px">Detections</div><div style="font-family:{{ d.numFam }};font-weight:{{ d.numWeight }};font-size:28px">1,284</div></div>
+<div style="border:{{ d.cellBorder }};border-left:{{ d.cellLeft }};padding:{{ d.cellPad }};border-radius:{{ d.radius }}"><div style="font-family:{{ d.monoFam }};font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:{{ d.muted }};margin-bottom:6px">Roads affected</div><div style="font-family:{{ d.numFam }};font-weight:{{ d.numWeight }};font-size:28px"><span style="text-decoration:{{ d.estDeco }};text-underline-offset:5px">{{ d.estPrefix }}37</span><span style="font-size:15px;color:{{ d.muted }}"> km</span></div>
+<span style="display:inline-block;margin-top:6px;font-family:{{ d.tagFam }};font-style:{{ d.tagStyle }};font-size:{{ d.tagSizeS }};color:{{ d.estColor }};border:{{ d.estBorder }};padding:{{ d.estPad }};border-radius:{{ d.estRadius }};text-transform:{{ d.tagCase }};letter-spacing:{{ d.tagTrack }}">{{ d.estTag }}</span></div>
+<div style="border:{{ d.cellBorder }};border-left:{{ d.cellLeft }};padding:{{ d.cellPad }};border-radius:{{ d.radius }}"><div style="font-family:{{ d.monoFam }};font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:{{ d.muted }};margin-bottom:6px">Cut off</div><div style="font-family:{{ d.numFam }};font-weight:{{ d.numWeight }};font-size:28px"><span style="text-decoration:{{ d.estDeco }};text-underline-offset:5px">{{ d.estPrefix }}1,240</span></div>
+<span style="display:inline-block;margin-top:6px;font-family:{{ d.tagFam }};font-style:{{ d.tagStyle }};font-size:{{ d.tagSizeS }};color:{{ d.estColor }};border:{{ d.estBorder }};padding:{{ d.estPad }};border-radius:{{ d.estRadius }};text-transform:{{ d.tagCase }};letter-spacing:{{ d.tagTrack }}">{{ d.estTag }}</span></div></div>
+
+<div style="border-top:1px solid {{ d.line }};padding-top:12px">
+<div style="display:flex;justify-content:space-between;font-size:14px;font-weight:600;margin-bottom:8px"><span>Areas cut off</span><span style="color:{{ d.muted }};font-weight:400">3 &nbsp;▴</span></div>
+<div style="display:flex;justify-content:space-between;font-size:14px;color:#c9c8c4;padding:5px 0"><span>Prairie Valley</span><span style="text-decoration:{{ d.estDeco }};text-underline-offset:4px">{{ d.estPrefix }}480</span></div>
+<div style="display:flex;justify-content:space-between;font-size:14px;color:#c9c8c4;padding:5px 0"><span>Trout Creek</span><span style="text-decoration:{{ d.estDeco }};text-underline-offset:4px">{{ d.estPrefix }}510</span></div>
+<div style="display:flex;justify-content:space-between;font-size:14px;color:#c9c8c4;padding:5px 0"><span>Garnet Valley</span><span style="text-decoration:{{ d.estDeco }};text-underline-offset:4px">{{ d.estPrefix }}250</span></div></div>
+
+<div style="border-top:1px solid {{ d.line }};padding-top:12px;display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:14px;font-weight:600">Briefing</span>
+<span style="font-size:13px;border:1px solid {{ d.line }};border-radius:{{ d.radius }};padding:4px 12px;color:#c9c8c4">English &nbsp;▾</span></div>
+<div style="font-size:13px;line-height:1.5;color:#c9c8c4">Detections moved east overnight. Two road segments near Prairie Valley are likely affected and an estimated 1,240 residents may be cut off.</div>
+<div style="display:flex;align-items:center;gap:12px"><div style="width:30px;height:30px;flex:none;border:1px solid {{ d.line }};border-radius:{{ d.radius }};display:flex;align-items:center;justify-content:center"><svg width="10" height="10" viewBox="0 0 14 14"><path d="M3 1L12 7L3 13Z" fill="#ecebe8"/></svg></div><div style="flex:1;height:3px;background:{{ d.line }}"><div style="width:35%;height:100%;background:#ecebe8"></div></div><span style="font-family:{{ d.monoFam }};font-size:12px;color:{{ d.muted }}">0:25 / 1:10</span></div></div>
+
+<div style="margin-top:auto;border-top:1px solid {{ d.line }};padding-top:10px;font-size:11px;line-height:1.45;color:{{ d.muted }}">Figures are estimates from satellite detections and road data. This is not an official evacuation order. Follow local authorities.</div>
+</div></div></div>
+
+</div></div>
+</sc-for>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const sw = (a) => a.map(([role, hex]) => ({ role, hex }));
+    const base = { muted: '#8a8d93', exit: '#9cc9f0', red: '#e5484d' };
+    const A = { ...base, id: '4a', name: 'Graphite', concept: 'Closest to the logo. Neutral near-black, sharp corners that echo the arrowheads, hairline panels. Ember is only fire and the progress fill.',
+      bg: '#0a0b0d', panel: 'rgba(12,14,18,.84)', line: '#23262e', map: '#0e1116', lake: '#10141a', road: 'rgba(236,235,232,.28)',
+      headFam: 'Sora, system-ui, sans-serif', bodyFam: 'Sora, system-ui, sans-serif', monoFam: "'JetBrains Mono', ui-monospace, monospace", numFam: 'Sora, system-ui, sans-serif',
+      headWeight: 600, headSize: '68px', headTrack: '-.025em', numWeight: 600, radius: '2px', blur: '12px', panelTop: '1px solid #23262e',
+      pBg: '#ecebe8', pFg: '#0a0b0d', pBorder: '1px solid #ecebe8', sBg: 'transparent', sFg: '#ecebe8', sBorder: '1px solid #3a3e47',
+      btnFam: 'Sora, system-ui, sans-serif', btnWeight: 600, btnCase: 'none', btnTrack: '.01em',
+      buttonNote: 'Primary: off-white fill. Secondary: 1px outline. 2px radius. Panel: 84% black, 12px blur, 1px hairline.',
+      trackH: '2px', thumbR: '0', cellGap: '0', cellBorder: '0', cellLeft: '1px solid #23262e', cellPad: '0 0 0 12px',
+      estPrefix: '', estDeco: 'underline dotted #8a8d93', estTag: 'est.', estColor: '#8a8d93', estBorder: '0', estPad: '0', estRadius: '0', tagFam: "'JetBrains Mono', ui-monospace, monospace", tagStyle: 'normal', tagSize: '13px', tagSizeS: '11px', tagCase: 'none', tagTrack: '.04em',
+      estNote: 'Dotted underline on the number plus a small mono "est." tag. Quiet, no color.',
+      swatches: sw([['Background', '#0A0B0D'], ['Panel', '#0C0E12'], ['Line', '#23262E'], ['Text', '#ECEBE8'], ['Muted text', '#8A8D93'], ['Fire / logo', '#FF6A2B'], ['Affected road', '#E5484D'], ['Exit route', '#9CC9F0']]),
+      types: [{ role: 'Headline + body', name: 'Sora', sys: 'system-ui (SF Pro / Segoe UI)', family: 'Sora', weight: 600, sample: 'Calm, exact.' }, { role: 'Labels + figures', name: 'JetBrains Mono', sys: 'ui-monospace (SF Mono / Consolas)', family: "'JetBrains Mono'", weight: 400, sample: '18:40 · 1,284' }] };
+    A.swatches = sw([['Background', '#0A0B0D'], ['Panel', '#0C0E12'], ['Line', '#23262E'], ['Text', '#ECEBE8'], ['Muted text', '#8A8D93'], ['Fire / logo', '#FF6A2B'], ['Affected road', '#E5484D'], ['Exit route', '#9CC9F0']]);
+    const B = { ...base, muted: '#8c98a6', exit: '#a9d2f5', id: '4b', name: 'Observatory', concept: 'Warmer and more human. Blue-slate ground, a serif headline and date readout, soft corners, frosted panel. Estimates are written as "~" plus the word estimated.',
+      bg: '#0b1118', panel: 'rgba(13,20,29,.72)', line: '#1f2d3b', map: '#0c141c', lake: '#0f1a25', road: 'rgba(236,235,232,.26)',
+      headFam: "Newsreader, ui-serif, Georgia, serif", bodyFam: "'Hanken Grotesk', system-ui, sans-serif", monoFam: "'Hanken Grotesk', system-ui, sans-serif", numFam: "Newsreader, ui-serif, Georgia, serif",
+      headWeight: 400, headSize: '78px', headTrack: '-.02em', numWeight: 400, radius: '12px', blur: '18px', panelTop: '1px solid #1f2d3b',
+      pBg: '#ff6a2b', pFg: '#0b1118', pBorder: '1px solid #ff6a2b', sBg: 'rgba(255,255,255,.05)', sFg: '#ecebe8', sBorder: '1px solid #2a3b4d',
+      btnFam: "'Hanken Grotesk', system-ui, sans-serif", btnWeight: 600, btnCase: 'none', btnTrack: '0',
+      buttonNote: 'Primary: solid ember. Secondary: translucent fill. 12px radius. Panel: 72% slate, 18px blur.',
+      trackH: '4px', thumbR: '999px', cellGap: '8px', cellBorder: '1px solid #1f2d3b', cellLeft: '1px solid #1f2d3b', cellPad: '12px', 
+      estPrefix: '~', estDeco: 'none', estTag: 'estimated', estColor: '#8c98a6', estBorder: '0', estPad: '0', estRadius: '0', tagFam: "Newsreader, ui-serif, Georgia, serif", tagStyle: 'italic', tagSize: '16px', tagSizeS: '13px', tagCase: 'none', tagTrack: '0',
+      estNote: 'Tilde before the number and an italic "estimated" after it. Reads like a caption in a report.',
+      types: [{ role: 'Headline + numerals', name: 'Newsreader', sys: 'ui-serif (New York / Georgia)', family: 'Newsreader', weight: 400, sample: 'Calm, exact.' }, { role: 'Body + labels', name: 'Hanken Grotesk', sys: 'system-ui (SF Pro / Segoe UI)', family: "'Hanken Grotesk'", weight: 500, sample: 'Roads likely affected' }] };
+    B.swatches = sw([['Background', '#0B1118'], ['Panel', '#0D141D'], ['Line', '#1F2D3B'], ['Text', '#ECEBE8'], ['Muted text', '#8C98A6'], ['Fire / logo', '#FF6A2B'], ['Affected road', '#E5484D'], ['Exit route', '#A9D2F5']]);
+    const C = { ...base, exit: '#8ec5f0', id: '4c', name: 'Console', concept: 'Operational and exact. Monospace figures, ruled cells, square corners, uppercase labels. Ember is a hairline outline on actions and a bar on the panel.',
+      bg: '#0e1013', panel: 'rgba(9,10,12,.93)', line: '#2a2d33', map: '#0f1113', lake: '#111418', road: 'rgba(236,235,232,.3)',
+      headFam: "'IBM Plex Sans', system-ui, sans-serif", bodyFam: "'IBM Plex Sans', system-ui, sans-serif", monoFam: "'IBM Plex Mono', ui-monospace, monospace", numFam: "'IBM Plex Mono', ui-monospace, monospace",
+      headWeight: 500, headSize: '62px', headTrack: '-.02em', numWeight: 500, radius: '0', blur: '0px', panelTop: '2px solid #ff6a2b',
+      pBg: 'transparent', pFg: '#ff6a2b', pBorder: '1px solid #ff6a2b', sBg: 'transparent', sFg: '#b9bbbf', sBorder: '1px solid #2a2d33',
+      btnFam: "'IBM Plex Mono', ui-monospace, monospace", btnWeight: 500, btnCase: 'uppercase', btnTrack: '.08em',
+      buttonNote: 'Primary: ember outline, mono caps. Secondary: grey outline. 0 radius. Panel: near-opaque, 2px ember top bar.',
+      trackH: '6px', thumbR: '0', cellGap: '8px', cellBorder: '1px solid #2a2d33', cellLeft: '1px solid #2a2d33', cellPad: '10px',
+      estPrefix: '', estDeco: 'none', estTag: 'EST', estColor: '#ff6a2b', estBorder: '1px solid #ff6a2b', estPad: '1px 6px', estRadius: '0', tagFam: "'IBM Plex Mono', ui-monospace, monospace", tagStyle: 'normal', tagSize: '12px', tagSizeS: '10px', tagCase: 'none', tagTrack: '.08em',
+      estNote: 'Boxed "EST" tag in ember beside the figure. Most visible of the three; hard to miss.',
+      types: [{ role: 'Headline + body', name: 'IBM Plex Sans', sys: 'system-ui (SF Pro / Segoe UI)', family: "'IBM Plex Sans'", weight: 500, sample: 'Calm, exact.' }, { role: 'Figures + labels', name: 'IBM Plex Mono', sys: 'ui-monospace (SF Mono / Consolas)', family: "'IBM Plex Mono'", weight: 500, sample: '18:40 · 1,284' }] };
+    C.swatches = sw([['Background', '#0E1013'], ['Panel', '#090A0C'], ['Line', '#2A2D33'], ['Text', '#ECEBE8'], ['Muted text', '#8A8D93'], ['Fire / logo', '#FF6A2B'], ['Affected road', '#E5484D'], ['Exit route', '#8EC5F0']]);
+    return { dirs: [A, B, C] };
+  }
+}
+</script>
+</body>
+</html>

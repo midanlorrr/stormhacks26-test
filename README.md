@@ -45,6 +45,9 @@ python -m http.server 8000
 ```
 Open http://localhost:8000. (Opening `index.html` directly will not work, because the page fetches its data files.) The page needs internet for the MapLibre library and the OpenStreetMap background tiles.
 
+## Design
+The look follows the Evacusense design handoff (direction 4a "Graphite") kept in `design/` (read `design/DESIGN.md`). `web/evacusense-theme.css` is a copy of the handoff stylesheet with one change: the Google Fonts import is replaced by local font files, so the page works offline. `web/style.css` holds the app's own layout on top of it, and the map colours are set in `web/app.js`. Set `ROAD_STYLE` near the top of `app.js` to `"typed"` or `"original"` for the earlier road looks.
+
 ## Known limits
 - FIRMS only sees fire when a satellite passes over, so the replay shows when detections appeared, not how the fire moved between passes. The data is near-real-time (NRT); standard-processing data was not yet available for these dates.
 - "Likely affected" roads are those within 100 m of a detection. This is a simple rule, not an official closure list.
@@ -78,7 +81,7 @@ What this does and does not show:
 - **Source label:** the CBC text we saved is labelled "Aug 7 9:15pm" but describes events through 8 am Saturday, so the label is probably wrong; check the original page before citing it.
 
 ## Data sources
-NASA FIRMS (VIIRS and MODIS active fire), WorldPop (population, CC BY 4.0: Bondarenko et al., WorldPop, University of Southampton, DOI 10.5258/SOTON/WP00839), OpenStreetMap (roads, via osmnx), Noto Sans map label fonts (SIL Open Font License; glyph files in `web/fonts/` from the MapLibre demo font server), BC Wildfire Service (perimeter, for checking only), DriveBC (one closure, compared by hand).
+NASA FIRMS (VIIRS and MODIS active fire), WorldPop (population, CC BY 4.0: Bondarenko et al., WorldPop, University of Southampton, DOI 10.5258/SOTON/WP00839), OpenStreetMap (roads, via osmnx), Noto Sans map label fonts (SIL Open Font License; glyph files in `web/fonts/` from the MapLibre demo font server), Sora and JetBrains Mono interface fonts (SIL Open Font License; `web/fonts/ui/`), BC Wildfire Service (perimeter, for checking only), DriveBC (one closure, compared by hand).
 
 ## To do
 - Briefings: add the official evacuation-order timing (whole District of Summerland ordered out just after midnight on Aug 8, per CBC) as a fact, without turning it into an instruction, then regenerate. Today the briefings do not know about the order, so wording like "prepare belongings in advance" can read oddly after midnight.

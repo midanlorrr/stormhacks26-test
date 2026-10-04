@@ -1,166 +1,168 @@
-/* Evacusense: dark theme. Change the colours here, in one place. System fonts only, so it works offline. */
-:root {
-  --bg: #0b0f14;                       /* near-black blue-grey page */
-  --panel: rgba(15, 20, 27, 0.88);     /* translucent dark panel */
-  --panel-solid: #121820;              /* popups and controls */
-  --text: #eceae4;                     /* off-white, matches the logo */
-  --muted: #98a1ad;                    /* secondary text */
-  --line: rgba(255, 255, 255, 0.09);   /* thin dividers */
-  --accent: #ff7a1a;                   /* fire orange */
-  --est: #e0a548;                      /* muted amber for "estimated" tags */
-  --danger: #ff5a5a;                   /* likely-affected roads */
-  --cyan: #8ff0ff;                     /* exit route */
-}
+/* Evacusense app styles: layout and behaviour that sit on top of evacusense-theme.css (the design handoff, direction 4a "Graphite").
+   Colours, type and components come from the --es-* tokens and es- classes there; change them there, not here.
+   Rules from the handoff: orange = fire/slider fill/focus/logo only; red = affected roads only; pale blue = exit route only;
+   one off-white primary button; 2px radius; no shadows, no gradients; no animation beyond the globe, the fly-in and the replay. */
 
 * { box-sizing: border-box; }
 html { color-scheme: dark; }
-body { margin: 0; background: var(--bg); color: var(--text); font-size: 14px;
-       font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+body { font-size: 14px; }
+button, select { font-family: inherit; }
+
+/* The map fills the page; the globe on the landing page is this same map */
 #map { position: absolute; inset: 0; }
-a { color: var(--accent); }
 
-/* ----- Side panel ----- */
-#panel {
-  position: absolute; top: 12px; left: 12px; width: 330px; max-height: calc(100vh - 24px);
-  overflow-y: auto; background: var(--panel); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
-  border-radius: 10px; padding: 16px; border: 1px solid var(--line); box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
-  scrollbar-width: thin; scrollbar-color: #3a4350 transparent;
-}
-.brand { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-.brand img { width: 32px; height: 32px; flex: none; }
-h1 { font-size: 19px; margin: 0; letter-spacing: 0.04em; }
-.tagline { margin: 1px 0 0; color: var(--muted); font-size: 12px; }
-.sub { margin: 2px 0 10px; color: var(--muted); font-size: 12px; }
-#clock { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+/* ----- Loading screen ----- */
+#loading { position: fixed; inset: 0; z-index: 50; background: var(--es-bg); display: flex; flex-direction: column;
+           align-items: center; justify-content: center; gap: 18px;
+           font: 400 12px var(--es-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--es-muted);
+           transition: opacity 0.5s ease, visibility 0s 0.5s; }
+#loading p { margin: 0; }
+body:not(.loading) #loading { opacity: 0; visibility: hidden; pointer-events: none; }
 
-.controls { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
-.controls input { flex: 1; accent-color: var(--accent); }
-button { padding: 6px 14px; cursor: pointer; color: var(--text); background: rgba(255, 255, 255, 0.07);
-         border: 1px solid var(--line); border-radius: 6px; font-size: 13px; }
-button:hover { background: rgba(255, 255, 255, 0.13); }
-#play { background: var(--accent); color: #15100a; border-color: transparent; font-weight: 600; min-width: 64px; }
-#play:hover { background: #ff9140; }
+/* ----- Landing: text column on the left, the globe (the map) on the right ----- */
+#landing { position: fixed; top: 0; bottom: 0; left: 0; width: 50vw; z-index: 20; display: flex; flex-direction: column;
+           padding: 40px 64px 48px; background: var(--es-bg); transition: opacity 0.5s ease, visibility 0s 0.5s; }
+body:not(.landing) #landing { opacity: 0; visibility: hidden; pointer-events: none; }
+#landing .es-copy { margin: auto 0; max-width: 600px; }
+#landing .es-title { margin-bottom: 28px; }
+.es-skip { display: inline-block; margin-top: 28px; font: 400 12px var(--es-mono); letter-spacing: 0.06em; color: var(--es-muted); }
+.es-skip:hover { color: var(--es-text); }
+.es-credits { margin: 0; max-width: 560px; font: 400 10px/1.7 var(--es-mono); letter-spacing: 0.04em; color: var(--es-muted); }
+#start:disabled { opacity: 0.45; cursor: wait; }
 
-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
-td { padding: 6px 0; border-bottom: 1px solid var(--line); }
-td:last-child { text-align: right; font-weight: 600; white-space: nowrap; padding-left: 8px; }
-.est { font-weight: 400; font-size: 11px; color: var(--est); border: 1px solid rgba(224, 165, 72, 0.5);
-       border-radius: 4px; padding: 0 5px; white-space: nowrap; }
+/* The Summerland marker on the globe: a fire dot with two soft halos, and its label */
+.es-marker { position: relative; width: 12px; height: 12px; }
+.es-marker::before { content: ""; position: absolute; left: 50%; top: 50%; width: 68px; height: 68px; margin: -34px 0 0 -34px;
+                     border-radius: 50%; background: var(--es-fire); opacity: 0.12; }
+.es-marker-core { position: absolute; inset: 0; }
+.es-marker-core::before { content: ""; position: absolute; left: 50%; top: 50%; width: 36px; height: 36px; margin: -18px 0 0 -18px;
+                          border-radius: 50%; background: var(--es-fire); opacity: 0.25; }
+.es-marker-core::after { content: ""; position: absolute; inset: 3px; border-radius: 50%; background: var(--es-fire); }
+.es-marker-label { position: absolute; left: 24px; top: -9px; white-space: nowrap; pointer-events: none;
+                   font: 400 13px var(--es-mono); letter-spacing: 0.04em; color: var(--es-muted); }
 
-h2 { font-size: 14px; margin: 14px 0 6px; }
-#areas-list { margin: 0 0 4px; padding-left: 18px; font-size: 12px; }
-#areas-list li { margin-bottom: 4px; }
-.small { font-size: 11px; color: var(--muted); margin: 2px 0 8px; }
-.tight { color: var(--danger); font-weight: 600; }
+/* ----- "How it works" ----- */
+#how { position: fixed; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center;
+       background: rgba(10, 11, 13, 0.82); padding: 16px; }
+#how[hidden] { display: none; }
+.how-card { width: min(640px, 100%); max-height: 88vh; overflow-y: auto; background: #0c0e12; padding: 28px; }
+.how-card h2 { font: 600 22px var(--es-font); margin: 0 0 12px; letter-spacing: -0.01em; }
+.how-card h3 { margin: 20px 0 6px; }
+.how-card ul { margin: 0; padding-left: 20px; }
+.how-card .es-btn { margin-top: 18px; }
 
-select { width: 100%; margin-bottom: 6px; padding: 6px; color: var(--text); background: #1a212b;
-         border: 1px solid var(--line); border-radius: 6px; }
-#briefing { font-size: 12px; margin-bottom: 8px; line-height: 1.45; }
-#briefing h3 { font-size: 12px; margin: 10px 0 2px; color: var(--muted); }
+/* ----- Replay: panel, controls and legend appear once the replay has started ----- */
+#panel, #legend, .maplibregl-ctrl-top-right { transition: opacity 0.4s ease; }
+body:not(.replay) #panel, body:not(.replay) #legend, body:not(.replay) .maplibregl-ctrl-top-right {
+  opacity: 0; visibility: hidden; pointer-events: none; }
+
+#panel { overflow: hidden; }                       /* only the middle block scrolls, so the disclaimer stays in view */
+.es-brand--small { gap: 10px; }
+.es-brand--small img { width: 22px; height: 22px; }
+.es-brand--small span { font-size: 12px; }
+.es-time-row { display: flex; align-items: baseline; margin-top: 4px; }
+.es-note { font-size: 11px; line-height: 1.45; color: var(--es-muted); margin: 6px 0 0; }
+
+.es-controls { display: flex; align-items: center; gap: 14px; }
+/* Play button: the icon is drawn with CSS from the data-state the script sets; the word stays for screen readers */
+.es-play { font-size: 0; }
+.es-play::before { content: ""; border-style: solid; border-width: 7px 0 7px 12px; border-color: transparent transparent transparent var(--es-bg); margin-left: 3px; }
+.es-play[data-state="playing"]::before { width: 4px; height: 14px; border: 0; margin: 0; background: var(--es-bg); }
+.es-play[data-state="playing"]::after { content: ""; width: 4px; height: 14px; margin-left: 4px; background: var(--es-bg); }
+.es-play:hover { background: #fff; border-color: #fff; }
+.es-play:focus-visible { outline: 2px solid var(--es-fire); outline-offset: 2px; }
+
+/* Slider: a 2px line, an orange fill (width set by the script) and a native range on top for dragging and keyboard use */
+.es-slider-wrap { position: relative; flex: 1; height: 14px; }
+.es-slider-wrap::before { content: ""; position: absolute; left: 0; right: 0; top: 6px; height: 2px; background: var(--es-line); }
+.es-slider-fill { position: absolute; left: 0; top: 6px; height: 2px; width: 0; background: var(--es-fire); }
+.es-slider-wrap input[type="range"].es-slider-native { position: absolute; inset: 0; height: 14px; margin: 0; background: transparent; }
+.es-slider-native::-webkit-slider-runnable-track { background: transparent; height: 14px; }
+.es-slider-native::-moz-range-track { background: transparent; height: 14px; }
+
+.es-stat .es-number { display: block; }
+.es-stat .es-est-tag { display: block; margin: 4px 0 0; }
+
+.es-scroll { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-right: 6px;
+             scrollbar-width: thin; scrollbar-color: var(--es-line-strong) transparent; }
+.es-section.es-static, .es-section-head.es-static { cursor: default; }
+.es-section-meta { display: flex; align-items: center; gap: 10px; font-weight: 400; color: var(--es-muted); }
+.es-chev { width: 12px; text-align: center; }
+.es-section.is-closed .es-section-body { display: none; }
+.es-section-head:focus-visible { outline: 2px solid var(--es-fire); outline-offset: 2px; }
+.es-row-wrap { padding: 4px 0; }
+.es-row-wrap .es-row { padding: 0; }
+.es-row-sub { font-size: 11px; line-height: 1.4; color: var(--es-muted); margin-top: 2px; }
+.es-row-sub .tight { color: var(--es-text); font-weight: 600; }
+.es-section .es-est-tag { margin-left: 4px; }
+
+select.es-select option { background: #12151a; color: var(--es-text); }
+#briefing { font-size: 13px; line-height: 1.5; }
+#briefing p { margin: 6px 0; }
+#briefing h3 { font: 400 11px var(--es-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--es-muted); margin: 12px 0 4px; }
 #briefing ul { margin: 0; padding-left: 18px; }
 
-.legend { list-style: none; padding: 0; margin: 12px 0 8px; font-size: 12px; color: var(--muted); }
-.legend li { margin: 4px 0; }
-.dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; vertical-align: middle; }
-.dot.fire { background: var(--accent); }
-.dot.exit { background: #2fb457; border: 2px solid #fff; outline: 1px solid #2fb457; }
-.dot.origin { background: #7d8cab; }
-.line { display: inline-block; width: 18px; height: 4px; vertical-align: middle; border-radius: 2px; }
-.line.cut { background: var(--danger); }
-.line.route { background: var(--cyan); }
-.legend .places .dot { margin-left: 6px; margin-right: 2px; }
+.es-disclaimer { flex: none; }
 
-.note { font-size: 11px; color: var(--muted); line-height: 1.45; }
-.disclaimer { font-size: 12px; background: rgba(255, 90, 90, 0.1); border: 1px solid rgba(255, 90, 90, 0.4);
-              border-radius: 6px; padding: 8px 10px; margin: 10px 0 0; line-height: 1.4; }
+/* Map legend, bottom-right (above the map credit line) */
+#legend { position: fixed; right: 24px; bottom: 44px; z-index: 5; font-size: 12px; }
+/* Legend swatches share one width so the labels line up */
+.es-legend .es-swatch { width: 22px; height: auto; display: flex; justify-content: center; background: none; border-radius: 0; }
+.es-legend .es-swatch::after { content: ""; display: block; }
+.es-legend .es-swatch--fire::after { width: 10px; height: 10px; border-radius: 50%; background: var(--es-fire); }
+.es-legend .es-swatch--road::after { width: 22px; height: 4px; background: var(--es-road-affected); }
+.es-legend .es-swatch--exit::after { width: 22px; height: 4px; background: var(--es-route-exit); }
+.es-legend .es-swatch--point::after { width: 10px; height: 10px; border-radius: 50%; background: var(--es-text); border: 2px solid var(--es-bg); outline: 1px solid var(--es-muted); }
+.es-legend-note { font-size: 11px; opacity: 0.8; }
 
-@media (max-width: 600px) {
-  #panel { width: auto; right: 12px; max-height: 55vh; }
-}
-
-/* ----- Map controls, attribution and popups, to match the dark theme ----- */
-.maplibregl-ctrl-group { background: var(--panel-solid); border: 1px solid var(--line); box-shadow: none; }
-.maplibregl-ctrl-group button { background-color: transparent; border-color: var(--line); }
-.maplibregl-ctrl-group button .maplibregl-ctrl-icon { filter: invert(1) brightness(1.1); }
-.maplibregl-ctrl-group button:not(:disabled):hover { background-color: rgba(255, 255, 255, 0.1); }
-/* !important: MapLibre's own attribution colours have higher priority than our theme */
-.maplibregl-ctrl-attrib, .maplibregl-ctrl-attrib-inner { background: rgba(11, 15, 20, 0.78) !important; color: var(--muted) !important; }
-.maplibregl-ctrl-attrib a { color: var(--text) !important; }
+/* ----- Map controls, attribution, popups: matched to the design ----- */
+.maplibregl-ctrl-group { background: #0c0e12; border: 1px solid var(--es-line); border-radius: var(--es-radius); box-shadow: none; }
+.maplibregl-ctrl-group button { background-color: transparent; border-color: var(--es-line); }
+.maplibregl-ctrl-group button .maplibregl-ctrl-icon { filter: invert(1) brightness(0.9); }
+.maplibregl-ctrl-group button:not(:disabled):hover { background-color: rgba(236, 235, 232, 0.08); }
+/* !important: MapLibre's own attribution colours would otherwise win */
+.maplibregl-ctrl-attrib, .maplibregl-ctrl-attrib-inner { background: rgba(10, 11, 13, 0.8) !important; color: var(--es-muted) !important;
+                                                         font: 400 10px var(--es-mono); }
+.maplibregl-ctrl-attrib a { color: var(--es-text) !important; }
 .maplibregl-ctrl-attrib-button { filter: invert(1); }
 
-.maplibregl-popup-content { background: var(--panel-solid); color: var(--text); border: 1px solid var(--line);
-                            border-radius: 8px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5); padding: 10px 12px; }
+.maplibregl-popup-content { background: #0c0e12; color: var(--es-text); border: 1px solid var(--es-line); border-radius: var(--es-radius);
+                            box-shadow: none; padding: 10px 12px; font-family: var(--es-font); }
 .maplibregl-popup-anchor-bottom .maplibregl-popup-tip, .maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip,
-.maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip { border-top-color: var(--panel-solid); }
+.maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip { border-top-color: #0c0e12; }
 .maplibregl-popup-anchor-top .maplibregl-popup-tip, .maplibregl-popup-anchor-top-left .maplibregl-popup-tip,
-.maplibregl-popup-anchor-top-right .maplibregl-popup-tip { border-bottom-color: var(--panel-solid); }
-.maplibregl-popup-anchor-left .maplibregl-popup-tip { border-right-color: var(--panel-solid); }
-.maplibregl-popup-anchor-right .maplibregl-popup-tip { border-left-color: var(--panel-solid); }
+.maplibregl-popup-anchor-top-right .maplibregl-popup-tip { border-bottom-color: #0c0e12; }
+.maplibregl-popup-anchor-left .maplibregl-popup-tip { border-right-color: #0c0e12; }
+.maplibregl-popup-anchor-right .maplibregl-popup-tip { border-left-color: #0c0e12; }
 .road-popup { font-size: 12px; line-height: 1.4; }
-.road-popup .affected { color: var(--danger); font-weight: 600; }
-.road-popup .small { font-size: 11px; color: var(--muted); margin-top: 3px; }
+.road-popup .affected { color: var(--es-road-affected); font-weight: 600; }   /* red = affected roads */
+.road-popup .small { font-size: 11px; color: var(--es-muted); margin-top: 3px; }
 
+/* Satellite / Streets toggle: the active side is off-white, never orange */
 .basemap-toggle { display: flex; }
-.basemap-toggle button { width: auto; padding: 0 10px; font-size: 12px; color: var(--text); }
+.basemap-toggle button { width: auto; padding: 0 10px; font: 400 11px var(--es-mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--es-text-soft); }
 /* !important: MapLibre's own hover style would otherwise override the active colour */
-.basemap-toggle button.active { background-color: var(--accent) !important; color: #15100a; font-weight: 600; }
+.basemap-toggle button.active { background-color: var(--es-text) !important; color: var(--es-bg); }
 
-/* ----- Loading screen, landing page and "How it works" ----- */
-#loading { position: fixed; inset: 0; z-index: 50; background: var(--bg); display: flex; flex-direction: column;
-           align-items: center; justify-content: center; gap: 16px; color: var(--muted);
-           transition: opacity 0.6s ease, visibility 0s 0.6s; }
-#loading img { animation: breathe 2s ease-in-out infinite; }
-body:not(.loading) #loading { opacity: 0; visibility: hidden; pointer-events: none; }
-@keyframes breathe { 50% { opacity: 0.45; transform: scale(0.94); } }
-
-#landing { position: fixed; top: 0; bottom: 0; left: 0; width: 45vw; min-width: 400px; z-index: 20;
-           display: flex; flex-direction: column; justify-content: space-between;
-           background: linear-gradient(90deg, rgba(11, 15, 20, 0.97) 0%, rgba(11, 15, 20, 0.92) 75%, rgba(11, 15, 20, 0) 100%);
-           transition: opacity 0.7s ease, visibility 0s 0.7s; }
-body:not(.landing) #landing { opacity: 0; visibility: hidden; pointer-events: none; }
-.landing-inner { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 48px 56px 24px; max-width: 640px; }
-.landing-brand { display: flex; align-items: center; gap: 14px; font-size: 22px; font-weight: 700; letter-spacing: 0.06em; margin-bottom: 28px; }
-.landing-title { font-size: clamp(30px, 3.6vw, 48px); line-height: 1.1; margin: 0 0 16px; letter-spacing: normal; }
-.landing-lead { font-size: 17px; line-height: 1.5; color: #c9cdd2; margin: 0 0 30px; max-width: 34em; }
-.landing-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; }
-#start { background: var(--accent); color: #15100a; font-weight: 700; font-size: 16px; padding: 13px 22px; border: 0; border-radius: 8px; }
-#start:hover:not(:disabled) { background: #ff9140; }
-#start:disabled { opacity: 0.5; cursor: wait; }
-#how-btn { font-size: 16px; padding: 13px 20px; border-radius: 8px; }
-#skip { color: var(--muted); font-size: 13px; width: fit-content; }
-#credits { margin: 0; padding: 0 56px 22px; font-size: 11px; line-height: 1.5; color: var(--muted); max-width: 640px; }
-
-#how { position: fixed; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center;
-       background: rgba(5, 8, 12, 0.82); padding: 16px; }
-#how[hidden] { display: none; }
-.how-card { width: min(640px, 100%); max-height: 88vh; overflow-y: auto; background: var(--panel-solid);
-            border: 1px solid var(--line); border-radius: 12px; padding: 26px 28px; line-height: 1.5; font-size: 14px; }
-.how-card h2 { font-size: 22px; margin: 0 0 8px; }
-.how-card h3 { font-size: 13px; margin: 16px 0 4px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
-.how-card ul { margin: 0; padding-left: 20px; }
-.how-card button { margin-top: 16px; }
-
-/* Pulsing marker on Summerland while the globe is showing */
-.pulse { width: 14px; height: 14px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 2px #15100a; position: relative; }
-.pulse::before, .pulse::after { content: ""; position: absolute; inset: -2px; border-radius: 50%; border: 2px solid var(--accent);
-                                animation: pulse 2.4s ease-out infinite; }
-.pulse::after { animation-delay: 1.2s; }
-@keyframes pulse { from { transform: scale(1); opacity: 0.9; } to { transform: scale(4.5); opacity: 0; } }
-
-/* The replay panel and map buttons appear only once the replay has started */
-#panel, .maplibregl-ctrl-top-right { transition: opacity 0.6s ease; }
-body:not(.replay) #panel, body:not(.replay) .maplibregl-ctrl-top-right { opacity: 0; visibility: hidden; pointer-events: none; }
-
-@media (max-width: 900px) {
-  #landing { width: 100vw; min-width: 0; bottom: auto; background: linear-gradient(180deg, rgba(11, 15, 20, 0.96) 70%, rgba(11, 15, 20, 0)); }
-  .landing-inner { padding: 24px 22px 8px; }
-  #credits { padding: 0 22px 14px; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .pulse::before, .pulse::after, #loading img { animation: none; }
-  #landing, #loading, #panel { transition: none; }
-}
+/* The satellite imagery shows on the landing globe, so its credit line stays visible there, above the left column */
+body.landing .maplibregl-ctrl-bottom-right { z-index: 30; }
 
 /* While the camera flies to Summerland the map ignores the mouse, so a stray drag cannot cut the flight short */
 body.flying #map { pointer-events: none; }
+
+/* ----- Narrow screens: the landing stacks, the panel docks to the bottom ----- */
+@media (max-width: 800px) {
+  #landing { width: 100vw; bottom: auto; padding: 24px; }
+  #landing .es-copy { margin: 24px 0; }
+  .es-title { font-size: clamp(30px, 9vw, 44px); }
+}
+@media (max-width: 700px) {
+  #legend { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #landing, #loading, #panel, #legend { transition: none; }
+}
+
+.es-block-label { margin-bottom: 6px; }
+.es-section > .es-row { padding: 3px 0; }

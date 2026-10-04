@@ -8,12 +8,12 @@ let areas = [];          // features of areas.geojson (1 km squares with estimat
 let timer = null;        // setInterval id while playing
 
 const SUMMERLAND = [-119.67, 49.6];     // lng, lat
-const REPLAY_PADDING = { left: 360, top: 0, right: 0, bottom: 0 };   // keeps Summerland clear of the side panel
+const REPLAY_PADDING = { left: 440, top: 0, right: 0, bottom: 0 };   // keeps Summerland clear of the side panel (24 + 380 px + space)
 
 const map = new maplibregl.Map({
   container: "map",
   center: [-125, 40],                     // landing: zoomed-out globe, roughly over North America
-  zoom: 1.6,
+  zoom: 1.8,
   // Basemap: dimmed Sentinel-2 cloudless satellite imagery (EOX). If its tiles fail, we switch to a plain OpenStreetMap fallback.
   style: {
     version: 8,
@@ -36,32 +36,38 @@ const map = new maplibregl.Map({
       },
     },
     layers: [
+      // Under the imagery: graphite, which shows through the oceans and any missing tiles
+      { id: "globe-base", type: "background", paint: { "background-color": "#0e1116" } },
       // "Streets" basemap (standard OpenStreetMap). Hidden until you pick it, or until the satellite tiles fail.
       { id: "basemap-streets", type: "raster", source: "osm", layout: { visibility: "none" } },
-      // Main basemap, dimmed so the overlays stand out (tweak these three numbers to taste)
+      // Main basemap: Sentinel-2 imagery, dimmed so the overlays stand out (tweak these numbers to taste)
       { id: "basemap-satellite", type: "raster", source: "satellite",
-        paint: { "raster-brightness-max": 0.55, "raster-saturation": -0.45, "raster-contrast": 0.1 } },
+        paint: { "raster-brightness-max": 0.85, "raster-saturation": -0.45, "raster-contrast": 0.1 } },
+      // Design: a flat near-black layer over the imagery (35%) keeps the orange and red readable
+      { id: "basemap-shade", type: "background",
+        paint: { "background-color": "#0a0b0d", "background-opacity": 0.35 } },
     ],
   },
 });
 map.addControl(new maplibregl.NavigationControl(), "top-right");
 
-// ----- Landing: a globe in the right ~55% of the screen, with a pulsing marker on Summerland -----
+// ----- Landing: a globe in the right half of the screen, with a fire marker on Summerland -----
 // Globe docs: https://maplibre.org/maplibre-gl-js/docs/examples/display-a-globe-with-a-vector-map/
 function landingPadding() {
-  return innerWidth > 900 ? { left: Math.round(innerWidth * 0.45), top: 0, right: 0, bottom: 0 }
+  return innerWidth > 900 ? { left: Math.round(innerWidth * 0.5), top: 0, right: 0, bottom: 0 }
                           : { top: Math.round(innerHeight * 0.5), left: 0, right: 0, bottom: 0 };   // narrow screens: text on top
 }
 map.setPadding(landingPadding());
 map.on("style.load", () => {
   map.setProjection({ type: "globe" });
-  // A thin dark atmosphere around the globe that fades out as you zoom in
+  // A thin atmosphere around the globe that fades out as you zoom in
   map.setSky({ "sky-color": "#0b0f14", "horizon-color": "#3a2616",
                "atmosphere-blend": ["interpolate", ["linear"], ["zoom"], 0, 1, 5, 1, 7, 0] });
 });
-const pulse = document.createElement("div");
-pulse.className = "pulse";
-const summerlandMarker = new maplibregl.Marker({ element: pulse }).setLngLat(SUMMERLAND).addTo(map);
+const markerElement = document.createElement("div");           // fire dot with soft halos, and its label (styled in style.css)
+markerElement.className = "es-marker";
+markerElement.innerHTML = '<span class="es-marker-core"></span><span class="es-marker-label">SUMMERLAND, BC</span>';
+const summerlandMarker = new maplibregl.Marker({ element: markerElement }).setLngLat(SUMMERLAND).addTo(map);
 
 // ----- Basemap toggle: Satellite / Streets (top-right, under the zoom buttons) -----
 let satelliteErrors = 0;
@@ -112,8 +118,9 @@ map.on("error", (e) => {
 });
 
 // ----- Roads -----
-// "typed" = styled by road type with dark casing and a red glow; "original" = the earlier plain grey + red look
-const ROAD_STYLE = "typed";
+// "design" = the Evacusense design (thin light roads, red affected roads, pale blue exit route);
+// "typed" = styled by road type with dark casing and a glow; "original" = the earlier plain grey + red look
+const ROAD_STYLE = "design";
 
 // A road's tier, from its OSM tags: Highway 97 (ref), main roads, or local streets
 const isHwy97 = ["match", ["get", "ref"], ["BC 97", "97"], true, false];
@@ -133,6 +140,19 @@ function addRoadLayers() {
       paint: { "line-color": "#d11", "line-width": ["interpolate", ["linear"], ["zoom"], 9, 1.5, 14, 4] } });
     map.addLayer({ id: "route", type: "line", source: "routes", filter: ["==", ["get", "step"], 0],
       paint: { "line-color": "#1565c0", "line-width": 4 } });
+    return;
+  }
+  if (ROAD_STYLE === "design") {              // values from the design handoff (section 6); Highway 97 is a little brighter
+    const rounded = { "line-cap": "round", "line-join": "round" };
+    map.addLayer({ id: "roads", type: "line", source: "roads", layout: rounded,
+      paint: { "line-color": ["case", isHwy97, "rgba(236,235,232,0.6)", "rgba(236,235,232,0.28)"],
+               "line-width": ["interpolate", ["linear"], ["zoom"], 9, ["case", isHwy97, 1.2, 0.7], 11, ["case", isHwy97, 1.8, 1],
+                              13, ["case", isHwy97, 2.4, 1.5], 16, ["case", isHwy97, 4, 2.4]] } });
+    map.addLayer({ id: "roads-affected", type: "line", source: "roads", layout: rounded,
+      filter: ["<=", ["coalesce", ["get", "affected_step"], 999], 0],
+      paint: { "line-color": "#e5484d", "line-width": ["interpolate", ["linear"], ["zoom"], 9, 1.8, 13, 3.5, 16, 5] } });
+    map.addLayer({ id: "route", type: "line", source: "routes", layout: rounded, filter: ["==", ["get", "step"], 0],
+      paint: { "line-color": "#9cc9f0", "line-width": ["interpolate", ["linear"], ["zoom"], 9, 2.5, 13, 4, 16, 6] } });
     return;
   }
   const round = { "line-cap": "round", "line-join": "round" };
@@ -161,8 +181,9 @@ function addRoadLayers() {
 }
 
 // ----- Places: hospitals, fire stations, police, schools, community centres, big parks, beaches -----
-const POI_COLORS = { hospital: "#ff7eb6", fire_station: "#ffd166", police: "#6ea8ff", school: "#b69cff",
-                     community_centre: "#3ec9b6", park: "#89c26a", beach: "#f2d28b" };
+// Neutral on purpose: in the design, colour is reserved for fire (orange), affected roads (red) and the exit route (pale blue)
+const POI_COLORS = { hospital: "#ecebe8", fire_station: "#ecebe8", police: "#ecebe8", school: "#8a8d93",
+                     community_centre: "#c9c8c4", park: "#c9c8c4", beach: "#c9c8c4" };
 const POI_ORDER = ["hospital", "fire_station", "police", "community_centre", "park", "beach", "school"];   // label priority
 
 function addPoiLayers() {
@@ -171,13 +192,13 @@ function addPoiLayers() {
   const important = ["match", kind, ["hospital", "fire_station", "police"], true, false];
   map.addLayer({ id: "pois", type: "circle", source: "pois", minzoom: 11,
     paint: { "circle-color": colour, "circle-radius": ["case", important, 5, 3.5],
-             "circle-stroke-color": "#05080c", "circle-stroke-width": 1.2 } });
+             "circle-stroke-color": "#0a0b0d", "circle-stroke-width": 1.2 } });
   const label = (id, filter, minzoom) => map.addLayer({
     id, type: "symbol", source: "pois", filter, minzoom,
     layout: { "text-field": ["get", "name"], "text-font": ["Noto Sans Regular"], "text-size": 11, "text-anchor": "top",
               "text-offset": [0, 0.7], "text-max-width": 9, "text-optional": true,
               "symbol-sort-key": ["index-of", kind, ["literal", POI_ORDER]] },    // lower number = placed first
-    paint: { "text-color": colour, "text-halo-color": "#05080c", "text-halo-width": 1.6 },
+    paint: { "text-color": colour, "text-halo-color": "#0a0b0d", "text-halo-width": 1.6 },
   });
   label("pois-labels", ["!=", kind, "school"], 12);          // schools are many, so they get a label only when zoomed in
   label("pois-labels-schools", ["==", kind, "school"], 13.5);
@@ -263,7 +284,7 @@ function addRoadLabels() {
     id, type: "symbol", source, minzoom, ...(filter ? { filter } : {}),
     layout: { "symbol-placement": "line", "symbol-spacing": 300, "text-field": field, "text-font": [font],
               "text-size": ["interpolate", ["linear"], ["zoom"], 9, size - 2, 15, size + 2], "text-letter-spacing": 0.03 },
-    paint: { "text-color": "#f1efe6", "text-halo-color": "#05080c", "text-halo-width": 1.8, "text-halo-blur": 0.5 },
+    paint: { "text-color": "#ecebe8", "text-halo-color": "#0a0b0d", "text-halo-width": 1.8, "text-halo-blur": 0.5 },
   });
   // Added from least to most important: layers added later are placed first, so they win label collisions
   label("labels-local", ["all", hasName, ["!", isMajor], ["!", isAlways]], 13, "Noto Sans Regular", 11, ["get", "name"]);
@@ -303,15 +324,20 @@ map.on("load", async () => {
   addRoadLayers();
   addRoadPopups();
 
+  // Fire detections: a soft halo layer under a solid orange core
+  map.addLayer({ id: "fires-glow", type: "circle", source: "fires",
+    filter: ["<=", ["get", "step"], 0],
+    paint: { "circle-color": "#ff6a2b", "circle-opacity": 0.25, "circle-blur": 0.6,
+             "circle-radius": ["interpolate", ["linear"], ["zoom"], 8, 2.5, 10, 5, 12, 12, 15, 18] } });
   map.addLayer({ id: "fires", type: "circle", source: "fires",
     filter: ["<=", ["get", "step"], 0],
-    paint: { "circle-color": "#ff7a00", "circle-opacity": 0.7,
-             "circle-radius": ["interpolate", ["linear"], ["zoom"], 9, 2, 14, 9] } });
+    paint: { "circle-color": "#ff6a2b",
+             "circle-radius": ["interpolate", ["linear"], ["zoom"], 8, 0.8, 10, 1.6, 12, 3.5, 15, 5] } });
 
   map.addLayer({ id: "points", type: "circle", source: "points",
-    paint: { "circle-radius": ["match", ["get", "kind"], "exit", 7, 3],
-             "circle-color": ["match", ["get", "kind"], "exit", "#1b7f3b", "#5b6b8a"],
-             "circle-stroke-color": "#fff", "circle-stroke-width": 1 } });
+    paint: { "circle-radius": ["match", ["get", "kind"], "exit", 6, 3],
+             "circle-color": ["match", ["get", "kind"], "exit", "#ecebe8", "#8a8d93"],
+             "circle-stroke-color": "#0a0b0d", "circle-stroke-width": 1.5 } });
 
   addPoiLayers();
   addRoadLabels();           // added last, so road names win label collisions
@@ -328,7 +354,7 @@ map.on("load", async () => {
 });
 
 // ----- Landing page states: "loading" -> "landing" -> "replay" (a class on <body> drives the CSS) -----
-const REPLAY_LAYERS = ["roads-casing", "roads", "roads-affected-glow", "roads-affected", "route-casing", "route", "fires", "points",
+const REPLAY_LAYERS = ["roads-casing", "roads", "roads-affected-glow", "roads-affected", "route-casing", "route", "fires-glow", "fires", "points",
                        "pois", "pois-labels", "pois-labels-schools", "labels-local", "labels-major", "labels-always", "roads-hit"];
 
 function setReplayVisible(visible) {
@@ -413,23 +439,25 @@ function show(i) {
   const s = steps[i];
   slider.value = i;
   map.setFilter("fires", ["<=", ["get", "step"], i]);
+  map.setFilter("fires-glow", ["<=", ["get", "step"], i]);
   const affected = ["<=", ["coalesce", ["get", "affected_step"], 999], i];   // roads likely affected by step i
   map.setFilter("roads-affected", affected);
   if (map.getLayer("roads-affected-glow")) map.setFilter("roads-affected-glow", affected);
   map.setFilter("route", ["==", ["get", "step"], i]);
   if (map.getLayer("route-casing")) map.setFilter("route-casing", ["==", ["get", "step"], i]);
 
-  document.getElementById("clock").textContent = new Date(s.time).toLocaleString("en-CA", {
-    timeZone: "America/Vancouver", weekday: "short", month: "short", day: "numeric",
-    hour: "numeric", minute: "2-digit",
-  }) + " PDT (data up to this time)";
-  document.getElementById("s-fires").textContent = s.fires_so_far;
-  document.getElementById("s-roads").textContent = s.roads_affected;
-  document.getElementById("s-res").textContent = "~" + s.residents_cut_off.toLocaleString("en-CA");
+  const when = new Date(s.time);                                        // the data covers everything detected up to this time
+  document.getElementById("clock").textContent = when.toLocaleTimeString("en-GB", { timeZone: "America/Vancouver", hour: "2-digit", minute: "2-digit", hour12: false });
+  document.getElementById("clock-date").textContent = when.toLocaleDateString("en-CA", { timeZone: "America/Vancouver", month: "short", day: "numeric", year: "numeric" });
+  const fraction = Number(slider.max) > 0 ? i / Number(slider.max) : 0;   // orange slider fill ends at the middle of the thumb
+  document.getElementById("slider-fill").style.width = "calc(7px + (100% - 14px) * " + fraction + ")";
+  document.getElementById("s-fires").textContent = s.fires_so_far.toLocaleString("en-CA");
+  document.getElementById("s-roads").textContent = s.roads_affected.toLocaleString("en-CA");
+  document.getElementById("s-res").textContent = s.residents_cut_off.toLocaleString("en-CA");
   showAreas(i);
   showBriefing(i);
-  document.getElementById("s-longest").textContent = s.longest_drive_min == null ? "n/a" : "~" + Math.round(s.longest_drive_min) + " min";
-  document.getElementById("s-mean").textContent = s.mean_drive_min == null ? "n/a" : "~" + Math.round(s.mean_drive_min) + " min";
+  document.getElementById("s-longest").textContent = s.longest_drive_min == null ? "n/a" : Math.round(s.longest_drive_min) + " min";
+  document.getElementById("s-mean").textContent = s.mean_drive_min == null ? "n/a" : Math.round(s.mean_drive_min) + " min";
 }
 
 // ----- Briefings: pre-generated files, so the demo needs no API key or internet -----
@@ -492,26 +520,81 @@ async function showBriefing(i) {
 // List the areas cut off so far, largest first. Time is measured from the first detection.
 function showAreas(i) {
   const list = document.getElementById("areas-list");
-  list.innerHTML = "";
-  const cut = areas.filter((a) => a.cut_step <= i).sort((a, b) => b.residents - a.residents).slice(0, 6);
-  if (cut.length === 0) {
-    list.innerHTML = "<li>None yet</li>";
+  list.replaceChildren();
+  const cutNow = areas.filter((a) => a.cut_step <= i);
+  document.getElementById("areas-count").textContent = cutNow.length;
+  const top = cutNow.sort((a, b) => b.residents - a.residents).slice(0, 3);     // the three largest; the rest are counted in the heading
+  if (top.length === 0) {
+    const none = document.createElement("p");
+    none.className = "es-note";
+    none.textContent = "None yet";
+    list.appendChild(none);
     return;
   }
   const firstDetection = new Date(steps[0].first_detection);
-  for (const a of cut) {
+  for (const a of top) {
     const hours = ((new Date(a.cut_time) - firstDetection) / 3600000).toFixed(1);
-    const li = document.createElement("li");
-    li.innerHTML = a.name + ": ~" + a.residents + " residents, cut off " + hours + " h after first detection; est. drive " +
-      Math.round(a.baseline_drive_min) + " min" + (a.tight ? ' <span class="tight">(tight)</span>' : "");
-    list.appendChild(li);
+    const wrap = document.createElement("div");
+    wrap.className = "es-row-wrap";
+    const row = document.createElement("div");
+    row.className = "es-row";
+    const name = document.createElement("span");
+    name.textContent = a.name;
+    const count = document.createElement("span");
+    const number = document.createElement("span");
+    number.className = "es-est";
+    number.textContent = a.residents.toLocaleString("en-CA");
+    const tag = document.createElement("span");
+    tag.className = "es-est-tag";
+    tag.textContent = "est.";
+    count.append(number, tag);
+    row.append(name, count);
+    const detail = document.createElement("div");
+    detail.className = "es-row-sub";
+    detail.textContent = "cut off +" + hours + " h \u00b7 est. drive " + Math.round(a.baseline_drive_min) + " min";
+    if (a.tight) {
+      const flag = document.createElement("span");
+      flag.className = "tight";
+      flag.textContent = " \u00b7 tight";
+      detail.appendChild(flag);
+    }
+    wrap.append(row, detail);
+    list.appendChild(wrap);
+  }
+  if (cutNow.length > top.length) {
+    const more = document.createElement("p");
+    more.className = "es-note";
+    more.textContent = "+" + (cutNow.length - top.length) + " more";
+    list.appendChild(more);
   }
 }
+
+// Collapsible panel sections (Areas cut off, Briefing, About). The disclaimer is never collapsible.
+function initSections() {
+  for (const head of document.querySelectorAll(".es-section-head[data-toggle]")) {
+    const section = head.closest(".es-section");
+    const chevron = head.querySelector(".es-chev");
+    const setOpen = (open) => {
+      section.classList.toggle("is-closed", !open);
+      head.setAttribute("aria-expanded", String(open));
+      chevron.textContent = open ? "\u25b4" : "\u25be";
+    };
+    head.addEventListener("click", (e) => {
+      if (e.target.closest("select")) return;                          // choosing a language must not collapse the section
+      setOpen(section.classList.contains("is-closed"));
+    });
+    head.addEventListener("keydown", (e) => {
+      if ((e.key === "Enter" || e.key === " ") && e.target === head) { e.preventDefault(); head.click(); }
+    });
+  }
+}
+initSections();
 
 function togglePlay() {
   if (timer) { stop(); return; }
   if (Number(slider.value) >= steps.length - 1) show(0);   // restart from the beginning
   playBtn.textContent = "Pause";
+  playBtn.dataset.state = "playing";
   timer = setInterval(() => {
     const next = Number(slider.value) + 1;
     if (next >= steps.length) { stop(); return; }
@@ -523,4 +606,5 @@ function stop() {
   clearInterval(timer);
   timer = null;
   playBtn.textContent = "Play";
+  playBtn.dataset.state = "paused";
 }
