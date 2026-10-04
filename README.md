@@ -115,4 +115,4 @@ Copernicus Sentinel-2 L2A images (before and after the fire; modified Copernicus
 - ElevenLabs spoken briefings: tabled for now.
 - Highway 97: confirm when the official closure began and whether evacuees could use it (see `06_sensitivity_hwy97.py`).
 - More examples: parameterize `data_prep/config.py` and the `web/data` paths per area, and add an example picker to the landing page.
-- Layer 2 fire-spread hindcast: design only, see `docs/superpowers/specs/`.
+- Layer 2 fire-spread hindcast: tried and did **not pass**, so it is not used. The simulated fire reached Summerland's west edge about 10 hours late, overshot the final burned area about 8 times, and scored an IoU of 0.12 against the FIRMS footprint (the bar was 0.4). The code and write-up are on the `experiment/spread-sim` branch (`experiments/spread/RESULT.md`); the original design is in `docs/superpowers/specs/`.
