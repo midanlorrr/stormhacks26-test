@@ -31,6 +31,7 @@ pip install -r requirements.txt
 | 5 | `python data_prep/04_check_perimeter.py` | Compares our data with the official BCWS perimeter (optional, see below). |
 | 6 | `python data_prep/06_sensitivity_hwy97.py` | Optional test: reruns the end-of-replay numbers with the whole official Highway 97 closure treated as impassable. Does not change the main results. |
 | 7 | `python data_prep/07_briefings.py` | Generates plain-language briefings with Gemini (needs `GEMINI_API_KEY` in `.env`; the page reads the saved files in `web/briefings/`). Use `--dry-run` first (no API call). A normal run makes ONE call; `--all` makes about 12, and the free tier allows about 20 per day per model. |
+| 8 | `python data_prep/08_pois.py` | Gets named places (hospitals, fire stations, police, schools, community centres, parks over 20 ha, beaches) from OpenStreetMap for the map. Cached in `data_raw/`. |
 
 Downloads are cached in `data_raw/`, so reruns do not download again. The exported files in `web/data/` are committed, so you can view the map without running steps 1–4.
 

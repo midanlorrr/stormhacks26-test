@@ -105,6 +105,29 @@ function addRoadLayers() {
     paint: { "line-color": "#8ff0ff", "line-width": 4 } });
 }
 
+// ----- Places: hospitals, fire stations, police, schools, community centres, big parks, beaches -----
+const POI_COLORS = { hospital: "#ff7eb6", fire_station: "#ffd166", police: "#6ea8ff", school: "#b69cff",
+                     community_centre: "#3ec9b6", park: "#89c26a", beach: "#f2d28b" };
+const POI_ORDER = ["hospital", "fire_station", "police", "community_centre", "park", "beach", "school"];   // label priority
+
+function addPoiLayers() {
+  const kind = ["get", "kind"];
+  const colour = ["match", kind, ...Object.entries(POI_COLORS).flat(), "#ffffff"];
+  const important = ["match", kind, ["hospital", "fire_station", "police"], true, false];
+  map.addLayer({ id: "pois", type: "circle", source: "pois", minzoom: 11,
+    paint: { "circle-color": colour, "circle-radius": ["case", important, 5, 3.5],
+             "circle-stroke-color": "#05080c", "circle-stroke-width": 1.2 } });
+  const label = (id, filter, minzoom) => map.addLayer({
+    id, type: "symbol", source: "pois", filter, minzoom,
+    layout: { "text-field": ["get", "name"], "text-font": ["Noto Sans Regular"], "text-size": 11, "text-anchor": "top",
+              "text-offset": [0, 0.7], "text-max-width": 9, "text-optional": true,
+              "symbol-sort-key": ["index-of", kind, ["literal", POI_ORDER]] },    // lower number = placed first
+    paint: { "text-color": colour, "text-halo-color": "#05080c", "text-halo-width": 1.6 },
+  });
+  label("pois-labels", ["!=", kind, "school"], 12);          // schools are many, so they get a label only when zoomed in
+  label("pois-labels-schools", ["==", kind, "school"], 13.5);
+}
+
 // ----- Road popups: hover to peek, click to pin -----
 const ROAD_TYPES = {
   motorway: "Motorway", trunk: "Major highway", primary: "Primary road", secondary: "Secondary road",
@@ -201,11 +224,11 @@ async function load(name) {
 }
 
 map.on("load", async () => {
-  let fires, roads, points, routes, areaData, roadLabels;
+  let fires, roads, points, routes, areaData, roadLabels, pois;
   try {
-    [steps, fires, roads, points, routes, areaData, roadLabels] = await Promise.all([
+    [steps, fires, roads, points, routes, areaData, roadLabels, pois] = await Promise.all([
       load("steps.json"), load("fires.geojson"), load("roads.geojson"),
-      load("points.geojson"), load("routes.geojson"), load("areas.geojson"), load("road_labels.geojson"),
+      load("points.geojson"), load("routes.geojson"), load("areas.geojson"), load("road_labels.geojson"), load("pois.geojson"),
     ]);
   } catch (err) {
     document.getElementById("clock").textContent = "Error: " + err.message +
@@ -217,6 +240,7 @@ map.on("load", async () => {
 
   map.addSource("roads", { type: "geojson", data: roads });
   map.addSource("road-labels", { type: "geojson", data: roadLabels });
+  map.addSource("pois", { type: "geojson", data: pois });
   map.addSource("fires", { type: "geojson", data: fires });
   map.addSource("routes", { type: "geojson", data: routes });
   map.addSource("points", { type: "geojson", data: points });
@@ -234,7 +258,8 @@ map.on("load", async () => {
              "circle-color": ["match", ["get", "kind"], "exit", "#1b7f3b", "#5b6b8a"],
              "circle-stroke-color": "#fff", "circle-stroke-width": 1 } });
 
-  addRoadLabels();
+  addPoiLayers();
+  addRoadLabels();           // added last, so road names win label collisions
 
   await loadBriefings();
   slider.max = steps.length - 1;

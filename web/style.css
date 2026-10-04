@@ -51,3 +51,5 @@ h2 { font-size: 14px; margin: 10px 0 4px; }
 .road-popup { font-size: 12px; line-height: 1.4; }
 .road-popup .affected { color: #c01818; font-weight: 600; }
 .road-popup .small { font-size: 11px; color: #666; margin-top: 3px; }
+
+.legend .places .dot { margin-left: 6px; margin-right: 2px; }
