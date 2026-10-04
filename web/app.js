@@ -29,12 +29,12 @@ const map = new maplibregl.Map({
         type: "raster",
         tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
         tileSize: 256,
-        attribution: "FALLBACK basemap: &copy; OpenStreetMap contributors",
+        attribution: "&copy; OpenStreetMap contributors",
       },
     },
     layers: [
-      // FALLBACK basemap, hidden unless the satellite tiles fail
-      { id: "basemap-fallback-osm", type: "raster", source: "osm", layout: { visibility: "none" } },
+      // "Streets" basemap (standard OpenStreetMap). Hidden until you pick it, or until the satellite tiles fail.
+      { id: "basemap-streets", type: "raster", source: "osm", layout: { visibility: "none" } },
       // Main basemap, dimmed so the overlays stand out (tweak these three numbers to taste)
       { id: "basemap-satellite", type: "raster", source: "satellite",
         paint: { "raster-brightness-max": 0.55, "raster-saturation": -0.45, "raster-contrast": 0.1 } },
@@ -43,16 +43,51 @@ const map = new maplibregl.Map({
 });
 map.addControl(new maplibregl.NavigationControl(), "top-right");
 
-// If the satellite tiles keep failing (for example, no internet), show the OpenStreetMap fallback instead
+// ----- Basemap toggle: Satellite / Streets (top-right, under the zoom buttons) -----
 let satelliteErrors = 0;
+
+function setBasemap(mode) {                   // mode is "satellite" or "streets"
+  map.setLayoutProperty("basemap-satellite", "visibility", mode === "satellite" ? "visible" : "none");
+  map.setLayoutProperty("basemap-streets", "visibility", mode === "streets" ? "visible" : "none");
+  for (const button of document.querySelectorAll(".basemap-toggle button")) {
+    button.classList.toggle("active", button.dataset.mode === mode);
+  }
+  if (mode === "satellite") {                 // trying satellite again: forget earlier errors and hide the warning
+    satelliteErrors = 0;
+    document.getElementById("basemap-note").hidden = true;
+  }
+}
+
+// A small MapLibre control with two buttons
+class BasemapToggle {
+  onAdd() {
+    this.box = document.createElement("div");
+    this.box.className = "maplibregl-ctrl maplibregl-ctrl-group basemap-toggle";
+    for (const [mode, text] of [["satellite", "Satellite"], ["streets", "Streets"]]) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.dataset.mode = mode;
+      button.textContent = text;
+      button.addEventListener("click", () => setBasemap(mode));
+      this.box.appendChild(button);
+    }
+    this.box.firstChild.classList.add("active");
+    return this.box;
+  }
+  onRemove() {
+    this.box.remove();
+  }
+}
+map.addControl(new BasemapToggle(), "top-right");
+
+// If the satellite tiles keep failing (for example, no internet), switch to Streets and say so
 map.on("error", (e) => {
   if (e.sourceId !== "satellite") {           // not a satellite-tile problem: show it instead of hiding it
     console.error(e.error);
     return;
   }
   if (++satelliteErrors !== 3) return;
-  map.setLayoutProperty("basemap-satellite", "visibility", "none");
-  map.setLayoutProperty("basemap-fallback-osm", "visibility", "visible");
+  setBasemap("streets");
   document.getElementById("basemap-note").hidden = false;
 });
 

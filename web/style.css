@@ -53,3 +53,8 @@ h2 { font-size: 14px; margin: 10px 0 4px; }
 .road-popup .small { font-size: 11px; color: #666; margin-top: 3px; }
 
 .legend .places .dot { margin-left: 6px; margin-right: 2px; }
+
+.basemap-toggle { display: flex; }
+.basemap-toggle button { width: auto; padding: 0 10px; font-size: 12px; }
+/* !important: MapLibre's own hover style would otherwise override the active colour */
+.basemap-toggle button.active { background-color: #ff7a1a !important; color: #fff; }
