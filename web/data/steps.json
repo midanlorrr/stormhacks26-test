@@ -1,0 +1,252 @@
+[
+ {
+  "step": 0,
+  "time": "2026-08-07T18:00:00-07:00",
+  "fires_so_far": 2,
+  "roads_affected": 0,
+  "origins_total": 74,
+  "origins_cut_off": 0,
+  "longest_drive_min": 21.2,
+  "mean_drive_min": 14.1
+ },
+ {
+  "step": 1,
+  "time": "2026-08-07T21:00:00-07:00",
+  "fires_so_far": 43,
+  "roads_affected": 6,
+  "origins_total": 74,
+  "origins_cut_off": 0,
+  "longest_drive_min": 21.2,
+  "mean_drive_min": 14.1
+ },
+ {
+  "step": 2,
+  "time": "2026-08-08T00:00:00-07:00",
+  "fires_so_far": 95,
+  "roads_affected": 24,
+  "origins_total": 74,
+  "origins_cut_off": 0,
+  "longest_drive_min": 21.2,
+  "mean_drive_min": 14.1
+ },
+ {
+  "step": 3,
+  "time": "2026-08-08T03:00:00-07:00",
+  "fires_so_far": 1250,
+  "roads_affected": 278,
+  "origins_total": 74,
+  "origins_cut_off": 8,
+  "longest_drive_min": 21.2,
+  "mean_drive_min": 14.1
+ },
+ {
+  "step": 4,
+  "time": "2026-08-08T06:00:00-07:00",
+  "fires_so_far": 2911,
+  "roads_affected": 391,
+  "origins_total": 74,
+  "origins_cut_off": 10,
+  "longest_drive_min": 21.2,
+  "mean_drive_min": 14.1
+ },
+ {
+  "step": 5,
+  "time": "2026-08-08T09:00:00-07:00",
+  "fires_so_far": 2913,
+  "roads_affected": 391,
+  "origins_total": 74,
+  "origins_cut_off": 10,
+  "longest_drive_min": 21.2,
+  "mean_drive_min": 14.1
+ },
+ {
+  "step": 6,
+  "time": "2026-08-08T12:00:00-07:00",
+  "fires_so_far": 2913,
+  "roads_affected": 391,
+  "origins_total": 74,
+  "origins_cut_off": 10,
+  "longest_drive_min": 21.2,
+  "mean_drive_min": 14.1
+ },
+ {
+  "step": 7,
+  "time": "2026-08-08T15:00:00-07:00",
+  "fires_so_far": 2957,
+  "roads_affected": 391,
+  "origins_total": 74,
+  "origins_cut_off": 10,
+  "longest_drive_min": 21.2,
+  "mean_drive_min": 14.1
+ },
+ {
+  "step": 8,
+  "time": "2026-08-08T18:00:00-07:00",
+  "fires_so_far": 3007,
+  "roads_affected": 391,
+  "origins_total": 74,
+  "origins_cut_off": 10,
+  "longest_drive_min": 21.2,
+  "mean_drive_min": 14.1
+ },
+ {
+  "step": 9,
+  "time": "2026-08-08T21:00:00-07:00",
+  "fires_so_far": 3071,
+  "roads_affected": 393,
+  "origins_total": 74,
+  "origins_cut_off": 10,
+  "longest_drive_min": 21.2,
+  "mean_drive_min": 14.1
+ },
+ {
+  "step": 10,
+  "time": "2026-08-09T00:00:00-07:00",
+  "fires_so_far": 3071,
+  "roads_affected": 393,
+  "origins_total": 74,
+  "origins_cut_off": 10,
+  "longest_drive_min": 21.2,
+  "mean_drive_min": 14.1
+ },
+ {
+  "step": 11,
+  "time": "2026-08-09T03:00:00-07:00",
+  "fires_so_far": 3889,
+  "roads_affected": 399,
+  "origins_total": 74,
+  "origins_cut_off": 10,
+  "longest_drive_min": 21.2,
+  "mean_drive_min": 14.1
+ },
+ {
+  "step": 12,
+  "time": "2026-08-09T06:00:00-07:00",
+  "fires_so_far": 4423,
+  "roads_affected": 407,
+  "origins_total": 74,
+  "origins_cut_off": 10,
+  "longest_drive_min": 21.2,
+  "mean_drive_min": 14.1
+ },
+ {
+  "step": 13,
+  "time": "2026-08-09T09:00:00-07:00",
+  "fires_so_far": 4423,
+  "roads_affected": 407,
+  "origins_total": 74,
+  "origins_cut_off": 10,
+  "longest_drive_min": 21.2,
+  "mean_drive_min": 14.1
+ },
+ {
+  "step": 14,
+  "time": "2026-08-09T12:00:00-07:00",
+  "fires_so_far": 4450,
+  "roads_affected": 407,
+  "origins_total": 74,
+  "origins_cut_off": 10,
+  "longest_drive_min": 21.2,
+  "mean_drive_min": 14.1
+ },
+ {
+  "step": 15,
+  "time": "2026-08-09T15:00:00-07:00",
+  "fires_so_far": 4780,
+  "roads_affected": 407,
+  "origins_total": 74,
+  "origins_cut_off": 10,
+  "longest_drive_min": 21.2,
+  "mean_drive_min": 14.1
+ },
+ {
+  "step": 16,
+  "time": "2026-08-09T18:00:00-07:00",
+  "fires_so_far": 4780,
+  "roads_affected": 407,
+  "origins_total": 74,
+  "origins_cut_off": 10,
+  "longest_drive_min": 21.2,
+  "mean_drive_min": 14.1
+ },
+ {
+  "step": 17,
+  "time": "2026-08-09T21:00:00-07:00",
+  "fires_so_far": 4780,
+  "roads_affected": 407,
+  "origins_total": 74,
+  "origins_cut_off": 10,
+  "longest_drive_min": 21.2,
+  "mean_drive_min": 14.1
+ },
+ {
+  "step": 18,
+  "time": "2026-08-10T00:00:00-07:00",
+  "fires_so_far": 4780,
+  "roads_affected": 407,
+  "origins_total": 74,
+  "origins_cut_off": 10,
+  "longest_drive_min": 21.2,
+  "mean_drive_min": 14.1
+ },
+ {
+  "step": 19,
+  "time": "2026-08-10T03:00:00-07:00",
+  "fires_so_far": 5023,
+  "roads_affected": 412,
+  "origins_total": 74,
+  "origins_cut_off": 10,
+  "longest_drive_min": 21.2,
+  "mean_drive_min": 14.1
+ },
+ {
+  "step": 20,
+  "time": "2026-08-10T06:00:00-07:00",
+  "fires_so_far": 5509,
+  "roads_affected": 413,
+  "origins_total": 74,
+  "origins_cut_off": 10,
+  "longest_drive_min": 21.2,
+  "mean_drive_min": 14.1
+ },
+ {
+  "step": 21,
+  "time": "2026-08-10T09:00:00-07:00",
+  "fires_so_far": 5509,
+  "roads_affected": 413,
+  "origins_total": 74,
+  "origins_cut_off": 10,
+  "longest_drive_min": 21.2,
+  "mean_drive_min": 14.1
+ },
+ {
+  "step": 22,
+  "time": "2026-08-10T12:00:00-07:00",
+  "fires_so_far": 5515,
+  "roads_affected": 413,
+  "origins_total": 74,
+  "origins_cut_off": 10,
+  "longest_drive_min": 21.2,
+  "mean_drive_min": 14.1
+ },
+ {
+  "step": 23,
+  "time": "2026-08-10T15:00:00-07:00",
+  "fires_so_far": 5902,
+  "roads_affected": 415,
+  "origins_total": 74,
+  "origins_cut_off": 10,
+  "longest_drive_min": 21.2,
+  "mean_drive_min": 14.1
+ },
+ {
+  "step": 24,
+  "time": "2026-08-10T18:00:00-07:00",
+  "fires_so_far": 6014,
+  "roads_affected": 415,
+  "origins_total": 74,
+  "origins_cut_off": 10,
+  "longest_drive_min": 21.2,
+  "mean_drive_min": 14.1
+ }
+]

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Summerland Wildfire Evacuation Replay</title>
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="map"></div>
+
+  <aside id="panel">
+    <h1>Summerland wildfire replay</h1>
+    <p class="sub">Satellite fire detections, Aug 7&ndash;10, 2026 (Pacific time)</p>
+
+    <div id="clock">&ndash;</div>
+    <div class="controls">
+      <button id="play" type="button">Play</button>
+      <input id="slider" type="range" min="0" max="0" value="0" step="1" aria-label="Time step">
+    </div>
+
+    <table>
+      <tr><td>Fire detections so far</td><td id="s-fires">&ndash;</td></tr>
+      <tr><td>Road segments likely affected</td><td id="s-roads">&ndash;</td></tr>
+      <tr><td>Origins cut off <span class="est">estimated</span></td><td id="s-cut">&ndash;</td></tr>
+      <tr><td>Longest estimated minimum drive time to an exit <span class="est">estimated</span></td><td id="s-longest">&ndash;</td></tr>
+      <tr><td>Average estimated minimum drive time to an exit <span class="est">estimated</span></td><td id="s-mean">&ndash;</td></tr>
+    </table>
+
+    <ul class="legend">
+      <li><span class="dot fire"></span> Fire detection (NASA FIRMS)</li>
+      <li><span class="line cut"></span> Road within 100 m of a detection (likely affected, treated as impassable)</li>
+      <li><span class="line route"></span> Route for the longest drive (estimated)</li>
+      <li><span class="dot exit"></span> Exit &nbsp; <span class="dot origin"></span> Sample origin</li>
+    </ul>
+
+    <p class="note">
+      Origins are 74 sample points in Summerland. &ldquo;Cut off&rdquo; means no drivable route to an exit
+      once nearby roads are removed. Drive times are estimated minimum times (free-flow, no congestion) using OSM speed limits where
+      tagged (about 15% of roads) and default speeds otherwise. Satellites only see fire when they pass over, and no detections
+      were found near Peachland.
+    </p>
+
+    <p class="disclaimer">
+      <strong>Not official guidance.</strong> This is an illustrative planning tool built from public data.
+      For real evacuations follow BC Wildfire Service and EmergencyInfoBC.
+    </p>
+  </aside>
+
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
