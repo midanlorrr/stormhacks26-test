@@ -9,3 +9,4 @@ networkx==3.7
 shapely==2.1.2
 pyogrio==0.13.0
 pyproj==3.8.0
+rasterio==1.5.2

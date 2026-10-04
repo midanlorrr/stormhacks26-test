@@ -3,6 +3,7 @@
 const slider = document.getElementById("slider");
 const playBtn = document.getElementById("play");
 let steps = [];          // contents of steps.json
+let areas = [];          // features of areas.geojson (1 km squares with estimated residents)
 let timer = null;        // setInterval id while playing
 
 const map = new maplibregl.Map({
@@ -32,17 +33,19 @@ async function load(name) {
 }
 
 map.on("load", async () => {
-  let fires, roads, points, routes;
+  let fires, roads, points, routes, areaData;
   try {
-    [steps, fires, roads, points, routes] = await Promise.all([
+    [steps, fires, roads, points, routes, areaData] = await Promise.all([
       load("steps.json"), load("fires.geojson"), load("roads.geojson"),
-      load("points.geojson"), load("routes.geojson"),
+      load("points.geojson"), load("routes.geojson"), load("areas.geojson"),
     ]);
   } catch (err) {
     document.getElementById("clock").textContent = "Error: " + err.message +
       " (run the page through a local server, see README)";
     return;
   }
+
+  areas = areaData.features.map((f) => f.properties).filter((p) => p.cut_step != null);
 
   map.addSource("roads", { type: "geojson", data: roads });
   map.addSource("fires", { type: "geojson", data: fires });
@@ -90,9 +93,29 @@ function show(i) {
   }) + " PDT (data up to this time)";
   document.getElementById("s-fires").textContent = s.fires_so_far;
   document.getElementById("s-roads").textContent = s.roads_affected;
-  document.getElementById("s-cut").textContent = s.origins_cut_off + " of " + s.origins_total;
+  document.getElementById("s-res").textContent = "~" + s.residents_cut_off.toLocaleString("en-CA");
+  showAreas(i);
   document.getElementById("s-longest").textContent = s.longest_drive_min == null ? "n/a" : "~" + Math.round(s.longest_drive_min) + " min";
   document.getElementById("s-mean").textContent = s.mean_drive_min == null ? "n/a" : "~" + Math.round(s.mean_drive_min) + " min";
+}
+
+// List the areas cut off so far, largest first. Time is measured from the first detection.
+function showAreas(i) {
+  const list = document.getElementById("areas-list");
+  list.innerHTML = "";
+  const cut = areas.filter((a) => a.cut_step <= i).sort((a, b) => b.residents - a.residents).slice(0, 6);
+  if (cut.length === 0) {
+    list.innerHTML = "<li>None yet</li>";
+    return;
+  }
+  const firstDetection = new Date(steps[0].first_detection);
+  for (const a of cut) {
+    const hours = ((new Date(a.cut_time) - firstDetection) / 3600000).toFixed(1);
+    const li = document.createElement("li");
+    li.innerHTML = a.name + ": ~" + a.residents + " residents, cut off " + hours + " h after first detection; est. drive " +
+      Math.round(a.baseline_drive_min) + " min" + (a.tight ? ' <span class="tight">(tight)</span>' : "");
+    list.appendChild(li);
+  }
 }
 
 function togglePlay() {

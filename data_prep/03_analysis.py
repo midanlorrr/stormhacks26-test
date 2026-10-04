@@ -1,5 +1,6 @@
 """Phase 2: mark roads near fire detections, compute drive times to exits, export JSON for the web page."""
 import json
+from collections import Counter
 
 import geopandas as gpd
 import networkx as nx
@@ -14,6 +15,9 @@ STEP_HOURS = 3
 SUMMERLAND = (-119.677, 49.601)   # lon, lat of town centre (approximate)
 ORIGIN_RADIUS_M = 2500        # sample origins within this distance of the centre
 ORIGIN_GRID_M = 500           # at most one origin per 500 m cell
+AREA_M = 1000                # population areas are 1 km squares
+TIGHT_SHARE = 0.25            # flag an area if its drive time is >= 25% of the time before it was cut off
+NEVER = pd.Timestamp("2100-01-01", tz=config.TIMEZONE)   # stands in for "never cut off"
 UTM = "EPSG:32611"            # metres, so buffers and distances are real metres
 OUT = config.ROOT / "web" / "data"
 OUT.mkdir(parents=True, exist_ok=True)
@@ -86,6 +90,67 @@ near["cell"] = list(zip((near.x // ORIGIN_GRID_M).astype(int), (near.y // ORIGIN
 origins = list(near.groupby("cell").head(1).index)
 print(f"{len(origins)} origin points sampled in Summerland")
 
+# ---------- 5b. Residents: when does each road node lose every route to an exit? ----------
+# node_population.csv comes from 05_population.py: WorldPop people assigned to their nearest road node
+pop = pd.read_csv(config.RAW / "node_population.csv").set_index("node")["pop"]
+pop = pop[pop.index.isin(G.nodes)]
+t0 = fires["time_pacific"].min()                       # first detection
+
+# Remove affected roads one detection time at a time (they only ever get removed, never restored)
+# and note the first time each populated node can no longer reach any exit.
+node_cut_time = {}
+H = G.copy()
+for t, grp in edges.dropna(subset=["affected_time"]).groupby("affected_time"):
+    H.remove_edges_from(zip(grp.u, grp.v, grp.key))
+    reachable = nx.multi_source_dijkstra_path_length(H.reverse(copy=False), exits)
+    for n in pop.index:
+        if n not in reachable and n not in node_cut_time:
+            node_cut_time[n] = t
+print(f"{len(node_cut_time)} of {len(pop)} populated road nodes lose every route to an exit "
+      f"(~{pop[list(node_cut_time)].sum():,.0f} of {pop.sum():,.0f} people in the study box)")
+
+# Baseline drive time (no fire at all) from every node to its nearest exit, in minutes
+base = nx.multi_source_dijkstra_path_length(G.reverse(copy=False), exits, weight="travel_time")
+
+# Group populated nodes into 1 km squares ("areas") and work out the race for each one
+street = {}                                            # a street name for each node, to label areas
+for u, name in zip(edges.u, edges["name"]):
+    street.setdefault(u, str(name) if isinstance(name, str) else "")
+xy = nodes.loc[pop.index]
+area_id = pd.Series(list(zip((xy.x // AREA_M).astype(int), (xy.y // AREA_M).astype(int))), index=pop.index)
+areas = []
+for _, members in area_id.groupby(area_id):
+    ids = list(members.index)
+    p = pop[ids]
+    if p.sum() < 20:                                   # skip nearly empty squares
+        continue
+    # "Cut off" = the time by which at least half of the area's residents have lost every route
+    cum = 0
+    cut_time = None
+    for n in sorted(ids, key=lambda n: node_cut_time.get(n, NEVER)):
+        if n not in node_cut_time:
+            break
+        cum += p[n]
+        if cum >= p.sum() / 2:
+            cut_time = node_cut_time[n]
+            break
+    drive = float((p * pd.Series({n: base[n] / 60 for n in ids})).sum() / p.sum())   # people-weighted minutes
+    window = (cut_time - t0).total_seconds() / 60 if cut_time is not None else None
+    centre = gpd.GeoSeries([Point((xy.loc[ids, "x"] * p).sum() / p.sum(), (xy.loc[ids, "y"] * p).sum() / p.sum())], crs=UTM).to_crs(4326).iloc[0]
+    names = Counter(street[n] for n in ids if street.get(n))
+    areas.append({"name": "near " + names.most_common(1)[0][0] if names else "unnamed roads",
+                  "residents": int(round(p.sum(), -1)), "baseline_drive_min": round(drive, 1),
+                  "cut_time": cut_time, "window_min": round(window) if window is not None else None,
+                  "drive_share": round(drive / window, 2) if window else None,
+                  "geometry": centre})
+cut_areas = [a for a in areas if a["cut_time"] is not None]
+print(f"\n{len(areas)} populated 1 km areas; {len(cut_areas)} get cut off. Time from first detection ({t0:%a %H:%M}) to cut-off:")
+for a in sorted(cut_areas, key=lambda a: -a["residents"])[:8]:
+    print(f"  {a['name']:<32} ~{a['residents']:>5} residents  cut off {a['cut_time']:%a %H:%M}  window {a['window_min']:>4} min  "
+          f"est. drive {a['baseline_drive_min']:>4} min  share {a['drive_share']:.0%}")
+tight = [a for a in cut_areas if a["drive_share"] >= TIGHT_SHARE]
+print(f"Areas where the drive is >= {TIGHT_SHARE:.0%} of the time before cut-off: {len(tight)}")
+
 # ---------- 6. Drive times per step ----------
 results = []
 routes = []
@@ -96,12 +161,12 @@ for i, t in enumerate(steps):
     # Search backwards from the exits: gives each node's drive time to the NEAREST exit
     dist = nx.multi_source_dijkstra_path_length(H.reverse(copy=False), exits, weight="travel_time")
     times = {o: dist[o] / 60 for o in origins if o in dist}       # minutes
-    cut_off = [o for o in origins if o not in dist]
+    residents = sum(v for n, v in pop.items() if node_cut_time.get(n, NEVER) <= t)
     worst = max(times, key=times.get) if times else None
-    res = {"step": i, "time": t.isoformat(),
+    res = {"step": i, "time": t.isoformat(), "first_detection": t0.isoformat(),
            "fires_so_far": int((fires["time_pacific"] <= t).sum()),
            "roads_affected": int(len(cut)),
-           "origins_total": len(origins), "origins_cut_off": len(cut_off),
+           "origins_total": len(origins), "residents_cut_off": int(round(residents, -1)),
            "longest_drive_min": round(times[worst], 1) if worst else None,
            "mean_drive_min": round(sum(times.values()) / len(times), 1) if times else None}
     results.append(res)
@@ -113,7 +178,7 @@ for i, t in enumerate(steps):
         routes.append({"type": "Feature", "properties": {"step": i, "minutes": round(times[worst], 1)},
                        "geometry": {"type": "LineString", "coordinates": [[round(p.x, 5), round(p.y, 5)] for p in pts]}})
     print(f"{t:%a %d %H:%M}  fires={res['fires_so_far']:5d}  roads affected={res['roads_affected']:4d}  "
-          f"cut off={res['origins_cut_off']:2d}/{len(origins)}  longest={res['longest_drive_min']} min  "
+          f"residents cut off~{res['residents_cut_off']:>6,}  longest={res['longest_drive_min']} min  "
           f"mean={res['mean_drive_min']} min")
 
 # ---------- 7. Export (WGS84 GeoJSON, 5 decimals ~ 1 m) ----------
@@ -135,6 +200,11 @@ gpd.GeoDataFrame(r[["name", "highway", "affected_time", "affected_step", "geomet
 pts = gpd.GeoDataFrame({"kind": ["exit"] * len(exits) + ["origin"] * len(origins)},
                        geometry=list(nodes.loc[exits + origins].geometry), crs=UTM)
 pts.to_crs(4326).to_file(OUT / "points.geojson", driver="GeoJSON", COORDINATE_PRECISION=5)
+area_gdf = gpd.GeoDataFrame([{**a, "cut_step": step_index(a["cut_time"], steps) if a["cut_time"] is not None else None,
+                              "cut_time": a["cut_time"].isoformat() if a["cut_time"] is not None else None,
+                              "tight": bool(a["drive_share"] is not None and a["drive_share"] >= TIGHT_SHARE)}
+                             for a in areas], crs=4326)
+area_gdf.to_file(OUT / "areas.geojson", driver="GeoJSON", COORDINATE_PRECISION=5)
 (OUT / "routes.geojson").write_text(json.dumps({"type": "FeatureCollection", "features": routes}))
 (OUT / "steps.json").write_text(json.dumps(results, indent=1))
 print("\nExported to", OUT)

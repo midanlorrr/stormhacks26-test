@@ -23,10 +23,15 @@
     <table>
       <tr><td>Fire detections so far</td><td id="s-fires">&ndash;</td></tr>
       <tr><td>Road segments likely affected</td><td id="s-roads">&ndash;</td></tr>
-      <tr><td>Origins cut off <span class="est">estimated</span></td><td id="s-cut">&ndash;</td></tr>
+      <tr><td>Residents cut off from all exits <span class="est">estimated</span></td><td id="s-res">&ndash;</td></tr>
       <tr><td>Longest estimated minimum drive time to an exit <span class="est">estimated</span></td><td id="s-longest">&ndash;</td></tr>
       <tr><td>Average estimated minimum drive time to an exit <span class="est">estimated</span></td><td id="s-mean">&ndash;</td></tr>
     </table>
+
+    <h2>Areas cut off so far <span class="est">estimated</span></h2>
+    <ol id="areas-list"></ol>
+    <p class="small">Time = from the first satellite detection to when most residents of a 1 km square lost every route to an exit.
+      &ldquo;Drive&rdquo; = estimated minimum drive time to an exit before the fire.</p>
 
     <ul class="legend">
       <li><span class="dot fire"></span> Fire detection (NASA FIRMS)</li>
@@ -36,10 +41,11 @@
     </ul>
 
     <p class="note">
-      Origins are 74 sample points in Summerland. &ldquo;Cut off&rdquo; means no drivable route to an exit
-      once nearby roads are removed. Drive times are estimated minimum times (free-flow, no congestion) using OSM speed limits where
-      tagged (about 15% of roads) and default speeds otherwise. Satellites only see fire when they pass over, and no detections
-      were found near Peachland.
+      Residents come from WorldPop 100 m gridded population (2025 estimate, approximate), with each cell&rsquo;s people
+      assigned to the nearest road node; &ldquo;cut off&rdquo; means no drivable route to an exit once likely-affected
+      roads are removed. Drive times are estimated minimum times (free-flow, no congestion) from 74 sample points in
+      Summerland, using OSM speed limits where tagged (about 15% of roads) and default speeds otherwise.
+      Satellites only see fire when they pass over, and no detections were found near Peachland.
     </p>
 
     <p class="disclaimer">
