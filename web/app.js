@@ -274,7 +274,7 @@ const fmtTime = (iso) => new Date(iso).toLocaleString("en-CA", {
 }) + " PDT";
 
 // Build the popup content from a road's properties (DOM text, never HTML, so odd characters in names are safe)
-function roadPopupContent(p) {
+function roadPopupContent(p, onInspect) {
   const box = document.createElement("div");
   box.className = "road-popup";
   const add = (tag, text, cls) => {
@@ -296,6 +296,14 @@ function roadPopupContent(p) {
     add("div", "Not yet affected at this time; likely affected from " + fmtTime(p.affected_time) + ".");
   }
   add("div", "Estimate from satellite detections, not an official closure.", "small");
+  if (onInspect) {                                                           // only in the clicked (pinned) popup
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "es-link road-popup-inspect";
+    button.textContent = "Inspect this spot";
+    button.addEventListener("click", (e) => { e.stopPropagation(); onInspect(); });
+    box.appendChild(button);
+  }
   return box;
 }
 
@@ -324,7 +332,8 @@ function addRoadPopups() {
   map.on("click", (e) => {
     const hit = map.queryRenderedFeatures(e.point, { layers: ["roads-hit"] });
     pinned = hit.length > 0;
-    if (pinned) popup.setLngLat(e.lngLat).setDOMContent(roadPopupContent(pickRoad(hit))).addTo(map);
+    const inspectHere = () => { popup.remove(); pinned = false; if (window.openInspect) window.openInspect(e.lngLat.lng, e.lngLat.lat); };
+    if (pinned) popup.setLngLat(e.lngLat).setDOMContent(roadPopupContent(pickRoad(hit), inspectHere)).addTo(map);
     else popup.remove();
   });
 }
@@ -370,6 +379,7 @@ map.on("load", async () => {
     return;
   }
 
+  window.inspectData = { fires: fires.features, roads: roads.features };       // used by inspect.js
   areas = areaData.features.map((f) => f.properties).filter((p) => p.cut_step != null);
   showCrosscheck();
   buildMoments(roads.features);
@@ -579,6 +589,7 @@ function fillBurnPane(info) {
 async function enterBurn() {
   if (burn.active || !document.body.classList.contains("replay")) return;
   stop();
+  if (window.closeInspect) window.closeInspect();                            // click-to-inspect is off in this view
   burn.active = true;
   burn.saved = { center: map.getCenter(), zoom: map.getZoom(), pitch: map.getPitch(), bearing: map.getBearing() };
   document.body.classList.add("burn");
@@ -858,6 +869,7 @@ function showPanel(i) {
   const high = s.residents_cut_off, low = s.residents_cut_off_low ?? high;      // 100 m rule = high estimate, 50 m rule = low estimate
   tweenValues(document.getElementById("s-res"), low === high ? [high] : [low, high], (v) => v.length === 1 ? fmt(v[0]) : fmt(v[0]) + "\u2013" + fmt(v[1]));
   updateTimeStates(i);
+  if (window.updateInspect) window.updateInspect();                           // keep an open inspect card in step with the replay
   showAreas(i);
   showBriefing(i);
   document.getElementById("s-longest").textContent = s.longest_drive_min == null ? "n/a" : Math.round(s.longest_drive_min) + " min";

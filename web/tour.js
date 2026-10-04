@@ -2,17 +2,17 @@
 // startTour() opens it, endTour() closes it. The page's own buttons are blocked while it is open.
 
 const TOUR_STEPS = [
-  { target: "#tour-time", title: "Date and time",
+  { target: "#tour-time", fit: "text", title: "Date and time",
     text: "The replay moves through the fire in 3-hour steps. The big date and time show the moment you are looking at. All counts are up to that moment." },
   { target: "#tour-controls", title: "Playback",
     text: "Press play to watch it unfold, or drag the playhead. Dragging pauses playback. Above the line, bars are key moments and diamonds are times with an AI-written briefing. Hover one for details, click to jump there." },
-  { target: "#tour-stats", title: "What is counted", before: () => window.selectDataTab?.("summary"),
+  { target: "#pane-summary", fit: "text", title: "What is counted", before: () => window.selectDataTab?.("summary"),
     text: "Fire detections are hot spots seen by satellites. Roads affected are road segments within 100 m of a detection, treated as closed. Residents cut off is an estimated range (50 m to 100 m rule): people with no drivable route to any exit. \"est.\" means estimated." },
-  { target: "#tour-data", title: "Data tabs", before: () => window.selectDataTab?.("moments"),
+  { target: ".es-tabs", fit: "text", title: "Data tabs", before: () => window.selectDataTab?.("moments"),
     text: "Use the tabs on the side. Summary: the headline counts. Moments: real events and the model's milestones (click one to jump there). Briefing: AI-written summary. Areas: 1 km squares that were cut off. Drive: estimated minimum drive to an exit. Burn scar: before and after satellite images with a draggable divider. About: how the figures are made." },
   { target: "#legend", title: "Map key",
     text: "Orange dots are fire detections, red lines are affected roads, and the pale blue line is the longest estimated drive out. Zoom in for road names and places." },
-  { target: "#tour-data", title: "Briefing", before: () => window.selectDataTab?.("briefing"),
+  { target: "#pane-briefing", fit: "text", title: "Briefing", before: () => window.selectDataTab?.("briefing"),
     text: "A plain-language briefing written by an AI model from these figures only. Pick the language at the top. It is not official guidance." },
   { target: "#play", title: "Your turn",
     text: "Press play when you are ready. You can reopen this tour any time from the Tour button." },
@@ -77,14 +77,38 @@ function showTourStep(i) {
   tourEl.querySelector(".tour-next").focus();
 }
 
+// The outline of just the words inside an element (so a wide box with short text does not get an off-centre outline)
+function textBounds(el) {
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+  let box = null;
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    const inside = node.parentElement;
+    if (!node.textContent.trim() || inside.closest("option, select")) continue;
+    if (inside.closest("details:not([open])") && !inside.closest("summary")) continue;      // folded-away text takes no space
+    const range = document.createRange();
+    range.selectNodeContents(node);
+    const r = range.getBoundingClientRect();
+    if (r.width === 0 || r.height === 0) continue;
+    box = box ? { left: Math.min(box.left, r.left), top: Math.min(box.top, r.top), right: Math.max(box.right, r.right), bottom: Math.max(box.bottom, r.bottom) }
+              : { left: r.left, top: r.top, right: r.right, bottom: r.bottom };
+  }
+  const scroller = el.closest(".es-panes");                                  // text scrolled out of view does not count
+  if (box && scroller) {
+    const s = scroller.getBoundingClientRect();
+    box = { left: Math.max(box.left, s.left), top: Math.max(box.top, s.top), right: Math.min(box.right, s.right), bottom: Math.min(box.bottom, s.bottom) };
+  }
+  return box;
+}
+
 // Put the four dark panels, the outline and the text card around the highlighted element
 function placeTour() {
   if (!tourEl) return;
   const target = document.querySelector(TOUR_STEPS[tourIndex].target);
   if (!target) return;
   target.scrollIntoView({ block: "nearest" });
-  const r = target.getBoundingClientRect();
-  const pad = 8;
+  const step = TOUR_STEPS[tourIndex];
+  const r = (step.fit === "text" && textBounds(target)) || target.getBoundingClientRect();
+  const pad = step.fit === "text" ? 12 : 8;
   const x1 = Math.max(0, r.left - pad), y1 = Math.max(0, r.top - pad);
   const x2 = Math.min(innerWidth, r.right + pad), y2 = Math.min(innerHeight, r.bottom + pad);
   const box = (el, left, top, width, height) => Object.assign(el.style, { left: left + "px", top: top + "px", width: width + "px", height: height + "px" });

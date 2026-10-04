@@ -133,7 +133,8 @@ for u, name in zip(edges.u, edges["name"]):
 xy = nodes.loc[pop.index]
 area_id = pd.Series(list(zip((xy.x // AREA_M).astype(int), (xy.y // AREA_M).astype(int))), index=pop.index)
 areas = []
-for _, members in area_id.groupby(area_id):
+cell_shares = []                                       # extra output for the click-to-inspect card (see below)
+for cell_key, members in area_id.groupby(area_id):
     ids = list(members.index)
     p = pop[ids]
     if p.sum() < 20:                                   # skip nearly empty squares
@@ -157,6 +158,7 @@ for _, members in area_id.groupby(area_id):
                   "cut_time": cut_time, "window_min": round(window) if window is not None else None,
                   "drive_share": round(drive / window, 2) if window else None,
                   "geometry": centre})
+    cell_shares.append({"key": cell_key, "ids": ids, "p": p, "drive": round(drive, 1), "name": areas[-1]["name"]})
 cut_areas = [a for a in areas if a["cut_time"] is not None]
 print(f"\n{len(areas)} populated 1 km areas; {len(cut_areas)} get cut off. Time from first detection ({t0:%a %H:%M}) to cut-off:")
 for a in sorted(cut_areas, key=lambda a: -a["residents"])[:8]:
@@ -253,6 +255,44 @@ area_gdf = gpd.GeoDataFrame([{**a, "cut_step": step_index(a["cut_time"], steps) 
                               "tight": bool(a["drive_share"] is not None and a["drive_share"] >= TIGHT_SHARE)}
                              for a in areas], crs=4326)
 area_gdf.to_file(OUT / "areas.geojson", driver="GeoJSON", COORDINATE_PRECISION=5)
+
+# ---------- 7b. Per 1 km area: % of estimated residents with no route to any exit, at every step ----------
+# "hi" uses the 100 m rule (the main estimate), "lo" the 50 m rule. Used by the click-to-inspect card on the page.
+def shares_for(cut_times, ids, p):
+    """Whole percent of the area's residents cut off at each step, and the same as residents (for the cross-check below)."""
+    people = [sum(p[n] for n in ids if cut_times.get(n, NEVER) <= t) for t in steps]
+    return [int(round(100 * v / p.sum())) for v in people], people
+
+def first_cut(cut_times, ids, p):
+    """Time the first road node holding at least about one estimated resident loses every route (None if never)."""
+    times = [cut_times[n] for n in ids if n in cut_times and p[n] >= 1]
+    return min(times).isoformat() if times else None
+
+cells_out, check_hi, check_lo, display_hi, display_lo = [], [0.0] * len(steps), [0.0] * len(steps), [0] * len(steps), [0] * len(steps)
+for c in cell_shares:
+    hi, people_hi = shares_for(node_cut_time, c["ids"], c["p"])
+    lo, people_lo = shares_for(node_cut_time_low, c["ids"], c["p"])
+    residents = int(round(c["p"].sum(), -1))
+    cells_out.append({"x": int(c["key"][0]), "y": int(c["key"][1]), "name": c["name"], "residents": residents, "drive": c["drive"],
+                      "hi": hi, "lo": lo, "first_hi": first_cut(node_cut_time, c["ids"], c["p"]), "first_lo": first_cut(node_cut_time_low, c["ids"], c["p"])})
+    for i in range(len(steps)):
+        check_hi[i] += people_hi[i]
+        check_lo[i] += people_lo[i]
+        display_hi[i] += residents * (round(hi[i] / 10) * 10) / 100          # what a reader gets by multiplying the card's numbers
+        display_lo[i] += residents * (round(lo[i] / 10) * 10) / 100
+(OUT / "area_cut_shares.json").write_text(json.dumps({"cell_m": AREA_M, "crs": UTM, "cells": cells_out}, separators=(",", ":")))
+
+# Cross-check: do the per-area numbers add up to the headline "residents cut off"?
+print("\nReconciliation of area_cut_shares.json with steps.json (residents cut off; 100 m rule = high, 50 m rule = low)")
+print("step  time          headline_hi  sum_areas_hi  sum_displayed_hi | headline_lo  sum_areas_lo  sum_displayed_lo")
+for i, t in enumerate(steps):
+    h = results[i]
+    print(f"{i:>4}  {t:%a %d %H:%M}  {h['residents_cut_off']:>10,}  {check_hi[i]:>12,.0f}  {display_hi[i]:>16,.0f} | "
+          f"{h['residents_cut_off_low']:>10,}  {check_lo[i]:>12,.0f}  {display_lo[i]:>16,.0f}")
+tiny = {n for n in pop.index} - {n for c in cell_shares for n in c["ids"]}
+print(f"Last step, exact: all nodes {sum(pop[n] for n in pop.index if node_cut_time.get(n, NEVER) <= steps[-1]):,.1f}; "
+      f"in the 280 squares {check_hi[-1]:,.1f}; in squares under 20 residents {sum(pop[n] for n in tiny if node_cut_time.get(n, NEVER) <= steps[-1]):,.1f}")
+print(f"Residents in squares of fewer than 20 people (no entry on the card): {pop.sum() - sum(c['p'].sum() for c in cell_shares):,.0f} of {pop.sum():,.0f}")
 (OUT / "routes.geojson").write_text(json.dumps({"type": "FeatureCollection", "features": routes}))
 (OUT / "steps.json").write_text(json.dumps(results, indent=1))
 (OUT / "crosschecks.json").write_text(json.dumps({"official_boundary_residents": official_boundary_residents}, indent=1))
