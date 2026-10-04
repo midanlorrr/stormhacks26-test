@@ -34,6 +34,7 @@ pip install -r requirements.txt
 | 6 | `python data_prep/06_sensitivity_hwy97.py` | Optional test: reruns the end-of-replay numbers with the whole official Highway 97 closure treated as impassable. Does not change the main results. |
 | 7 | `python data_prep/07_briefings.py` | Generates plain-language briefings with Gemini (needs `GEMINI_API_KEY` in `.env`; the page reads the saved files in `web/briefings/`). Use `--dry-run` first (no API call). A normal run makes ONE call; `--all` makes about 12, and the free tier allows about 20 per day per model. |
 | 8 | `python data_prep/08_pois.py` | Gets named places (hospitals, fire stations, police, schools, community centres, parks over 20 ha, beaches) from OpenStreetMap for the map. Cached in `data_raw/`. |
+| 9 | `python data_prep/09_burn_scar.py` | Downloads Sentinel-2 images (before: Aug 4, after: Aug 24, 2026) from the Microsoft Planetary Computer (free, no key), makes true-colour pictures and a burn-severity map (dNBR), and checks it against the official perimeter. Writes the small images and `burn_scar.json` into `web/data/`. Cached in `data_raw/`. |
 
 Downloads are cached in `data_raw/`, so reruns do not download again. The exported files in `web/data/` are committed, so you can view the map without running steps 1–4.
 
@@ -55,6 +56,7 @@ The look follows the Evacusense design handoff (direction 4a "Graphite") kept in
 - The date, time, Play button and playhead sit in a bar along the bottom. Drag the playhead to move through time (this pauses playback). Click a line in **Key moments** to jump to that time.
 - **Tour** (top of the side panel) shows the tour again; **Intro** goes back to the globe; **Hide** collapses the panel (the **Panel** button brings it back).
 - The side panel is a set of tabs: **Summary** (the headline counts at the current moment), Moments, Briefing, Areas, Drive and About. The **Briefing** tab shows the AI-written briefing (pick the language at the top). On the bottom bar, bars above the line are key moments and diamonds are times with a briefing; hover for details, click to jump there.
+- The **Burn scar** tab turns the map to look straight down and lays two Sentinel-2 images over it: drag the divider to compare before (Aug 4) and after (Aug 24). **Show burn severity** adds the dNBR colours and the official perimeter. Leaving the tab restores the replay view.
 - During the replay the map is limited to about 100 km around Summerland (a flat map, not the globe).
 
 ## Known limits
@@ -101,7 +103,7 @@ What this does and does not show:
 | SSSS Python | The whole data pipeline is Python (`data_prep/01` to `08`): pandas, geopandas, osmnx, networkx, rasterio and the Gemini SDK. The page itself is plain JavaScript. |
 
 ## Data sources
-NASA FIRMS (VIIRS and MODIS active fire), WorldPop (population, CC BY 4.0: Bondarenko et al., WorldPop, University of Southampton, DOI 10.5258/SOTON/WP00839), OpenStreetMap (roads, via osmnx), Noto Sans map label fonts (SIL Open Font License; glyph files in `web/fonts/` from the MapLibre demo font server), Sora and JetBrains Mono interface fonts (SIL Open Font License; `web/fonts/ui/`), BC Wildfire Service (perimeter, for checking only), DriveBC (one closure, compared by hand).
+Copernicus Sentinel-2 L2A images (before and after the fire; modified Copernicus Sentinel data 2026, read from the Microsoft Planetary Computer), NASA FIRMS (VIIRS and MODIS active fire), WorldPop (population, CC BY 4.0: Bondarenko et al., WorldPop, University of Southampton, DOI 10.5258/SOTON/WP00839), OpenStreetMap (roads, via osmnx), Noto Sans map label fonts (SIL Open Font License; glyph files in `web/fonts/` from the MapLibre demo font server), Sora and JetBrains Mono interface fonts (SIL Open Font License; `web/fonts/ui/`), BC Wildfire Service (perimeter, for checking only), DriveBC (one closure, compared by hand).
 
 ## To do
 - Confirm the evacuation-order time against an official notice (RDOS or the District of Summerland); today it is cited as reported by CBC.

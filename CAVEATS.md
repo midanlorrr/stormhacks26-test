@@ -51,6 +51,14 @@ Everything below applies to this project as of Oct 4, 2026. Read this before quo
 - Everything else (roads closed, drive times, residents cut off) is **not validated** against real closure or traffic records.
 - Timeline facts come from the BCWS incident record, the BC Emergency Alert of Aug 8, and a CBC article published Aug 8 at 9:15 pm PT. The article describes events through 8 am that morning. The order times in it are the news outlet's account, not an official notice.
 
+## Burn scar (Sentinel-2)
+- The before/after images are Sentinel-2 L2A from Aug 4 (3 days before ignition) and Aug 24, 2026. The after image is 14 days after ignition, so it includes any burning after Aug 10 and not just Aug 7-10. A later, clearer image (Sep 18) is used only as a cross-check.
+- "Burn severity" is dNBR = NBR before minus NBR after, with NBR = (NIR - SWIR2) / (NIR + SWIR2) from bands B08 and B12. The classes (0.10, 0.27, 0.44, 0.66) are the common USGS/FIREMON ones, which were developed for forests and Landsat. Treat the colours as relative severity, not measured damage.
+- About **89.5%** of the official perimeter has dNBR above 0.10 (86.3% with the Sep 18 image). FIRMS has a detection within 1 km of **87%** of it. These are different tests of different things, so they are close but not directly comparable. The perimeter is a later (Aug 29) and larger snapshot than the fire at Aug 10.
+- Cloud, cloud shadow, thin cirrus and water pixels are left out. Cloud is under 1% and shadow about 3% of the perimeter in the Aug 24 image; there is one small smoke plume in the lower left of that image, away from the main scar. Haze (aerosol) was low on both dates, but smoke is not removed.
+- Farm fields, grass drying out, logging and new roads between the two dates can also change NBR. Outside the perimeter 1.5% of usable pixels still pass the threshold.
+- Pixels are about 20 m on the ground. The images are drawn flat on the map, which is why the map cannot be tilted or rotated in this view.
+
 ## AI briefings (Gemini)
 - Written by a small Gemini model (`gemini-3.5-flash-lite`) from our computed numbers. Code rejects invented or rounded numbers, missing "BC Wildfire Service" and "EmergencyInfoBC", and (in English) instructions to evacuate. That does not guarantee every sentence is accurate or appropriate.
 - The "steps", "what to bring" and "pets" lists come from the model's general knowledge, not from official guidance.

@@ -256,7 +256,7 @@ body.flying #map { pointer-events: none; }
 .es-tab { text-align: left; padding: 7px 8px; background: none; border: 0; border-left: 2px solid transparent; border-radius: 0;
           font: 400 11px var(--es-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--es-muted); cursor: pointer; }
 .es-tab:hover { color: var(--es-text); background: rgba(236, 235, 232, 0.04); }
-.es-tab[aria-selected="true"] { color: var(--es-text); border-left-color: var(--es-text); background: rgba(236, 235, 232, 0.07); }
+.es-tab[aria-selected="true"] { color: var(--es-text); background: rgba(236, 235, 232, 0.07); }
 .es-tab:focus-visible { outline: 2px solid var(--es-fire); outline-offset: -2px; }
 .es-tab-count { margin-left: 4px; color: var(--es-text-soft); }
 .es-panes { flex: 1; min-width: 0; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--es-line-strong) transparent; }
@@ -322,3 +322,96 @@ body.flying #map { pointer-events: none; }
 #pane-summary .es-number { font-size: 30px; }
 #pane-summary #crosscheck-note { margin-top: 14px; }
 .es-data { border-top: 0; padding-top: 0; }
+
+
+/* =============== Landing: fits short screens (type and spacing follow the window height) =============== */
+#landing { padding: clamp(20px, 4.5vh, 40px) clamp(28px, 4.5vw, 64px) clamp(20px, 4.5vh, 48px); overflow-y: auto; }
+#landing .es-eyebrow { font-size: clamp(11px, 1.7vh, 14px); margin-bottom: clamp(12px, 2.6vh, 28px); }
+#landing .es-title { font-size: clamp(30px, min(5.3vw, 8.4vh), 68px); margin-bottom: clamp(14px, 2.6vh, 28px); }
+#landing .es-lede { font-size: clamp(15px, 2.4vh, 21px); margin-bottom: clamp(12px, 2.2vh, 20px); }
+#landing .es-example { margin-bottom: clamp(14px, 2.6vh, 24px); }
+.es-skip { margin-top: clamp(14px, 2.6vh, 28px); }
+.es-credits { font-size: clamp(8.5px, 1.25vh, 10px); line-height: 1.55; }
+#landing .es-copy { margin: auto 0; padding: 12px 0; }
+
+/* =============== Motion (all of it is switched off for people who ask for less motion) =============== */
+@media (prefers-reduced-motion: no-preference) {
+  /* landing text rises into place one piece after another */
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  body.landing #landing .es-brand, body.landing #landing .es-eyebrow, body.landing #landing .es-title, body.landing #landing .es-lede,
+  body.landing #landing .es-example, body.landing #landing .es-actions, body.landing #landing .es-skip, body.landing #landing .es-credits {
+    animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+  body.landing #landing .es-eyebrow { animation-delay: 0.10s; }
+  body.landing #landing .es-title { animation-delay: 0.20s; }
+  body.landing #landing .es-lede { animation-delay: 0.32s; }
+  body.landing #landing .es-example { animation-delay: 0.42s; }
+  body.landing #landing .es-actions { animation-delay: 0.52s; }
+  body.landing #landing .es-skip { animation-delay: 0.60s; }
+  body.landing #landing .es-credits { animation-delay: 0.70s; }
+
+  /* the side panel slides in from the left and the time bar rises from the bottom when the replay starts */
+  #panel { transition: opacity 0.5s ease, transform 0.55s cubic-bezier(0.2, 0.7, 0.2, 1), visibility 0s; }
+  #timebar { transition: opacity 0.5s ease 0.15s, transform 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) 0.15s, visibility 0s; }
+  body:not(.replay) #panel { transform: translateX(-28px); }
+  body:not(.replay) #timebar { transform: translateY(24px); }
+  #panel.is-collapsed { transform: translateX(-110%); }
+
+  /* tab content eases in; the new date slides in */
+  @keyframes paneIn { from { opacity: 0; transform: translateX(8px); } to { opacity: 1; transform: none; } }
+  .es-pane:not([hidden]) { animation: paneIn 0.22s ease-out; }
+  @keyframes dateIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+  .es-date.tick { animation: dateIn 0.3s ease-out; }
+  /* a key moment ringing as the playhead passes it */
+  @keyframes ping { from { opacity: 0.9; transform: translateX(-50%) scale(0.4); } to { opacity: 0; transform: translateX(-50%) scale(2.6); } }
+  .es-mark.ping::after { content: ""; position: absolute; left: 50%; top: 0; width: 10px; height: 10px; border: 1px solid var(--es-text); border-radius: 50%;
+                         transform: translateX(-50%); animation: ping 0.7s ease-out forwards; pointer-events: none; }
+  .es-mark--briefing.ping::after { top: 0; }
+}
+.es-tab-indicator { position: absolute; left: 0; top: 0; width: 2px; background: var(--es-text); transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.2, 1), height 0.2s; pointer-events: none; }
+.es-tabs { position: relative; }
+.es-btn, .es-link, .es-tab, .es-mark::before { transition: background-color 0.15s, color 0.15s, border-color 0.15s; }
+/* figures keep their width while they count */
+.es-number, .es-date, .es-clock, .es-est { font-variant-numeric: tabular-nums; }
+
+/* =============== Key moments and marks: passed, current and upcoming =============== */
+.es-moment { border-left: 2px solid transparent; padding-left: 8px; margin-left: -10px; width: calc(100% + 10px); }
+.es-moment.is-future { opacity: 0.45; }
+.es-moment.is-active { border-left-color: var(--es-text); background: rgba(236, 235, 232, 0.06); color: var(--es-text); }
+.es-mark::before { opacity: 0.55; }
+.es-mark.is-passed::before { opacity: 1; }
+.es-mark--moment.is-passed::before { background: var(--es-text); }
+
+/* =============== Burn scar view =============== */
+.es-dates { display: flex; gap: 16px; margin: 6px 0 12px; }
+.es-dates > div { display: flex; flex-direction: column; gap: 2px; }
+.es-date-val { font: 600 14px var(--es-font); }
+.es-switch { display: flex; align-items: center; gap: 10px; font-size: 13px; cursor: pointer; margin: 4px 0 10px; }
+.es-switch input { position: absolute; opacity: 0; width: 0; height: 0; }
+.es-switch-box { width: 30px; height: 16px; border: 1px solid var(--es-muted); border-radius: var(--es-radius); position: relative; flex: none; transition: border-color 0.15s, background-color 0.15s; }
+.es-switch-box::after { content: ""; position: absolute; left: 2px; top: 2px; width: 10px; height: 10px; background: var(--es-muted); transition: transform 0.18s, background-color 0.15s; }
+.es-switch input:checked + .es-switch-box { border-color: var(--es-text); }
+.es-switch input:checked + .es-switch-box::after { transform: translateX(14px); background: var(--es-text); }
+.es-switch input:focus-visible + .es-switch-box { outline: 2px solid var(--es-fire); outline-offset: 2px; }
+.es-burn-legend { margin: 0 0 12px; padding: 10px 0; border-top: 1px solid var(--es-line); border-bottom: 1px solid var(--es-line); }
+.es-burn-legend .es-label { margin-bottom: 6px; }
+.es-burn-key { display: flex; align-items: center; gap: 8px; font-size: 11px; line-height: 1.7; color: var(--es-text-soft); }
+.es-burn-swatch { width: 14px; height: 10px; flex: none; }
+.es-burn-line { width: 14px; height: 0; border-top: 2px dashed var(--es-text); flex: none; }
+.es-burn-stats .es-stat-row { flex-direction: column; align-items: flex-start; gap: 4px; padding: 10px 0; }
+.es-burn-stats .es-number { font-size: 26px; }
+
+.burn-canvas { position: absolute; left: 0; top: 0; pointer-events: none; }
+body:not(.burn) #burn-divider, body:not(.burn) #burn-caption { display: none; }
+body.burn #timebar, body.burn #legend { opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(16px); }
+#burn-divider[hidden], #burn-caption[hidden] { display: none; }
+#burn-divider { position: fixed; z-index: 8; width: 28px; margin-left: -14px; cursor: ew-resize; touch-action: none; }
+#burn-divider::before { content: ""; position: absolute; left: 13px; top: 0; bottom: 0; width: 2px; background: var(--es-text); }
+#burn-divider:focus-visible { outline: 2px solid var(--es-fire); outline-offset: 0; }
+.burn-grip { position: absolute; left: 0; top: 50%; width: 28px; height: 44px; margin-top: -22px; background: #0c0e12; border: 1px solid var(--es-text); border-radius: var(--es-radius); }
+.burn-grip::before, .burn-grip::after { content: ""; position: absolute; top: 18px; border-style: solid; border-width: 4px 5px 4px 0; border-color: transparent var(--es-text) transparent transparent; }
+.burn-grip::before { left: 3px; }
+.burn-grip::after { right: 3px; transform: scaleX(-1); }
+.burn-tag { position: absolute; top: 10px; padding: 3px 8px; background: #0c0e12; border: 1px solid var(--es-line-strong); font: 400 10px var(--es-mono); letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; }
+.burn-tag--before { right: 22px; }
+.burn-tag--after { left: 22px; }
+#burn-caption { position: fixed; left: 24px; bottom: 34px; z-index: 7; max-width: 420px; margin: 0; padding: 8px 10px; background: rgba(12, 14, 18, 0.88); border: 1px solid var(--es-line); }

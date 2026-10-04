@@ -85,11 +85,13 @@
     <section id="tour-data" class="es-data" aria-label="Data">
       <div class="es-tabs" role="tablist" aria-orientation="vertical" aria-label="Data">
         <span class="es-tabs-title">Data</span>
+        <span class="es-tab-indicator" aria-hidden="true"></span>
         <button class="es-tab" role="tab" id="tab-summary" data-tab="summary" aria-selected="true" aria-controls="pane-summary" type="button">Summary</button>
         <button class="es-tab" role="tab" id="tab-moments" data-tab="moments" aria-selected="false" aria-controls="pane-moments" tabindex="-1" type="button">Moments</button>
         <button class="es-tab" role="tab" id="tab-briefing" data-tab="briefing" aria-selected="false" aria-controls="pane-briefing" tabindex="-1" type="button">Briefing</button>
         <button class="es-tab" role="tab" id="tab-areas" data-tab="areas" aria-selected="false" aria-controls="pane-areas" tabindex="-1" type="button">Areas <span id="areas-count" class="es-tab-count">0</span></button>
         <button class="es-tab" role="tab" id="tab-drive" data-tab="drive" aria-selected="false" aria-controls="pane-drive" tabindex="-1" type="button">Drive</button>
+        <button class="es-tab" role="tab" id="tab-burn" data-tab="burn" aria-selected="false" aria-controls="pane-burn" tabindex="-1" type="button">Burn scar</button>
         <button class="es-tab" role="tab" id="tab-about" data-tab="about" aria-selected="false" aria-controls="pane-about" tabindex="-1" type="button">About</button>
       </div>
       <div class="es-panes">
@@ -134,6 +136,31 @@
           <div class="es-row"><span>Longest</span><span><span id="s-longest" class="es-est">&ndash;</span><span class="es-est-tag">est.</span></span></div>
           <div class="es-row"><span>Average</span><span><span id="s-mean" class="es-est">&ndash;</span><span class="es-est-tag">est.</span></span></div>
           <p class="es-note">Free-flow, no congestion, from 74 sample points in the example area.</p>
+        </div>
+        <div id="pane-burn" class="es-pane" role="tabpanel" aria-labelledby="tab-burn" hidden>
+          <h3 class="es-pane-title">Burn scar</h3>
+          <p class="es-note es-pane-sub">Sentinel-2 satellite images of the same ground. Drag the divider on the map: left is before the fire, right is after.</p>
+          <div class="es-dates">
+            <div><span class="es-label">Before</span><span id="burn-date-before" class="es-date-val">&ndash;</span></div>
+            <div><span class="es-label">After</span><span id="burn-date-after" class="es-date-val">&ndash;</span></div>
+          </div>
+          <label class="es-switch"><input id="burn-dnbr-toggle" type="checkbox"><span class="es-switch-box" aria-hidden="true"></span>Show burn severity</label>
+          <div id="burn-legend" class="es-burn-legend" hidden>
+            <div class="es-label">Burn severity estimated from Sentinel-2 (dNBR)</div>
+            <div id="burn-ramp"></div>
+            <div class="es-burn-key"><span class="es-burn-line"></span>Official BCWS perimeter</div>
+          </div>
+          <div class="es-stat-list es-burn-stats">
+            <div class="es-stat-row">
+              <div><div class="es-stat-title">Sentinel-2 burn index</div><div class="es-stat-desc">Share of the official perimeter with a burn signal</div></div>
+              <span class="es-number"><span id="burn-share" class="es-est">&ndash;</span><span class="es-est-tag">est.</span></span>
+            </div>
+            <div class="es-stat-row">
+              <div><div class="es-stat-title">FIRMS detections</div><div class="es-stat-desc">Share of the perimeter within 1 km of a detection</div></div>
+              <span class="es-number"><span id="burn-firms" class="es-est">&ndash;</span></span>
+            </div>
+          </div>
+          <p id="burn-note" class="es-note"></p>
         </div>
         <div id="pane-about" class="es-pane" role="tabpanel" aria-labelledby="tab-about" hidden>
           <h3 class="es-pane-title">About these figures</h3>
@@ -184,6 +211,13 @@
     <div><span class="es-swatch es-swatch--point"></span>Exit and sample points</div>
     <div class="es-legend-note">Places appear when zoomed in</div>
   </div>
+
+  <div id="burn-divider" aria-label="Before and after divider" role="slider" tabindex="0" aria-valuemin="0" aria-valuemax="100" hidden>
+    <span class="burn-tag burn-tag--before" id="burn-tag-before"></span>
+    <span class="burn-tag burn-tag--after" id="burn-tag-after"></span>
+    <span class="burn-grip" aria-hidden="true"></span>
+  </div>
+  <p id="burn-caption" class="es-credits" hidden></p>
 
   <div id="mark-tip" role="tooltip" hidden></div>
 

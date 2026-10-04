@@ -1,0 +1,66 @@
+{
+ "bounds": [
+  -120.01078970806113,
+  49.51008761502957,
+  -119.66826209022634,
+  49.70602877836288
+ ],
+ "before": {
+  "date": "2026-08-04",
+  "scenes": [
+   "S2C_MSIL2A_20260804T185921_R013_T11ULR_20260804T233659",
+   "S2C_MSIL2A_20260804T185921_R013_T11ULQ_20260804T233659",
+   "S2C_MSIL2A_20260804T185921_R013_T10UGV_20260804T233659",
+   "S2C_MSIL2A_20260804T185921_R013_T10UGA_20260804T233659"
+  ]
+ },
+ "after": {
+  "date": "2026-08-24",
+  "scenes": [
+   "S2C_MSIL2A_20260824T185911_R013_T11ULR_20260824T231808",
+   "S2C_MSIL2A_20260824T185911_R013_T11ULQ_20260824T231808",
+   "S2C_MSIL2A_20260824T185911_R013_T10UGV_20260824T231808",
+   "S2C_MSIL2A_20260824T185911_R013_T10UGA_20260824T231808"
+  ]
+ },
+ "burned_threshold": 0.1,
+ "moderate_threshold": 0.27,
+ "perimeter_km2": 251.6,
+ "perimeter_source": "BCWS fire K51490, track date 2026-08-29",
+ "ramp": [
+  {
+   "from": 0.1,
+   "color": "#6a4bd6",
+   "label": "Low"
+  },
+  {
+   "from": 0.27,
+   "color": "#c13fb0",
+   "label": "Moderate-low"
+  },
+  {
+   "from": 0.44,
+   "color": "#ff6fa1",
+   "label": "Moderate-high"
+  },
+  {
+   "from": 0.66,
+   "color": "#fff2a8",
+   "label": "High"
+  }
+ ],
+ "firms_within_1km_share": 87,
+ "result": {
+  "usable_share": 99.9,
+  "burned_share": 89.5,
+  "moderate_or_higher_share": 61.6,
+  "burned_inside_perimeter_share": 98.3
+ },
+ "cross_check_scene": "2026-09-18",
+ "cross_check": {
+  "usable_share": 99.8,
+  "burned_share": 86.3,
+  "moderate_or_higher_share": 55.0,
+  "burned_inside_perimeter_share": 95.5
+ }
+}

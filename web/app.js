@@ -24,6 +24,9 @@ const REPLAY_MIN_ZOOM = 7.5;
 let tourShown = false;           // the guided tour opens by itself the first time only
 const REPLAY_PADDING = { left: 440, top: 0, right: 0, bottom: 120 };   // keeps Summerland clear of the side panel (24 + 380 px + space) and the time bar
 const REPLAY_PADDING_NO_PANEL = { left: 0, top: 0, right: 0, bottom: 120 };
+function currentPadding(panelOpen) {                                          // the burn scar view keeps the same padding as the replay
+  return panelOpen ? REPLAY_PADDING : REPLAY_PADDING_NO_PANEL;
+}
 
 const map = new maplibregl.Map({
   container: "map",
@@ -97,7 +100,20 @@ function selectDataTab(name) {
     tab.tabIndex = on ? 0 : -1;
     document.getElementById("pane-" + tab.dataset.tab).hidden = !on;
   }
+  moveTabIndicator();
+  if (name === "burn") enterBurn();
+  else exitBurn(true);
 }
+
+// A small bar that slides to the selected tab
+function moveTabIndicator() {
+  const tab = document.querySelector('.es-tab[aria-selected="true"]');
+  const bar = document.querySelector(".es-tab-indicator");
+  if (!tab || !bar) return;
+  bar.style.height = tab.offsetHeight + "px";
+  bar.style.transform = "translateY(" + tab.offsetTop + "px)";
+}
+window.addEventListener("resize", moveTabIndicator);
 window.selectDataTab = selectDataTab;                                       // the tour opens the right tab
 for (const tab of document.querySelectorAll(".es-tab")) {
   tab.addEventListener("click", () => selectDataTab(tab.dataset.tab));
@@ -480,6 +496,8 @@ function arriveAtSummerland() {
 function goToIntro() {
   stop();
   endTour();
+  exitBurn(false);
+  selectDataTab("summary");
   showSidePanel(true);
   document.body.classList.replace("replay", "landing");
   document.getElementById("start").disabled = false;
@@ -498,13 +516,234 @@ function goToIntro() {
 }
 document.getElementById("intro-btn").addEventListener("click", goToIntro);
 
+
+// ----- Burn scar view: Sentinel-2 images before and after, drawn on a canvas over the flat map -----
+// The map is turned to look straight down (no tilt, no rotation), so the images are plain rectangles that follow pan and zoom.
+const burn = { active: false, info: null, before: null, after: null, dnbr: null, perimeter: null, saved: null,
+               divX: null, dnbrOn: false, loading: null, canvas: null, ctx: null };
+const burnDivider = document.getElementById("burn-divider");
+const burnCaption = document.getElementById("burn-caption");
+const CREDIT = "Contains modified Copernicus Sentinel data 2026 (Sentinel-2 L2A, via Microsoft Planetary Computer)";
+
+function loadImage(url) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error("could not load " + url));
+    img.src = url;
+  });
+}
+
+const niceDate = (iso) => new Date(iso + "T12:00:00Z").toLocaleDateString("en-CA", { timeZone: "UTC", month: "short", day: "numeric", year: "numeric" });
+
+function loadBurnData() {
+  if (burn.loading) return burn.loading;
+  burn.loading = (async () => {
+    burn.info = await (await fetch("data/burn_scar.json")).json();
+    burn.perimeter = await (await fetch("data/burn_perimeter.geojson")).json();
+    [burn.before, burn.after, burn.dnbr] = await Promise.all([loadImage("data/burn_before.jpg"), loadImage("data/burn_after.jpg"), loadImage("data/burn_dnbr.png")]);
+    fillBurnPane(burn.info);
+  })();
+  burn.loading.catch(() => { burn.loading = null; });
+  return burn.loading;
+}
+
+// The words and numbers in the Burn scar tab
+function fillBurnPane(info) {
+  const b = niceDate(info.before.date), a = niceDate(info.after.date);
+  document.getElementById("burn-date-before").textContent = b;
+  document.getElementById("burn-date-after").textContent = a;
+  document.getElementById("burn-tag-before").textContent = "Before · " + b;
+  document.getElementById("burn-tag-after").textContent = "After · " + a;
+  burnCaption.textContent = "Before " + b + " · After " + a;
+  document.getElementById("burn-share").textContent = info.result.burned_share.toFixed(1) + "%";
+  document.getElementById("burn-firms").textContent = info.firms_within_1km_share + "%";
+  document.getElementById("burn-note").textContent =
+    "Burn signal = dNBR above " + info.burned_threshold.toFixed(2) + ", the usual boundary between unburned and burned ground. Using a later image (" +
+    niceDate(info.cross_check_scene) + ") gives " + info.cross_check.burned_share.toFixed(1) + "%. The two figures use different tests, so they should be close, not equal. " +
+    "Smoke, shadow and lake pixels are left out.";
+  const ramp = document.getElementById("burn-ramp");
+  ramp.replaceChildren();
+  info.ramp.forEach((r, k) => {
+    const row = document.createElement("div");
+    row.className = "es-burn-key";
+    const sw = document.createElement("span");
+    sw.className = "es-burn-swatch";
+    sw.style.background = r.color;
+    const to = info.ramp[k + 1] ? " to " + info.ramp[k + 1].from.toFixed(2) : "+";
+    row.append(sw, document.createTextNode(r.label + "  (" + r.from.toFixed(2) + to + ")"));
+    ramp.appendChild(row);
+  });
+}
+
+async function enterBurn() {
+  if (burn.active || !document.body.classList.contains("replay")) return;
+  stop();
+  burn.active = true;
+  burn.saved = { center: map.getCenter(), zoom: map.getZoom(), pitch: map.getPitch(), bearing: map.getBearing() };
+  document.body.classList.add("burn");
+  setReplayVisible(false);
+  map.dragRotate.disable();
+  map.touchZoomRotate.disableRotation();
+  try {
+    await loadBurnData();
+  } catch (err) {
+    console.warn("Burn scar images failed to load:", err);
+    document.getElementById("burn-note").textContent = "The Sentinel-2 images could not be loaded.";
+    exitBurn(true);
+    return;
+  }
+  if (!burn.active) return;                                                  // the user left the tab while we were loading
+  if (!burn.canvas) {
+    burn.canvas = document.createElement("canvas");
+    burn.canvas.className = "burn-canvas";
+    map.getCanvasContainer().appendChild(burn.canvas);
+    burn.ctx = burn.canvas.getContext("2d");
+  }
+  if (!map.getSource("burn-credit")) {                                       // an empty layer whose only job is to put the credit in the map attribution
+    map.addSource("burn-credit", { type: "geojson", data: { type: "FeatureCollection", features: [] }, attribution: CREDIT });
+    map.addLayer({ id: "burn-credit", type: "circle", source: "burn-credit" });
+  }
+  burnDivider.hidden = false;
+  burnCaption.hidden = false;
+  const [w, s2, e, n] = burn.info.bounds;
+  burn.divX = null;                                                          // the divider starts in the middle of the visible map
+  map.fitBounds([[w, s2], [e, n]], { padding: 40, pitch: 0, bearing: 0, duration: 900 });       // 40 px on top of the map's own padding
+  drawBurn();
+}
+
+function exitBurn(animate) {
+  if (!burn.active) return;
+  burn.active = false;
+  document.body.classList.remove("burn");
+  burnDivider.hidden = true;
+  burnCaption.hidden = true;
+  if (burn.ctx) burn.ctx.clearRect(0, 0, burn.canvas.width, burn.canvas.height);
+  if (map.getLayer("burn-credit")) map.removeLayer("burn-credit");
+  if (map.getSource("burn-credit")) map.removeSource("burn-credit");
+  map.dragRotate.enable();
+  map.touchZoomRotate.enableRotation();
+  if (document.body.classList.contains("replay")) {
+    setReplayVisible(true);
+    map.easeTo({ ...burn.saved, padding: currentPadding(!sidePanel.classList.contains("is-collapsed")), duration: animate ? 900 : 0 });
+  }
+}
+
+// Draw the images, the perimeter and the survey-style corner marks for the current map view
+function drawBurn() {
+  if (!burn.active || !burn.canvas || !burn.info) return;
+  const mapCanvas = map.getCanvas();
+  const dpr = window.devicePixelRatio || 1;
+  const cw = mapCanvas.clientWidth, ch = mapCanvas.clientHeight;
+  if (burn.canvas.width !== Math.round(cw * dpr) || burn.canvas.height !== Math.round(ch * dpr)) {
+    burn.canvas.width = Math.round(cw * dpr);
+    burn.canvas.height = Math.round(ch * dpr);
+    burn.canvas.style.width = cw + "px";
+    burn.canvas.style.height = ch + "px";
+  }
+  const ctx = burn.ctx;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, cw, ch);
+  const [w, s2, e, n] = burn.info.bounds;
+  const nw = map.project([w, n]), se = map.project([e, s2]);
+  const x = nw.x, y = nw.y, width = se.x - nw.x, height = se.y - nw.y;
+  if (burn.divX === null) {                                                  // middle of the map that is not covered by the side panel
+    const left = sidePanel.classList.contains("is-collapsed") ? 0 : 420;
+    burn.divX = left + (cw - left) / 2;
+  }
+  const dx = Math.max(x, Math.min(x + width, burn.divX));
+  ctx.imageSmoothingQuality = "high";
+  ctx.save();                                                                // BEFORE on the left of the divider
+  ctx.beginPath();
+  ctx.rect(x, y, dx - x, height);
+  ctx.clip();
+  ctx.drawImage(burn.before, x, y, width, height);
+  ctx.restore();
+  ctx.save();                                                                // AFTER (and optionally burn severity) on the right
+  ctx.beginPath();
+  ctx.rect(dx, y, x + width - dx, height);
+  ctx.clip();
+  ctx.drawImage(burn.after, x, y, width, height);
+  if (burn.dnbrOn) {
+    ctx.globalAlpha = 0.82;
+    ctx.drawImage(burn.dnbr, x, y, width, height);
+  }
+  ctx.restore();
+  if (burn.dnbrOn) {                                                         // official perimeter, dashed
+    ctx.save();
+    ctx.setLineDash([6, 4]);
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = "#ecebe8";
+    for (const feature of burn.perimeter.features) {
+      const polygons = feature.geometry.type === "Polygon" ? [feature.geometry.coordinates] : feature.geometry.coordinates;
+      for (const rings of polygons) {
+        for (const ring of rings) {
+          ctx.beginPath();
+          ring.forEach(([lng, lat], k) => { const p = map.project([lng, lat]); if (k === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y); });
+          ctx.stroke();
+        }
+      }
+    }
+    ctx.restore();
+  }
+  // corner marks like on a survey sheet, with the corner coordinates
+  ctx.save();
+  ctx.strokeStyle = "#ecebe8";
+  ctx.fillStyle = "#c9c8c4";
+  ctx.lineWidth = 1;
+  ctx.font = "10px 'JetBrains Mono', monospace";
+  const L = 16;
+  for (const [cx, cy, sx, sy] of [[x, y, 1, 1], [x + width, y, -1, 1], [x, y + height, 1, -1], [x + width, y + height, -1, -1]]) {
+    ctx.beginPath();
+    ctx.moveTo(cx + sx * L, cy);
+    ctx.lineTo(cx, cy);
+    ctx.lineTo(cx, cy + sy * L);
+    ctx.stroke();
+  }
+  const dms = (v, pos, neg) => Math.abs(v).toFixed(3) + "°" + (v >= 0 ? pos : neg);
+  ctx.textBaseline = "bottom";
+  ctx.fillText(dms(n, "N", "S") + "  " + dms(w, "E", "W"), x + 4, y - 6);
+  ctx.textAlign = "right";
+  ctx.textBaseline = "top";
+  ctx.fillText(dms(s2, "N", "S") + "  " + dms(e, "E", "W"), x + width - 4, y + height + 6);
+  ctx.restore();
+  // the divider: a line over the image, with a grip in the middle
+  const top = Math.max(0, y), bottom = Math.min(ch, y + height);
+  burnDivider.style.left = dx + "px";
+  burnDivider.style.top = top + "px";
+  burnDivider.style.height = Math.max(0, bottom - top) + "px";
+  burnDivider.setAttribute("aria-valuenow", String(Math.round(((dx - x) / width) * 100)));
+}
+map.on("render", drawBurn);
+
+// Drag the divider (mouse, touch or arrow keys)
+burnDivider.addEventListener("pointerdown", (e) => {
+  burnDivider.setPointerCapture(e.pointerId);
+  const move = (ev) => { burn.divX = ev.clientX; drawBurn(); };
+  const up = () => { burnDivider.removeEventListener("pointermove", move); burnDivider.removeEventListener("pointerup", up); };
+  burnDivider.addEventListener("pointermove", move);
+  burnDivider.addEventListener("pointerup", up);
+  e.preventDefault();
+});
+burnDivider.addEventListener("keydown", (e) => {
+  if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+  burn.divX += e.key === "ArrowLeft" ? -20 : 20;
+  drawBurn();
+  e.preventDefault();
+});
+document.getElementById("burn-dnbr-toggle").addEventListener("change", (e) => {
+  burn.dnbrOn = e.target.checked;
+  document.getElementById("burn-legend").hidden = !burn.dnbrOn;
+  drawBurn();
+});
+
 // ----- Hide / show the side panel (the time bar stays) -----
 const sidePanel = document.getElementById("panel");
 const panelOpenButton = document.getElementById("panel-open");
 function showSidePanel(open) {
   sidePanel.classList.toggle("is-collapsed", !open);
   panelOpenButton.hidden = open;
-  if (document.body.classList.contains("replay")) map.easeTo({ padding: open ? REPLAY_PADDING : REPLAY_PADDING_NO_PANEL, duration: 500 });
+  if (document.body.classList.contains("replay")) map.easeTo({ padding: currentPadding(open), duration: 500 });
 }
 window.showSidePanel = showSidePanel;                                       // the tour opens it again if needed
 document.getElementById("panel-hide").addEventListener("click", () => showSidePanel(false));
@@ -557,18 +796,68 @@ function drawMap() {
   setTimeout(release, 600);                                // never wait longer than this
 }
 
+// Count numbers up or down over a short moment instead of jumping (and not at all if the system asks for less motion)
+function tweenValues(el, to, render) {
+  let from = el._vals && el._vals.length === to.length ? el._vals : to;
+  cancelAnimationFrame(el._raf);
+  el._vals = to;
+  if (reducedMotion.matches || from.every((v, k) => v === to[k])) {
+    el.textContent = render(to);
+    return;
+  }
+  const start = performance.now(), ms = 380;
+  const step = (now) => {
+    const t = Math.min(1, (now - start) / ms), eased = 1 - Math.pow(1 - t, 3);
+    el.textContent = render(to.map((v, k) => Math.round(from[k] + (v - from[k]) * eased)));
+    if (t < 1) el._raf = requestAnimationFrame(step);
+  };
+  el._raf = requestAnimationFrame(step);
+}
+
+// Marks and moments the replay has already passed look "lit"; the newest passed moment is highlighted in the list.
+// While playing, a mark that has just been reached gives a small ping.
+function updateTimeStates(i) {
+  const playing = playBtn.dataset.state === "playing";
+  for (const mark of document.querySelectorAll(".es-mark")) {
+    const passed = Number(mark.dataset.step) <= i;
+    const was = mark.classList.contains("is-passed");
+    mark.classList.toggle("is-passed", passed);
+    if (passed && !was && playing && !reducedMotion.matches) {
+      mark.classList.remove("ping");
+      void mark.offsetWidth;
+      mark.classList.add("ping");
+    }
+  }
+  const rows = [...document.querySelectorAll(".es-moment")];
+  let active = -1;
+  rows.forEach((row, k) => { if (Number(row.dataset.step) <= i) active = k; });
+  rows.forEach((row, k) => {
+    row.classList.toggle("is-future", Number(row.dataset.step) > i);
+    row.classList.toggle("is-active", k === active);
+  });
+}
+
 function showPanel(i) {
   const s = steps[i];
   const when = new Date(s.time);                                        // the data covers everything detected up to this time
   const zone = { timeZone: "America/Vancouver" };
   document.getElementById("clock").textContent = when.toLocaleTimeString("en-GB", { ...zone, hour: "2-digit", minute: "2-digit", hour12: false });
-  document.getElementById("clock-date").textContent = when.toLocaleDateString("en-CA", { ...zone, weekday: "short", month: "short", day: "numeric" });
+  const dateEl = document.getElementById("clock-date");
+  const dateText = when.toLocaleDateString("en-CA", { ...zone, weekday: "short", month: "short", day: "numeric" });
+  if (dateEl.textContent !== dateText) {                                   // a new day: let the date slide in
+    dateEl.textContent = dateText;
+    dateEl.classList.remove("tick");
+    void dateEl.offsetWidth;
+    dateEl.classList.add("tick");
+  }
   const fraction = Number(slider.max) > 0 ? i / Number(slider.max) : 0;   // orange slider fill ends at the middle of the thumb
   document.getElementById("slider-fill").style.width = "calc(7px + (100% - 14px) * " + fraction + ")";
-  document.getElementById("s-fires").textContent = s.fires_so_far.toLocaleString("en-CA");
-  document.getElementById("s-roads").textContent = s.roads_affected.toLocaleString("en-CA");
+  const fmt = (n) => n.toLocaleString("en-CA");
+  tweenValues(document.getElementById("s-fires"), [s.fires_so_far], (v) => fmt(v[0]));
+  tweenValues(document.getElementById("s-roads"), [s.roads_affected], (v) => fmt(v[0]));
   const high = s.residents_cut_off, low = s.residents_cut_off_low ?? high;      // 100 m rule = high estimate, 50 m rule = low estimate
-  document.getElementById("s-res").textContent = low === high ? high.toLocaleString("en-CA") : low.toLocaleString("en-CA") + "\u2013" + high.toLocaleString("en-CA");
+  tweenValues(document.getElementById("s-res"), low === high ? [high] : [low, high], (v) => v.length === 1 ? fmt(v[0]) : fmt(v[0]) + "\u2013" + fmt(v[1]));
+  updateTimeStates(i);
   showAreas(i);
   showBriefing(i);
   document.getElementById("s-longest").textContent = s.longest_drive_min == null ? "n/a" : Math.round(s.longest_drive_min) + " min";
@@ -710,6 +999,8 @@ function addMark(parent, kind, leftCss, step, tab, time, text) {
   mark.className = "es-mark es-mark--" + kind;
   mark.style.left = leftCss;
   mark.setAttribute("aria-label", time + ": " + text);
+  mark.dataset.step = step;
+  mark.addEventListener("animationend", () => mark.classList.remove("ping"));
   const showTip = () => {
     markTip.replaceChildren();
     const t = document.createElement("span");
@@ -758,6 +1049,7 @@ function buildMoments(roadFeatures) {
     const row = document.createElement("button");
     row.type = "button";
     row.className = "es-moment";
+    row.dataset.step = step;
     const when = document.createElement("span");
     when.className = "es-moment-time";
     const moment = new Date(m.time);
