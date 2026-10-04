@@ -313,6 +313,8 @@ map.on("load", async () => {
   }
 
   areas = areaData.features.map((f) => f.properties).filter((p) => p.cut_step != null);
+  showCrosscheck();
+  buildMoments(roads.features);
 
   map.addSource("roads", { type: "geojson", data: roads });
   map.addSource("road-labels", { type: "geojson", data: roadLabels });
@@ -420,6 +422,7 @@ function startReplay(animate) {
 function arriveAtSummerland() {
   document.body.classList.replace("flying", "replay");
   summerlandMarker.remove();
+  placeCallout();
   show(0);
   if (!timer && !reducedMotion.matches) togglePlay();             // auto-play (people who prefer less motion press Play themselves)
 }
@@ -453,7 +456,8 @@ function show(i) {
   document.getElementById("slider-fill").style.width = "calc(7px + (100% - 14px) * " + fraction + ")";
   document.getElementById("s-fires").textContent = s.fires_so_far.toLocaleString("en-CA");
   document.getElementById("s-roads").textContent = s.roads_affected.toLocaleString("en-CA");
-  document.getElementById("s-res").textContent = s.residents_cut_off.toLocaleString("en-CA");
+  const high = s.residents_cut_off, low = s.residents_cut_off_low ?? high;      // 100 m rule = high estimate, 50 m rule = low estimate
+  document.getElementById("s-res").textContent = low === high ? high.toLocaleString("en-CA") : low.toLocaleString("en-CA") + "\u2013" + high.toLocaleString("en-CA");
   showAreas(i);
   showBriefing(i);
   document.getElementById("s-longest").textContent = s.longest_drive_min == null ? "n/a" : Math.round(s.longest_drive_min) + " min";
@@ -482,10 +486,12 @@ async function showBriefing(i) {
   const lang = document.getElementById("lang").value;
   const options = briefings.filter((b) => b.language === lang && b.step <= i && !b.file.includes("_near-"));
   if (options.length === 0) {
-    if (briefings.length > 0) box.innerHTML = '<p class="small">No briefing yet for this time. Briefings exist for later steps.</p>';
+    delete box.dataset.file;
+    if (briefings.length > 0) box.innerHTML = '<p class="es-note">No briefing yet for this time. Briefings exist for later steps.</p>';
     return;
   }
   const pick = options[options.length - 1];
+  if (box.dataset.file === pick.file) return;           // same briefing as before: leave it (and the "More" state) alone
   let data;
   try {
     data = await (await fetch("briefings/" + pick.file)).json();
@@ -494,16 +500,18 @@ async function showBriefing(i) {
     return;
   }
   if (Number(slider.value) !== i) return;      // the slider moved while we were loading
-  box.innerHTML = "";
-  const note = document.createElement("p");
-  note.className = "small";
-  note.textContent = "Written by " + data.model + " from the estimates above, for " +
-    new Date(data.time).toLocaleString("en-CA", { timeZone: "America/Vancouver", weekday: "short", hour: "numeric", minute: "2-digit" }) +
-    " PDT. Not official guidance.";
-  box.appendChild(note);
+  const wasOpen = box.querySelector("details")?.open;
+  box.replaceChildren();
+  box.dataset.file = pick.file;
   const summary = document.createElement("p");
+  summary.className = "callout-summary";
   summary.textContent = data.briefing.summary;           // textContent: AI text is never treated as HTML
-  box.appendChild(summary);
+  const more = document.createElement("details");
+  more.className = "callout-more";
+  more.open = Boolean(wasOpen);
+  const label = document.createElement("summary");
+  label.textContent = "More";
+  more.appendChild(label);
   for (const [title, key] of [["Steps", "steps"], ["What to bring", "what_to_bring"], ["Pets", "pets"], ["Caveats", "caveats"]]) {
     const h = document.createElement("h3");
     h.textContent = title;
@@ -513,7 +521,96 @@ async function showBriefing(i) {
       li.textContent = item;
       ul.appendChild(li);
     }
-    box.append(h, ul);
+    more.append(h, ul);
+  }
+  const note = document.createElement("p");
+  note.className = "es-note";
+  note.textContent = "Written by " + data.model + " for " +
+    new Date(data.time).toLocaleString("en-CA", { timeZone: "America/Vancouver", weekday: "short", hour: "numeric", minute: "2-digit" }) +
+    " PDT. Not official guidance.";
+  box.append(summary, more, note);
+}
+
+// ----- Briefing callout: sits on the map and is joined to Summerland by a thin line -----
+const callout = document.getElementById("callout");
+const calloutLine = document.getElementById("callout-line");
+
+function placeCallout() {
+  if (!document.body.classList.contains("replay")) return;
+  const point = map.project(SUMMERLAND);                                  // where Summerland is on screen right now
+  const box = callout.getBoundingClientRect();
+  const onScreen = point.x > 0 && point.y > 0 && point.x < innerWidth && point.y < innerHeight;
+  calloutLine.style.visibility = onScreen ? "visible" : "hidden";
+  const line = calloutLine.querySelector("line");
+  line.setAttribute("x1", box.left);                                      // the line starts at the callout's left edge, near the top
+  line.setAttribute("y1", box.top + 20);
+  line.setAttribute("x2", point.x);
+  line.setAttribute("y2", point.y);
+  const dot = calloutLine.querySelector("circle");
+  dot.setAttribute("cx", point.x);
+  dot.setAttribute("cy", point.y);
+}
+map.on("move", placeCallout);
+window.addEventListener("resize", placeCallout);
+new ResizeObserver(placeCallout).observe(callout);                         // the callout grows when "More" opens
+
+document.getElementById("callout-toggle").addEventListener("click", (e) => {
+  const collapsed = callout.classList.toggle("is-collapsed");
+  e.currentTarget.textContent = collapsed ? "\u25be" : "\u25b4";
+  e.currentTarget.setAttribute("aria-expanded", String(!collapsed));
+  placeCallout();
+});
+
+// ----- Cross-check note under the headline numbers -----
+async function showCrosscheck() {
+  const note = document.getElementById("crosscheck-note");
+  try {
+    const res = await fetch("data/crosschecks.json");
+    const data = res.ok ? await res.json() : null;
+    if (!data || !data.official_boundary_residents) return;
+    note.textContent = "Range: roads within 50 m (low) or 100 m (high) of a detection. Closing only roads inside the official fire boundary " +
+      "leaves about " + data.official_boundary_residents.toLocaleString("en-CA") + " cut off at the end of the replay.";
+    note.hidden = false;
+  } catch (err) {
+    // the note is optional
+  }
+}
+
+// ----- Key moments: real events next to the model's own milestones. Click one to jump the replay there. -----
+const KNOWN_MOMENTS = [
+  { time: "2026-08-08T00:00:00-07:00", text: "District of Summerland ordered to evacuate (just after midnight)", source: "News" },     // CBC, Aug 8
+  { time: "2026-08-08T12:45:00-07:00", text: "BC Emergency Alert: evacuate immediately; Highway 97 closed", source: "Official" },
+];
+
+function buildMoments(roadFeatures) {
+  const moments = [{ time: steps[0].first_detection, text: "First satellite detection", source: "Satellite" }, ...KNOWN_MOMENTS];
+  const hwyTimes = roadFeatures.filter((f) => (f.properties.ref === "BC 97" || f.properties.ref === "97") && f.properties.affected_time)
+                               .map((f) => new Date(f.properties.affected_time));
+  if (hwyTimes.length) moments.push({ time: new Date(Math.min(...hwyTimes)).toISOString(), text: "First Highway 97 stretch near town marked affected", source: "Model" });
+  if (areas.length) moments.push({ time: new Date(Math.min(...areas.map((a) => new Date(a.cut_time)))).toISOString(), text: "First area cut off from every exit (est.)", source: "Model" });
+  moments.sort((a, b) => new Date(a.time) - new Date(b.time));
+
+  const list = document.getElementById("moments-list");
+  for (const m of moments) {
+    const found = steps.findIndex((s) => new Date(s.time) >= new Date(m.time));      // first step that includes this moment
+    const step = found === -1 ? steps.length - 1 : found;
+    const row = document.createElement("button");
+    row.type = "button";
+    row.className = "es-moment";
+    const when = document.createElement("span");
+    when.className = "es-moment-time";
+    const moment = new Date(m.time);
+    when.textContent = moment.toLocaleDateString("en-CA", { timeZone: "America/Vancouver", month: "short", day: "numeric" }) + " " +
+      moment.toLocaleTimeString("en-GB", { timeZone: "America/Vancouver", hour: "2-digit", minute: "2-digit", hour12: false });
+    const what = document.createElement("span");
+    what.textContent = m.text + " ";
+    const tag = document.createElement("span");
+    tag.className = "es-src";
+    tag.textContent = m.source;
+    what.appendChild(tag);
+    row.append(when, what);
+    row.addEventListener("click", () => { stop(); show(step); });
+    list.appendChild(row);
   }
 }
 

@@ -1,0 +1,73 @@
+{
+ "step": 4,
+ "time": "2026-08-08T06:00:00-07:00",
+ "language": "Punjabi",
+ "model": "gemini-3.5-flash-lite",
+ "area": null,
+ "facts": {
+  "place": "Summerland, British Columbia (Bald Range wildfire)",
+  "time_of_this_snapshot_pacific": "Saturday August 8, 6:00 AM",
+  "hours_since_first_satellite_detection": 13.2,
+  "satellite_fire_detections_so_far": 2911,
+  "road_segments_likely_affected": 391,
+  "road_names_most_affected": [
+   "Princeton-Summerland Road",
+   "Okanagan Highway",
+   "Prairie Valley Road",
+   "Bathville Road",
+   "Garnet Valley Road"
+  ],
+  "estimated_residents_cut_off_low": 820,
+  "estimated_residents_cut_off_high": 1440,
+  "residents_range_note": "low = roads within 50 m of a satellite detection are treated as impassable; high = within 100 m",
+  "estimated_minimum_drive_minutes_longest_sample": 21.2,
+  "estimated_minimum_drive_minutes_average_sample": 14.1,
+  "drive_time_note": "free-flow minimum, no congestion, from 74 sample points in Summerland",
+  "areas_cut_off_so_far": [
+   {
+    "area": "near Morrow Avenue",
+    "estimated_residents": 120,
+    "hours_after_first_detection_when_cut_off": 9.4,
+    "estimated_minimum_drive_minutes": 17.1
+   },
+   {
+    "area": "near Sanborn Street",
+    "estimated_residents": 60,
+    "hours_after_first_detection_when_cut_off": 10.5,
+    "estimated_minimum_drive_minutes": 14.0
+   },
+   {
+    "area": "near McLarty Place",
+    "estimated_residents": 50,
+    "hours_after_first_detection_when_cut_off": 9.4,
+    "estimated_minimum_drive_minutes": 17.8
+   }
+  ],
+  "evacuation_order": "The entire District of Summerland was under an evacuation order from just after midnight on August 8, 2026 (reported by CBC)."
+ },
+ "briefing": {
+  "summary": "ਸਮਰਲੈਂਡ, ਬ੍ਰਿਟਿਸ਼ ਕੋਲੰਬੀਆ ਨੇੜੇ ਬਾਲਡ ਰੇਂਜ ਜੰਗਲੀ ਅੱਗ ਬਾਰੇ ਸ਼ਨੀਵਾਰ ਅਗਸਤ 8, 6:00 AM 'ਤੇ ਸਥਿਤੀ ਇਹ ਹੈ ਕਿ ਪਹਿਲੀ ਸੈਟੇਲਾਈਟ ਖੋਜ ਤੋਂ 13.2 ਘੰਟੇ ਬੀਤ ਚੁੱਕੇ ਹਨ ਅਤੇ 2911 ਸੈਟੇਲਾਈਟ ਅੱਗ ਦੀਆਂ ਖੋਜਾਂ ਦਰਜ ਕੀਤੀਆਂ ਗਈਆਂ ਹਨ। 391 ਸੜਕੀ ਹਿੱਸੇ ਪ੍ਰਭਾਵਿਤ ਹੋ ਸਕਦੇ ਹਨ ਅਤੇ ਪ੍ਰਭਾਵਿਤ ਹੋਣ ਵਾਲੀਆਂ ਮੁੱਖ ਸੜਕਾਂ Princeton-Summerland Road, Okanagan Highway, Prairie Valley Road, Bathville Road, Garnet Valley Road ਹਨ। ਅੰਦਾਜ਼ਨ 820 ਅਤੇ 1440 ਵਿਚਕਾਰ ਨਿਵਾਸੀ ਕੱਟੇ ਗਏ ਹਨ, ਜੋ ਕਿ ਇਸ ਗੱਲ 'ਤੇ ਨਿਰਭਰ ਕਰਦਾ ਹੈ ਕਿ ਸੜਕ ਸੈਟੇਲਾਈਟ ਖੋਜ ਦੇ ਕਿੰਨੇ ਨੇੜੇ ਹੈ। ਖ਼ਬਰਾਂ ਮੁਤਾਬਕ ਅਗਸਤ 8, 2026 ਨੂੰ ਅੱਧੀ ਰਾਤ ਤੋਂ ਤੁਰੰਤ ਬਾਅਦ ਸਮਰਲੈਂਡ ਦੇ ਪੂਰੇ ਜ਼ਿਲ੍ਹੇ ਲਈ ਨਿਕਾਸੀ ਦਾ ਹੁਕਮ ਜਾਰੀ ਕੀਤਾ ਗਿਆ ਸੀ ਅਤੇ ਸਥਾਨਕ ਅਧਿਕਾਰੀਆਂ ਦੇ ਹੁਕਮਾਂ ਦੀ ਪਾਲਣਾ ਕਰਨੀ ਚਾਹੀਦੀ ਹੈ।",
+  "steps": [
+   "ਜਦੋਂ ਨਿਕਾਸੀ ਦਾ ਹੁਕਮ ਦਿੱਤਾ ਜਾਂਦਾ ਹੈ ਤਾਂ ਲੋਕ ਅਕਸਰ ਆਪਣੇ ਅਧਿਕਾਰੀਆਂ ਦੇ ਨਿਰਦੇਸ਼ਾਂ ਦੀ ਪਾਲਣਾ ਕਰਦੇ ਹਨ",
+   "ਸੁਰੱਖਿਅਤ ਰੂਟਾਂ ਦੀ ਯੋਜਨਾ ਬਣਾਉਣਾ ਅਤੇ ਤਿਆਰ ਰਹਿਣਾ",
+   "ਸਥਾਨਕ ਅੱਪਡੇਟ 'ਤੇ ਨਜ਼ਰ ਰੱਖਣਾ"
+  ],
+  "what_to_bring": [
+   "ਜ਼ਰੂਰੀ ਦਸਤਾਵੇਜ਼ ਅਤੇ ਪਛਾਣ ਪੱਤਰ",
+   "ਦਵਾਈਆਂ ਅਤੇ ਮੈਡੀਕਲ ਸਪਲਾਈ",
+   "ਪੀਣ ਵਾਲਾ ਪਾਣੀ ਅਤੇ ਭੋਜਨ",
+   "ਕੱਪੜੇ ਅਤੇ ਨਿੱਜੀ ਸਮਾਨ"
+  ],
+  "pets": [
+   "ਪਾਲਤੂ ਜਾਨਵਰਾਂ ਲਈ ਭੋਜਨ ਅਤੇ ਪਾਣੀ",
+   "ਪਾਲਤੂ ਜਾਨਵਰਾਂ ਦਾ ਸਾਮਾਨ ਅਤੇ ਕੈਰੀਅਰ",
+   "ਜਾਨਵਰਾਂ ਦੀਆਂ ਜ਼ਰੂਰੀ ਦਵਾਈਆਂ"
+  ],
+  "caveats": [
+   "ਇਹ ਜਨਤਕ ਡਾਟਾ, ਸੈਟੇਲਾਈਟ ਅੱਗ ਦੀਆਂ ਖੋਜਾਂ, ਓਪਨਸਟ੍ਰੀਟਮੈਪ ਸੜਕਾਂ ਅਤੇ ਮਾਡਲ ਕੀਤੇ ਜਨਸੰਖਿਆ ਤੋਂ ਸਿਰਫ਼ ਉਦਾਹਰਣਾਤਮਕ ਅਨੁਮਾਨ ਹਨ, ਕੋਈ ਅਧਿਕਾਰਤ ਮਾਰਗਦਰਸ਼ਨ ਨਹੀਂ ਹੈ",
+   "ਡਰਾਈਵ ਦਾ ਸਮਾਂ ਬਿਨਾਂ ਕਿਸੇ ਭੀੜ ਦੇ ਅੰਦਾਜ਼ਨ ਘੱਟੋ-ਘੱਟ ਸਮਾਂ ਹੈ",
+   "ਅਸਲ ਫ਼ੈਸਲਿਆਂ ਲਈ ਕਿਰਪਾ ਕਰਕੇ BC Wildfire Service, EmergencyInfoBC ਅਤੇ ਸਥਾਨਕ ਨਿਕਾਸੀ ਹੁਕਮਾਂ 'ਤੇ ਭਰੋਸਾ ਕਰੋ"
+  ]
+ },
+ "generated_at": "2026-10-04T14:08:12.024941+00:00"
+}

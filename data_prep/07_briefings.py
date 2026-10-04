@@ -45,6 +45,8 @@ You are given a JSON object called FACTS. Rules:
 5. Write calmly and plainly, at a reading level suitable for the general public. No jargon, no alarmist words.
 6. Write all text values in the requested language, including weekday and month names in the date. For Punjabi use Gurmukhi script, not Latin letters. Keep JSON keys in English.
 7. If FACTS says a number is unknown or zero, say so plainly rather than guessing.
+8. Residents cut off is an ESTIMATED RANGE. Always give both ends ("between LOW and HIGH") and say it depends on how close a road must be to a satellite detection to count as affected. Never give a single figure, unless FACTS has "estimated_residents_cut_off_same_under_both_rules": then say both rules give the same figure.
+9. If FACTS contains "evacuation_order", state it plainly as reported by the news, say that official orders come first, and say to follow instructions from local authorities. Do not write as if no order existed, and do not tell anyone to leave or to stay. When an order is in effect, frame the lists as what people commonly do or bring when told to evacuate.
 """
 
 
@@ -74,7 +76,7 @@ def build_facts(step_index, area_name=None):
         "satellite_fire_detections_so_far": s["fires_so_far"],
         "road_segments_likely_affected": s["roads_affected"],
         "road_names_most_affected": [n for n, _ in sorted(names.items(), key=lambda kv: -kv[1])[:5]],
-        "estimated_residents_cut_off_from_all_exits": s["residents_cut_off"],
+        "residents_range_note": "low = roads within 50 m of a satellite detection are treated as impassable; high = within 100 m",
         "estimated_minimum_drive_minutes_longest_sample": s["longest_drive_min"],
         "estimated_minimum_drive_minutes_average_sample": s["mean_drive_min"],
         "drive_time_note": "free-flow minimum, no congestion, from 74 sample points in Summerland",
@@ -83,6 +85,19 @@ def build_facts(step_index, area_name=None):
              "hours_after_first_detection_when_cut_off": round((datetime.fromisoformat(a["cut_time"]) - t0).total_seconds() / 3600, 1),
              "estimated_minimum_drive_minutes": round(a["baseline_drive_min"], 1)} for a in cut[:3]],
     }
+    low = s.get("residents_cut_off_low", s["residents_cut_off"])
+    if low == s["residents_cut_off"]:            # both rules agree: say so, instead of a range like "60 to 60"
+        facts["estimated_residents_cut_off_same_under_both_rules"] = low
+    else:
+        facts["estimated_residents_cut_off_low"] = low
+        facts["estimated_residents_cut_off_high"] = s["residents_cut_off"]
+    # Reported by CBC (published Aug 8): the whole District of Summerland was ordered to evacuate just after midnight on Aug 8.
+    # We have no earlier order times, so snapshots before midnight get no order fact.
+    midnight = datetime.fromisoformat("2026-08-08T00:00:00-07:00")
+    if now > midnight:
+        facts["evacuation_order"] = "The entire District of Summerland was under an evacuation order from just after midnight on August 8, 2026 (reported by CBC)."
+    elif now == midnight:
+        facts["evacuation_order"] = "An evacuation order for the entire District of Summerland was issued just after this snapshot, shortly after midnight on August 8, 2026 (reported by CBC)."
     if area_name:   # restrict to one area
         match = [a for a in areas if a["name"] == area_name]
         if not match:

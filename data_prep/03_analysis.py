@@ -12,6 +12,7 @@ from shapely.ops import linemerge
 import config
 
 CUT_DISTANCE_M = 100          # roads this close to any detection so far are "likely affected" (treated as impassable)
+LOW_CUT_DISTANCE_M = 50       # a tighter rule, used only for the LOW end of the "residents cut off" range
 STEP_HOURS = 3
 SUMMERLAND = (-119.677, 49.601)   # lon, lat of town centre (approximate)
 ORIGIN_RADIUS_M = 2500        # sample origins within this distance of the centre
@@ -62,6 +63,12 @@ hits = gpd.sjoin(edges[["geometry"]], buffers, predicate="intersects")
 edges["affected_time"] = hits.groupby(level=0)["time_pacific"].min()
 print(f"Roads likely affected by the end: {edges['affected_time'].notna().sum()} of {len(edges)} edges")
 
+# Same thing with the tighter distance: gives the low estimate of residents cut off
+low_buffers = fire_pts[["time_pacific", "geometry"]].copy()
+low_buffers["geometry"] = low_buffers.buffer(LOW_CUT_DISTANCE_M)
+low_hits = gpd.sjoin(edges[["geometry"]], low_buffers, predicate="intersects")
+edges["affected_time_low"] = low_hits.groupby(level=0)["time_pacific"].min()
+
 # ---------- 3. Time steps (every 3 h, Pacific) ----------
 first = fires["time_pacific"].min().floor(f"{STEP_HOURS}h")
 last = fires["time_pacific"].max()
@@ -99,16 +106,22 @@ t0 = fires["time_pacific"].min()                       # first detection
 
 # Remove affected roads one detection time at a time (they only ever get removed, never restored)
 # and note the first time each populated node can no longer reach any exit.
-node_cut_time = {}
-H = G.copy()
-for t, grp in edges.dropna(subset=["affected_time"]).groupby("affected_time"):
-    H.remove_edges_from(zip(grp.u, grp.v, grp.key))
-    reachable = nx.multi_source_dijkstra_path_length(H.reverse(copy=False), exits)
-    for n in pop.index:
-        if n not in reachable and n not in node_cut_time:
-            node_cut_time[n] = t
+def cut_off_times(time_column):
+    found = {}
+    H = G.copy()
+    for t, grp in edges.dropna(subset=[time_column]).groupby(time_column):
+        H.remove_edges_from(zip(grp.u, grp.v, grp.key))
+        reachable = nx.multi_source_dijkstra_path_length(H.reverse(copy=False), exits)
+        for n in pop.index:
+            if n not in reachable and n not in found:
+                found[n] = t
+    return found
+
+node_cut_time = cut_off_times("affected_time")            # 100 m rule: the main (high) estimate
+node_cut_time_low = cut_off_times("affected_time_low")    # 50 m rule: the low estimate
 print(f"{len(node_cut_time)} of {len(pop)} populated road nodes lose every route to an exit "
-      f"(~{pop[list(node_cut_time)].sum():,.0f} of {pop.sum():,.0f} people in the study box)")
+      f"(~{pop[list(node_cut_time)].sum():,.0f} of {pop.sum():,.0f} people in the study box); "
+      f"with the {LOW_CUT_DISTANCE_M} m rule: ~{pop[list(node_cut_time_low)].sum():,.0f}")
 
 # Baseline drive time (no fire at all) from every node to its nearest exit, in minutes
 base = nx.multi_source_dijkstra_path_length(G.reverse(copy=False), exits, weight="travel_time")
@@ -163,11 +176,13 @@ for i, t in enumerate(steps):
     dist = nx.multi_source_dijkstra_path_length(H.reverse(copy=False), exits, weight="travel_time")
     times = {o: dist[o] / 60 for o in origins if o in dist}       # minutes
     residents = sum(v for n, v in pop.items() if node_cut_time.get(n, NEVER) <= t)
+    residents_low = sum(v for n, v in pop.items() if node_cut_time_low.get(n, NEVER) <= t)
     worst = max(times, key=times.get) if times else None
     res = {"step": i, "time": t.isoformat(), "first_detection": t0.isoformat(),
            "fires_so_far": int((fires["time_pacific"] <= t).sum()),
            "roads_affected": int(len(cut)),
            "origins_total": len(origins), "residents_cut_off": int(round(residents, -1)),
+           "residents_cut_off_low": int(round(residents_low, -1)),
            "longest_drive_min": round(times[worst], 1) if worst else None,
            "mean_drive_min": round(sum(times.values()) / len(times), 1) if times else None}
     results.append(res)
@@ -181,6 +196,21 @@ for i, t in enumerate(steps):
     print(f"{t:%a %d %H:%M}  fires={res['fires_so_far']:5d}  roads affected={res['roads_affected']:4d}  "
           f"residents cut off~{res['residents_cut_off']:>6,}  longest={res['longest_drive_min']} min  "
           f"mean={res['mean_drive_min']} min")
+
+# ---------- 6b. Cross-check against the official fire perimeter (needs the BCWS shapefile in data_raw/) ----------
+official_boundary_residents = None
+perimeter_file = config.RAW / "bcws_perimeters" / "prot_current_fire_polys.shp"
+if perimeter_file.exists():
+    perimeter = gpd.read_file(perimeter_file)
+    perimeter = perimeter[perimeter["FIRE_NUM"] == "K51490"].to_crs(UTM).geometry.union_all()
+    inside = edges[edges.geometry.intersects(perimeter)]
+    H = G.copy()
+    H.remove_edges_from(zip(inside.u, inside.v, inside.key))
+    reachable = nx.multi_source_dijkstra_path_length(H.reverse(copy=False), exits)
+    official_boundary_residents = int(round(sum(v for n, v in pop.items() if n not in reachable), -1))
+    print(f"Cross-check: closing every road that touches the official perimeter leaves ~{official_boundary_residents:,} residents cut off")
+else:
+    print("Cross-check skipped: download the BCWS perimeter first (see README)")
 
 # ---------- 7. Export (WGS84 GeoJSON, 5 decimals ~ 1 m) ----------
 f_out = fire_pts[["time_pacific", "source", "geometry"]].to_crs(4326)
@@ -225,6 +255,7 @@ area_gdf = gpd.GeoDataFrame([{**a, "cut_step": step_index(a["cut_time"], steps) 
 area_gdf.to_file(OUT / "areas.geojson", driver="GeoJSON", COORDINATE_PRECISION=5)
 (OUT / "routes.geojson").write_text(json.dumps({"type": "FeatureCollection", "features": routes}))
 (OUT / "steps.json").write_text(json.dumps(results, indent=1))
+(OUT / "crosschecks.json").write_text(json.dumps({"official_boundary_residents": official_boundary_residents}, indent=1))
 print("\nExported to", OUT)
 for p in sorted(OUT.iterdir()):
     print(f"  {p.name}: {p.stat().st_size / 1e6:.2f} MB")

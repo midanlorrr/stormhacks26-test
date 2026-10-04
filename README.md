@@ -78,15 +78,15 @@ What this does and does not show:
 - **Sizes:** FIRMS pixel footprints are the same order of magnitude as the quoted sizes but not close enough to claim agreement; the footprint method is rough.
 - **Sensitivity test (`06_sensitivity_hwy97.py`):** treating the whole official Highway 97 closure as impassable gives very different answers. Fire marks only (what the map shows): about 1,440 residents cut off, Penticton 12 min. Official closure only: about 390 cut off, but Penticton 59 min. Both together: every road out of the study area is sealed (all 74 sample points, about 13,000 residents), which cannot be what happened, since Summerland was evacuated toward Penticton. So the closure must have allowed evacuation traffic, and the results depend heavily on what "closed" meant on the road. We do not know that.
 - **Not used as model input:** none of these facts drive the model. They are only for checking it.
-- **Source label:** the CBC text we saved is labelled "Aug 7 9:15pm" but describes events through 8 am Saturday, so the label is probably wrong; check the original page before citing it.
+- **Source:** the CBC article was published Aug 8 at 9:15 pm PT and describes events through 8 am that morning. Its order times are the news outlet's account, not an official notice; confirm against an RDOS or District of Summerland notice before relying on them.
 
 ## Data sources
 NASA FIRMS (VIIRS and MODIS active fire), WorldPop (population, CC BY 4.0: Bondarenko et al., WorldPop, University of Southampton, DOI 10.5258/SOTON/WP00839), OpenStreetMap (roads, via osmnx), Noto Sans map label fonts (SIL Open Font License; glyph files in `web/fonts/` from the MapLibre demo font server), Sora and JetBrains Mono interface fonts (SIL Open Font License; `web/fonts/ui/`), BC Wildfire Service (perimeter, for checking only), DriveBC (one closure, compared by hand).
 
 ## To do
-- Briefings: add the official evacuation-order timing (whole District of Summerland ordered out just after midnight on Aug 8, per CBC) as a fact, without turning it into an instruction, then regenerate. Today the briefings do not know about the order, so wording like "prepare belongings in advance" can read oddly after midnight.
-- Briefings: regenerate Punjabi for steps 2 and 4 (the first attempts came back in Latin letters and were removed), and have a native Punjabi and Spanish speaker review the text.
-- Briefings: the free Gemini tier allows about 20 calls per day per model; keep test runs to one call until things are confirmed.
+- Confirm the evacuation-order time against an official notice (RDOS or the District of Summerland); today it is cited as reported by CBC.
+- Have a native Punjabi and Spanish speaker review the briefings.
+- The free Gemini tier allows about 20 calls per day per model; keep test runs to one call until things are confirmed.
 - ElevenLabs spoken briefings: tabled for now.
 - Highway 97: confirm when the official closure began and whether evacuees could use it (see `06_sensitivity_hwy97.py`).
 - Layer 2 fire-spread hindcast: design only, see `docs/superpowers/specs/`.

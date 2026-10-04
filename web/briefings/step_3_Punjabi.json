@@ -12,12 +12,14 @@
   "road_segments_likely_affected": 278,
   "road_names_most_affected": [
    "Okanagan Highway",
+   "Bathville Road",
    "Princeton-Summerland Road",
    "Garnet Valley Road",
-   "Bathville Road",
-   "Cartwright Avenue"
+   "Prairie Valley Road"
   ],
-  "estimated_residents_cut_off_from_all_exits": 1080,
+  "estimated_residents_cut_off_low": 270,
+  "estimated_residents_cut_off_high": 1080,
+  "residents_range_note": "low = roads within 50 m of a satellite detection are treated as impassable; high = within 100 m",
   "estimated_minimum_drive_minutes_longest_sample": 21.2,
   "estimated_minimum_drive_minutes_average_sample": 14.1,
   "drive_time_note": "free-flow minimum, no congestion, from 74 sample points in Summerland",
@@ -34,28 +36,31 @@
     "hours_after_first_detection_when_cut_off": 9.4,
     "estimated_minimum_drive_minutes": 17.8
    }
-  ]
+  ],
+  "evacuation_order": "The entire District of Summerland was under an evacuation order from just after midnight on August 8, 2026 (reported by CBC)."
  },
  "briefing": {
-  "summary": "ਸਮਰਲੈਂਡ, ਬ੍ਰਿਟਿਸ਼ ਕੋਲੰਬੀਆ ਵਿੱਚ ਬਾਲਡ ਰੇਂਜ ਜੰਗਲੀ ਅੱਗ ਦੇ ਸਬੰਧ ਵਿੱਚ, ਪਹਿਲੀ ਸੈਟੇਲਾਈਟ ਖੋਜ ਤੋਂ 10.2 ਘੰਟੇ ਬੀਤ ਚੁੱਕੇ ਹਨ ਅਤੇ 1250 ਸੈਟੇਲਾਈਟ ਅੱਗ ਦੀਆਂ ਖੋਜਾਂ ਦਰਜ ਕੀਤੀਆਂ ਗਈਆਂ ਹਨ। 278 ਸੜਕੀ ਹਿੱਸੇ ਪ੍ਰਭਾਵਿਤ ਹੋ ਸਕਦੇ ਹਨ ਅਤੇ 1080 ਨਿਵਾਸੀਆਂ ਦੇ ਸਾਰੇ ਬਾਹਰ ਜਾਣ ਦੇ ਰਸਤੇ ਕੱਟੇ ਜਾਣ ਦਾ ਅਨੁਮਾਨ ਹੈ।",
+  "summary": "ਸਮਰਲੈਂਡ, ਬ੍ਰਿਟਿਸ਼ ਕੋਲੰਬੀਆ ਵਿੱਚ ਬਾਲਡ ਰੇਂਜ ਜੰਗਲੀ ਅੱਗ ਦੇ ਆਲੇ-ਦੁਆਲੇ ਸ਼ਨੀਵਾਰ ਅਗਸਤ 8, 3:00 AM ਤੱਕ 10.2 ਘੰਟੇ ਬੀਤ ਚੁੱਕੇ ਹਨ ਅਤੇ 1250 ਸੈਟੇਲਾਈਟ ਅੱਗ ਦਾ ਪਤਾ ਲੱਗਿਆ ਹੈ। ਅੰਦਾਜ਼ਨ 270 ਅਤੇ 1080 ਦੇ ਵਿਚਕਾਰ ਨਿਵਾਸੀਆਂ ਦੇ ਪ੍ਰਭਾਵਿਤ ਹੋਣ ਦਾ ਅਨੁਮਾਨ ਹੈ, ਅਤੇ 278 ਸੜਕ ਹਿੱਸੇ ਪ੍ਰਭਾਵਿਤ ਹੋ ਸਕਦੇ ਹਨ। ਸੀਬੀਸੀ ਦੁਆਰਾ ਰਿਪੋਰਟ ਕੀਤੇ ਅਨੁਸਾਰ, ਅਗਸਤ 8, 2026 ਨੂੰ ਅੱਧੀ ਰਾਤ ਤੋਂ ਤੁਰੰਤ ਬਾਅਦ ਪੂਰੇ ਸਮਰਲੈਂਡ ਜ਼ਿਲ੍ਹੇ ਲਈ ਨਿਕਾਸੀ ਦਾ ਹੁਕਮ ਜਾਰੀ ਕੀਤਾ ਗਿਆ ਸੀ। ਅਧਿਕਾਰਤ ਹੁਕਮ ਪਹਿਲਾਂ ਆਉਂਦੇ ਹਨ ਅਤੇ ਸਥਾਨਕ ਅਧਿਕਾਰੀਆਂ ਦੀਆਂ ਹਦਾਇਤਾਂ ਦੀ ਪਾਲਣਾ ਕਰਨੀ ਚਾਹੀਦੀ ਹੈ।",
   "steps": [
-   "ਜ਼ਰੂਰੀ ਦਸਤਾਵੇਜ਼ ਅਤੇ ਦਵਾਈਆਂ ਤਿਆਰ ਰੱਖੋ",
-   "ਆਪਣੀ ਗੱਡੀ ਵਿੱਚ ਬਾਲਣ ਪੂਰਾ ਰੱਖੋ",
-   "ਅਧਿਕਾਰਤ ਅਪਡੇਟਸ 'ਤੇ ਨਜ਼ਰ ਰੱਖੋ"
+   "ਆਪਣੇ ਸਥਾਨਕ ਅਧਿਕਾਰੀਆਂ ਦੀਆਂ ਹਦਾਇਤਾਂ ਦੀ ਪਾਲਣਾ ਕਰੋ",
+   "ਜਦੋਂ ਨਿਕਾਸੀ ਦਾ ਹੁਕਮ ਦਿੱਤਾ ਜਾਂਦਾ ਹੈ ਤਾਂ ਲੋਕ ਤਿਆਰ ਰਹਿਣ ਲਈ ਆਮ ਤੌਰ 'ਤੇ ਆਪਣੇ ਜ਼ਰੂਰੀ ਦਸਤਾਵੇਜ਼ ਇਕੱਠੇ ਕਰਦੇ ਹਨ",
+   "ਸਥਾਨਕ ਖ਼ਬਰਾਂ ਅਤੇ ਅਧਿਕਾਰਤ ਅਪਡੇਟਾਂ 'ਤੇ ਨਜ਼ਰ ਰੱਖੋ"
   ],
   "what_to_bring": [
-   "ਪਾਣੀ ਅਤੇ ਭੋਜਨ",
-   "ਪਛਾਣ ਪੱਤਰ ਅਤੇ ਜ਼ਰੂਰੀ ਕਾਗਜ਼ਾਤ",
-   "प्राथमिक ਸਹਾਇਤਾ ਬਾਕਸ"
+   "ਜ਼ਰੂਰੀ ਦਵਾਈਆਂ",
+   "ਪਛਾਣ ਪੱਤਰ ਅਤੇ ਮਹੱਤਵਪੂਰਨ ਕਾਗਜ਼ਾਤ",
+   "ਪੀਣ ਵਾਲਾ ਪਾਣੀ ਅਤੇ ਭੋਜਨ",
+   "ਕੱਪੜੇ ਅਤੇ ਨਿੱਜੀ ਸਮਾਨ"
   ],
   "pets": [
    "ਪਾਲਤੂ ਜਾਨਵਰਾਂ ਲਈ ਭੋਜਨ ਅਤੇ ਪਾਣੀ ਤਿਆਰ ਰੱਖੋ",
-   "ਜਾਨਵਰਾਂ ਨੂੰ ਸੁਰੱਖਿਅਤ ਜਗ੍ਹਾ 'ਤੇ ਰੱਖਣ ਦਾ ਪ੍ਰਬੰਧ ਕਰੋ"
+   "ਪਾਲਤੂ ਜਾਨਵਰਾਂ ਦੇ ਕੈਰੀਅਰ ਜਾਂ ਪੱਟੇ ਨਾਲ ਰੱਖੋ"
   ],
   "caveats": [
-   "ਇਹ ਜਨਤਕ ਡੇਟਾ ਤੋਂ ਸਿਰਫ਼ ਉਦਾਹਰਣਕ ਅਨੁਮਾਨ ਹਨ, ਅਧਿਕਾਰਤ ਮਾਰਗਦਰਸ਼ਨ ਨਹੀਂ, ਅਤੇ ਡਰਾਈਵ ਸਮਾਂ ਬਿਨਾਂ ਭੀੜ ਦੇ ਘੱਟੋ-ਘੱਟ ਅਨੁਮਾਨ ਹਨ",
-   "ਅਸਲ ਫੈਸਲਿਆਂ ਲਈ BC Wildfire Service, EmergencyInfoBC ਅਤੇ ਸਥਾਨਕ ਨਿਕਾਸੀ ਆਦੇਸ਼ਾਂ 'ਤੇ ਭਰੋਸਾ ਕਰੋ"
+   "ਇਹ ਜਨਤਕ ਡੇਟਾ ਤੋਂ ਸਿਰਫ਼ ਉਦਾਹਰਣਾਤਮਕ ਅਨੁਮਾਨ ਹਨ ਅਤੇ ਅਧਿਕਾਰਤ ਮਾਰਗਦਰਸ਼ਨ ਨਹੀਂ ਹਨ",
+   "ਡਰਾਈਵ ਦਾ ਸਮਾਂ ਬਿਨਾਂ ਕਿਸੇ ਭੀੜ ਦੇ ਘੱਟੋ-ਘੱਟ ਅਨੁਮਾਨਿਤ ਸਮਾਂ ਹੈ",
+   "ਅਸਲ ਫ਼ੈਸਲਿਆਂ ਲਈ BC Wildfire Service, EmergencyInfoBC ਅਤੇ ਸਥਾਨਕ ਨਿਕਾਸੀ ਹੁਕਮਾਂ 'ਤੇ ਭਰੋਸਾ ਕਰੋ"
   ]
  },
- "generated_at": "2026-10-04T10:24:02.297525+00:00"
+ "generated_at": "2026-10-04T14:07:40.492940+00:00"
 }

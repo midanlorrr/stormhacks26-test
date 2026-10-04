@@ -12,12 +12,14 @@
   "road_segments_likely_affected": 278,
   "road_names_most_affected": [
    "Okanagan Highway",
+   "Bathville Road",
    "Princeton-Summerland Road",
    "Garnet Valley Road",
-   "Bathville Road",
-   "Cartwright Avenue"
+   "Prairie Valley Road"
   ],
-  "estimated_residents_cut_off_from_all_exits": 1080,
+  "estimated_residents_cut_off_low": 270,
+  "estimated_residents_cut_off_high": 1080,
+  "residents_range_note": "low = roads within 50 m of a satellite detection are treated as impassable; high = within 100 m",
   "estimated_minimum_drive_minutes_longest_sample": 21.2,
   "estimated_minimum_drive_minutes_average_sample": 14.1,
   "drive_time_note": "free-flow minimum, no congestion, from 74 sample points in Summerland",
@@ -34,31 +36,32 @@
     "hours_after_first_detection_when_cut_off": 9.4,
     "estimated_minimum_drive_minutes": 17.8
    }
-  ]
+  ],
+  "evacuation_order": "The entire District of Summerland was under an evacuation order from just after midnight on August 8, 2026 (reported by CBC)."
  },
  "briefing": {
-  "summary": "As of Saturday August 8, 3:00 AM, the Bald Range wildfire near Summerland, British Columbia has been tracked for 10.2 hours with 1250 satellite fire detections so far. Approximately 1080 residents are estimated to be cut off from all exits, affecting 278 road segments including Okanagan Highway, Princeton-Summerland Road, Garnet Valley Road, Bathville Road, and Cartwright Avenue. Estimated minimum drive times range from an average sample of 14.1 minutes to a longest sample of 21.2 minutes.",
+  "summary": "As of Saturday August 8, 3:00 AM, satellite data for the Bald Range wildfire near Summerland, British Columbia, show 1250 detections over 10.2 hours. An evacuation order was reported by CBC for the entire District of Summerland from just after midnight on August 8, 2026. Estimated residents cut off range between 270 and 1080, depending on whether roads within 50 m or 100 m of a satellite detection are treated as impassable, affecting 278 road segments including Okanagan Highway, Bathville Road, Princeton-Summerland Road, Garnet Valley Road, and Prairie Valley Road.",
   "steps": [
-   "Keep emergency supplies ready",
-   "Monitor local conditions",
-   "Review travel routes in advance"
+   "Check local news and official sources for updates",
+   "Keep important documents ready",
+   "Stay informed about local conditions"
   ],
   "what_to_bring": [
-   "Water and non-perishable food",
-   "Important documents",
+   "Identification and important papers",
    "Medications and first aid supplies",
-   "Flashlights and extra batteries"
+   "Water and non-perishable food"
   ],
   "pets": [
-   "Keep pet carriers ready",
-   "Pack enough pet food and water",
-   "Keep identification and leashes nearby"
+   "Keep pet carriers and leashes ready",
+   "Pack enough food and water for pets",
+   "Ensure pets have proper identification"
   ],
   "caveats": [
-   "These are illustrative estimates from public data, satellite fire detections, OpenStreetMap roads, and modelled population, not official guidance.",
-   "Drive times are estimated minimums with no congestion.",
+   "These are illustrative estimates from public data including satellite fire detections, OpenStreetMap roads, and modelled population, not official guidance.",
+   "Drive times are estimated minimums with no congestion, showing an average sample of 14.1 minutes and a longest sample of 17.1 to 17.8 minutes for specific cut-off areas.",
+   "Official orders come first; follow instructions from local authorities.",
    "Rely on the BC Wildfire Service, EmergencyInfoBC, and local evacuation orders for real decisions."
   ]
  },
- "generated_at": "2026-10-04T10:23:52.191459+00:00"
+ "generated_at": "2026-10-04T14:06:47.748310+00:00"
 }

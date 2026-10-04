@@ -11,41 +11,42 @@
   "satellite_fire_detections_so_far": 95,
   "road_segments_likely_affected": 24,
   "road_names_most_affected": [
+   "Bathville Road",
    "Princeton-Summerland Road",
    "Garnet Valley Road",
-   "Bathville Road",
-   "Marsh Lane",
-   "Bathville Road, Isintok-McNulty Forest Service Road"
+   "Marsh Lane"
   ],
-  "estimated_residents_cut_off_from_all_exits": 60,
+  "residents_range_note": "low = roads within 50 m of a satellite detection are treated as impassable; high = within 100 m",
   "estimated_minimum_drive_minutes_longest_sample": 21.2,
   "estimated_minimum_drive_minutes_average_sample": 14.1,
   "drive_time_note": "free-flow minimum, no congestion, from 74 sample points in Summerland",
-  "areas_cut_off_so_far": []
+  "areas_cut_off_so_far": [],
+  "estimated_residents_cut_off_same_under_both_rules": 60,
+  "evacuation_order": "An evacuation order for the entire District of Summerland was issued just after this snapshot, shortly after midnight on August 8, 2026 (reported by CBC)."
  },
  "briefing": {
-  "summary": "El incendio forestal de Bald Range cerca de Summerland, British Columbia, ha sido detectado por satélite hace 7.2 horas con 95 detecciones registradas hasta el momento. Hay 24 tramos de carretera probablemente afectados, incluyendo Princeton-Summerland Road, Garnet Valley Road, Bathville Road, Marsh Lane y Bathville Road, Isintok-McNulty Forest Service Road, dejando a unos 60 residentes estimados sin acceso a todas las salidas. Los tiempos de conducción mínimos estimados varían desde un promedio de 14.1 minutos hasta el punto más largo de 21.2 minutos, basados en 74 puntos de muestra en Summerland.",
+  "summary": "El incendio forestal Bald Range en Summerland, British Columbia, se registra desde hace 7.2 horas con 95 detecciones satelitales de fuego hasta el sábado 8 de agosto a las 12:00 AM. Hay 24 tramos de carretera probablemente afectados, incluidos Bathville Road, Princeton-Summerland Road, Garnet Valley Road y Marsh Lane. Se calcula que 60 residentes están aislados según las reglas de proximidad a las detecciones, y los tiempos de conducción estimados sin congestión son un promedio de 14.1 minutos y un máximo de 21.2 minutos de 74 puntos de muestra en Summerland. Se informó una orden de evacuación para todo el Distrito de Summerland, emitida justo después de este registro, poco después de la medianoche del 8 de agosto de 2026. Las órdenes oficiales son lo primero y se debe seguir las instrucciones de las autoridades locales.",
   "steps": [
-   "Mantenerse informado sobre el estado actual del incendio y las condiciones locales.",
-   "Revisar los planes familiares para estar preparados ante cualquier eventualidad.",
-   "Tener listas las rutas de salida habituales y posibles alternativas."
+   "Mantenerse informado sobre el estado actual del incendio",
+   "Revisar los planes familiares de emergencia",
+   "Preparar un kit con suministros básicos"
   ],
   "what_to_bring": [
-   "Documentos personales importantes y copias de seguridad",
-   "Agua potable y alimentos no perecederos",
-   "Un botiquín de primeros auxilios y medicamentos esenciales",
-   "Linternas y baterías de repuesto"
+   "Documentos de identidad importantes y dinero",
+   "Medicamentos necesarios y un botiquín de primeros auxilios",
+   "Agua potable, alimentos no perecederos y ropa adicional",
+   "Dispositivos de comunicación y cargadores"
   ],
   "pets": [
-   "Preparar suficiente comida y agua para los animales de compañía",
-   "Tener transportadoras o correas listas para cada mascota",
-   "Llevar registros de vacunación e historial médico si es posible"
+   "Llevar suficiente comida y agua para las mascotas",
+   "Asegurar correas, transportadoras y suministros médicos para los animales",
+   "Incluir a las mascotas en el plan familiar"
   ],
   "caveats": [
-   "Estas son estimaciones ilustrativas basadas en datos públicos de detecciones de incendios por satélite, carreteras de OpenStreetMap y población modelada, no una guía oficial.",
+   "Estas son estimaciones ilustrativas basadas en datos públicos de detecciones de incendios por satélite, carreteras de OpenStreetMap y población modelada, y no constituyen una guía oficial.",
    "Los tiempos de conducción son mínimos estimados sin congestión.",
-   "Consulte siempre a BC Wildfire Service, EmergencyInfoBC y a las órdenes de evacuación locales para tomar decisiones reales."
+   "Para tomar decisiones reales, consulte siempre al BC Wildfire Service, EmergencyInfoBC y las órdenes de evacuación locales."
   ]
  },
- "generated_at": "2026-10-04T10:23:42.546747+00:00"
+ "generated_at": "2026-10-04T14:09:29.790112+00:00"
 }

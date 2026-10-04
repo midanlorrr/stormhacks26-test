@@ -87,15 +87,21 @@
 
     <div class="es-stats">
       <div class="es-stat"><span class="es-label">Detections</span><span id="s-fires" class="es-number">&ndash;</span></div>
-      <div class="es-stat"><span class="es-label">Road segments</span><span class="es-number"><span id="s-roads" class="es-est">&ndash;</span></span><span class="es-est-tag">est.</span></div>
-      <div class="es-stat"><span class="es-label">Cut off</span><span class="es-number"><span id="s-res" class="es-est">&ndash;</span></span><span class="es-est-tag">est.</span></div>
+      <div class="es-stat"><span class="es-label" title="Road segments likely affected (estimated)">Roads</span><span class="es-number"><span id="s-roads" class="es-est">&ndash;</span></span><span class="es-est-tag">est.</span></div>
+      <div class="es-stat es-stat--range"><span class="es-label">Cut off</span><span class="es-number"><span id="s-res" class="es-est">&ndash;</span></span><span class="es-est-tag">est.</span></div>
     </div>
+
+    <p id="crosscheck-note" class="es-note" hidden></p>
 
     <div class="es-scroll">
       <section class="es-section">
-        <div class="es-label es-block-label">Minimum drive to an exit</div>
-        <div class="es-row"><span>Longest</span><span><span id="s-longest" class="es-est">&ndash;</span><span class="es-est-tag">est.</span></span></div>
-        <div class="es-row"><span>Average</span><span><span id="s-mean" class="es-est">&ndash;</span><span class="es-est-tag">est.</span></span></div>
+        <div class="es-section-head" data-toggle role="button" tabindex="0" aria-expanded="true">
+          <span>Key moments</span><span class="es-section-meta"><span class="es-chev">&#9652;</span></span>
+        </div>
+        <div class="es-section-body">
+          <div id="moments-list"></div>
+          <p class="es-note">Click a moment to jump the replay there.</p>
+        </div>
       </section>
 
       <section class="es-section">
@@ -108,14 +114,9 @@
       </section>
 
       <section class="es-section">
-        <div class="es-section-head" data-toggle role="button" tabindex="0" aria-expanded="true">
-          <span>Briefing</span>
-          <span class="es-section-meta"><select id="lang" class="es-select" aria-label="Briefing language" disabled></select><span class="es-chev">&#9652;</span></span>
-        </div>
-        <div class="es-section-body">
-          <p class="es-note">AI-written from the figures above. Illustrative.</p>
-          <div id="briefing" class="es-body"><p class="es-note">No briefings found. Run data_prep/07_briefings.py (see README).</p></div>
-        </div>
+        <div class="es-label es-block-label">Minimum drive to an exit</div>
+        <div class="es-row"><span>Longest</span><span><span id="s-longest" class="es-est">&ndash;</span><span class="es-est-tag">est.</span></span></div>
+        <div class="es-row"><span>Average</span><span><span id="s-mean" class="es-est">&ndash;</span><span class="es-est-tag">est.</span></span></div>
       </section>
 
       <section class="es-section is-closed">
@@ -145,6 +146,21 @@
     <div><span class="es-swatch es-swatch--point"></span>Exit and sample points</div>
     <div class="es-legend-note">Places appear when zoomed in</div>
   </div>
+
+  <!-- Briefing callout: pinned to Summerland on the map with a thin line -->
+  <svg id="callout-line" aria-hidden="true"><line x1="0" y1="0" x2="0" y2="0"></line><circle r="4" cx="0" cy="0"></circle></svg>
+  <aside id="callout" class="es-panel" aria-label="Briefing">
+    <div class="callout-head">
+      <span class="es-label">Briefing &middot; AI-written, not official</span>
+      <span class="es-section-meta">
+        <select id="lang" class="es-select" aria-label="Briefing language" disabled></select>
+        <button id="callout-toggle" class="callout-toggle" type="button" aria-expanded="true" aria-label="Collapse the briefing">&#9652;</button>
+      </span>
+    </div>
+    <div id="callout-body">
+      <div id="briefing" class="es-body"><p class="es-note">No briefings found. Run data_prep/07_briefings.py (see README).</p></div>
+    </div>
+  </aside>
 
   <script src="vendor/maplibre-gl.js"></script>
   <script src="app.js"></script>

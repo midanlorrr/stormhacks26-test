@@ -12,12 +12,14 @@
   "road_segments_likely_affected": 278,
   "road_names_most_affected": [
    "Okanagan Highway",
+   "Bathville Road",
    "Princeton-Summerland Road",
    "Garnet Valley Road",
-   "Bathville Road",
-   "Cartwright Avenue"
+   "Prairie Valley Road"
   ],
-  "estimated_residents_cut_off_from_all_exits": 1080,
+  "estimated_residents_cut_off_low": 270,
+  "estimated_residents_cut_off_high": 1080,
+  "residents_range_note": "low = roads within 50 m of a satellite detection are treated as impassable; high = within 100 m",
   "estimated_minimum_drive_minutes_longest_sample": 21.2,
   "estimated_minimum_drive_minutes_average_sample": 14.1,
   "drive_time_note": "free-flow minimum, no congestion, from 74 sample points in Summerland",
@@ -34,30 +36,31 @@
     "hours_after_first_detection_when_cut_off": 9.4,
     "estimated_minimum_drive_minutes": 17.8
    }
-  ]
+  ],
+  "evacuation_order": "The entire District of Summerland was under an evacuation order from just after midnight on August 8, 2026 (reported by CBC)."
  },
  "briefing": {
-  "summary": "El incendio forestal Bald Range cerca de Summerland, British Columbia ha registrado 1250 detecciones satelitales en 10.2 horas. Se estima que 1080 residentes podrian estar sin salida, afectando a 278 segmentos viales como Okanagan Highway, Princeton-Summerland Road, Garnet Valley Road, Bathville Road y Cartwright Avenue. El tiempo minimo estimado de manejo es de 14.1 minutos en promedio y hasta 21.2 minutos en la muestra mas larga.",
+  "summary": "El Sábado Agosto 8 a las 3:00 AM, el incendio forestal de Bald Range cerca de Summerland, British Columbia ha registrado 1250 detecciones de satélite en 10.2 horas. Se estiman entre 270 y 1080 residentes afectados según la distancia de las carreteras a las detecciones, afectando 278 segmentos viales, incluyendo Okanagan Highway, Bathville Road, Princeton-Summerland Road, Garnet Valley Road y Prairie Valley Road. Los tiempos mínimos de manejo son de un promedio de 14.1 minutos y un máximo de 21.2 minutos, con un reporte periodístico de una orden de evacuación para todo el Distrito de Summerland desde poco después de la medianoche del Agosto 8, 2026.",
   "steps": [
-   "Monitorear las condiciones actuales del area y mantener la calma",
-   "Preparar un plan familiar en caso de necesitar trasladarse",
-   "Revisar vehiculos y asegurar suficiente combustible"
+   "Mantener la calma y mantenerse informado sobre el estado actual del incendio forestal.",
+   "Revisar regularmente las actualizaciones de las autoridades locales y los servicios de emergencia.",
+   "Preparar un plan familiar de comunicación por si se necesita coordinar movimientos."
   ],
   "what_to_bring": [
-   "Documentos personales importantes",
-   "Agua potable y alimentos no perecederos",
-   "Medicamentos y un botiquin de primeros auxilios"
+   "Documentos de identidad importantes y registros médicos.",
+   "Medicamentos necesarios y un botiquín de primeros auxilios.",
+   "Agua potable, alimentos no perecederos y ropa adicional."
   ],
   "pets": [
-   "Mantener a las mascotas cerca y bajo control",
-   "Preparar comida, agua y transportadoras para los animales",
-   "Identificar lugares seguros para las mascotas"
+   "Mantener a las mascotas con correa o en transportadores seguros.",
+   "Preparar suficiente comida, agua y suministros necesarios para los animales."
   ],
   "caveats": [
-   "Estos son estimados ilustrativos basados en datos publicos de detecciones satelitales, vias de OpenStreetMap y poblacion modelada, no son una guia oficial",
-   "Los tiempos de manejo son minimos estimados sin congestion basados en 74 puntos de muestra en Summerland",
-   "Consulte siempre al BC Wildfire Service, EmergencyInfoBC y las ordenes de evacuacion locales para tomar decisiones reales"
+   "Estas son estimaciones ilustrativas basadas en datos públicos de incendios por satélite, mapas de carreteras y población modelada, y no constituyen una guía oficial.",
+   "Los tiempos de conducción son mínimos estimados y sin congestión vehicular.",
+   "Las órdenes oficiales tienen prioridad y se debe seguir estrictamente las instrucciones de las autoridades locales.",
+   "Consulte siempre al BC Wildfire Service y a EmergencyInfoBC para tomar decisiones reales."
   ]
  },
- "generated_at": "2026-10-04T10:24:14.319349+00:00"
+ "generated_at": "2026-10-04T14:07:50.568629+00:00"
 }

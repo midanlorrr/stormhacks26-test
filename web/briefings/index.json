@@ -21,6 +21,11 @@
  },
  {
   "step": 2,
+  "language": "Punjabi",
+  "file": "step_2_Punjabi.json"
+ },
+ {
+  "step": 2,
   "language": "Spanish",
   "file": "step_2_Spanish.json"
  },
@@ -43,6 +48,11 @@
   "step": 4,
   "language": "English",
   "file": "step_4_English.json"
+ },
+ {
+  "step": 4,
+  "language": "Punjabi",
+  "file": "step_4_Punjabi.json"
  },
  {
   "step": 4,

@@ -33,7 +33,7 @@ Everything below applies to this project as of Oct 4, 2026. Read this before quo
 ## Residents cut off
 - Population comes from **WorldPop** (100 m grid, 2025 estimate, CC BY 4.0). WorldPop is modelled, not a census, and labels this release as alpha. Counts are approximate; we round to the nearest 10.
 - Each grid cell's people are assigned to the nearest road node (cells over 1.5 km from any road are dropped, 47 people). A real address may be served by a different road.
-- About **1,440 residents** are estimated cut off by Aug 8 6 am. It depends on the 100 m rule and on the Highway 97 assumption above, so it could be too high or too low.
+- The page shows residents cut off as a **range**: about **820 to 1,440** by Aug 8 6 am (roads within 50 m or 100 m of a detection treated as impassable). The answer is very sensitive to that rule: 25 m gives about 280, 250 m about 3,000, 500 m about 4,560. Closing only the roads that touch the official fire perimeter (Aug 29 shape, end state only) gives about 470, and the official Highway 97 closure alone gives about 390. So 1,440 is probably the high side. Those two cross-checks are not time-resolved, so they appear only as a note on the page.
 - "Cut off" means no drivable route to any of our three exits. The evacuation orders covered the whole town (about 12,000 people), so "cut off" is **not** the number of people told to leave.
 - The "areas cut off" list uses a majority rule: an area counts as cut off when at least half its estimated residents have lost every route. Only 4 of 280 populated 1 km areas meet it.
 
@@ -48,13 +48,14 @@ Everything below applies to this project as of Oct 4, 2026. Read this before quo
 ## How well it has been checked
 - Fire data against the official perimeter: 97% of detections are inside it (BCWS Aug 29 version, 25,163 ha), 87% of its area has a detection within 1 km, and pixels directly cover 74%. The perimeter is a later, larger snapshot, so this is a generous check and says nothing about timing.
 - Everything else (roads closed, drive times, residents cut off) is **not validated** against real closure or traffic records.
-- Timeline facts come from the BCWS incident record, the BC Emergency Alert of Aug 8, and a CBC article. The article text we saved is labelled "Aug 7 9:15pm" but describes events through 8 am Aug 8, so that label is probably wrong.
+- Timeline facts come from the BCWS incident record, the BC Emergency Alert of Aug 8, and a CBC article published Aug 8 at 9:15 pm PT. The article describes events through 8 am that morning. The order times in it are the news outlet's account, not an official notice.
 
 ## AI briefings (Gemini)
 - Written by a small Gemini model (`gemini-3.5-flash-lite`) from our computed numbers. Code rejects invented or rounded numbers, missing "BC Wildfire Service" and "EmergencyInfoBC", and (in English) instructions to evacuate. That does not guarantee every sentence is accurate or appropriate.
 - The "steps", "what to bring" and "pets" lists come from the model's general knowledge, not from official guidance.
-- The briefings **do not know about the official evacuation order** (just after midnight Aug 8), so some wording, such as preparing belongings in advance, can read oddly after midnight. This is on the to-do list.
-- Spanish and Punjabi text was **not reviewed by a native speaker**. The Punjabi reads stiffly. Punjabi briefings for steps 2 and 4 are missing.
+- The briefings are told that the whole District of Summerland was ordered to evacuate just after midnight on Aug 8, **as reported by CBC**. That time is the news outlet's account, not an official notice, and "just after midnight" is not an exact time. Earlier orders, if any, are not known to the tool.
+- Spanish and Punjabi text was **not reviewed by a native speaker**. The Punjabi reads stiffly.
+- The model sometimes words things loosely (for example describing a per-area drive time as a "longest" figure). The number check cannot catch that.
 - The free Gemini tier is limited to about 20 calls per day per model, so briefings were pre-generated and saved.
 
 ## Map and display

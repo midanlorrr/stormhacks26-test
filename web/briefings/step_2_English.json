@@ -11,40 +11,41 @@
   "satellite_fire_detections_so_far": 95,
   "road_segments_likely_affected": 24,
   "road_names_most_affected": [
+   "Bathville Road",
    "Princeton-Summerland Road",
    "Garnet Valley Road",
-   "Bathville Road",
-   "Marsh Lane",
-   "Bathville Road, Isintok-McNulty Forest Service Road"
+   "Marsh Lane"
   ],
-  "estimated_residents_cut_off_from_all_exits": 60,
+  "residents_range_note": "low = roads within 50 m of a satellite detection are treated as impassable; high = within 100 m",
   "estimated_minimum_drive_minutes_longest_sample": 21.2,
   "estimated_minimum_drive_minutes_average_sample": 14.1,
   "drive_time_note": "free-flow minimum, no congestion, from 74 sample points in Summerland",
-  "areas_cut_off_so_far": []
+  "areas_cut_off_so_far": [],
+  "estimated_residents_cut_off_same_under_both_rules": 60,
+  "evacuation_order": "An evacuation order for the entire District of Summerland was issued just after this snapshot, shortly after midnight on August 8, 2026 (reported by CBC)."
  },
  "briefing": {
-  "summary": "As of Saturday August 8, 12:00 AM, satellite data for the Bald Range wildfire near Summerland, British Columbia shows 95 fire detections over 7.2 hours. An estimated 60 residents are cut off from all exits, with 24 road segments likely affected, including Princeton-Summerland Road, Garnet Valley Road, Bathville Road, Marsh Lane, and Bathville Road, Isintok-McNulty Forest Service Road. Estimated minimum drive times range from an average of 14.1 minutes to a longest sample of 21.2 minutes.",
+  "summary": "As of Saturday August 8, 12:00 AM, the Bald Range wildfire near Summerland, British Columbia has been tracked for 7.2 hours with 95 satellite fire detections. There are 24 road segments likely affected, including Bathville Road, Princeton-Summerland Road, Garnet Valley Road, and Marsh Lane. An estimated 60 residents are cut off under both distance rules. An evacuation order for the entire District of Summerland was issued just after this snapshot, shortly after midnight on August 8, 2026, as reported by CBC.",
   "steps": [
-   "Monitor local conditions and stay informed through official channels",
-   "Review your household plan and discuss readiness with family members",
-   "Keep vehicle fuel tanks filled and ready if you decide to travel"
+   "Stay informed through official local channels and monitor updates from the BC Wildfire Service and EmergencyInfoBC",
+   "Review local evacuation orders and follow instructions from local authorities",
+   "Keep vehicles fueled and ready in case travel is necessary"
   ],
   "what_to_bring": [
-   "Important personal documents and identification",
-   "Medications and a basic first aid kit",
-   "Bottled water and non-perishable food items",
-   "Clothing and personal care supplies"
+   "Identification and important documents",
+   "Medications and first aid supplies",
+   "Water, non-perishable food, and basic clothing"
   ],
   "pets": [
-   "Prepare carriers, leashes, and food for your pets",
-   "Ensure identification tags or microchips are up to date"
+   "Ensure pets have secure carriers, leashes, and collars with current ID",
+   "Pack enough food, water, and necessary medications for your animals",
+   "Keep pet vaccination records handy"
   ],
   "caveats": [
    "These are illustrative estimates from public data including satellite fire detections, OpenStreetMap roads, and modelled population, not official guidance",
-   "Drive times are estimated minimums with no congestion, based on 74 sample points in Summerland",
-   "Rely on the BC Wildfire Service, EmergencyInfoBC and local evacuation orders for real decisions"
+   "Drive times are estimated minimums with no congestion, showing an average sample of 14.1 minutes and a longest sample of 21.2 minutes from 74 sample points in Summerland",
+   "Rely on the BC Wildfire Service, EmergencyInfoBC, and local evacuation orders for real decisions and official instructions"
   ]
  },
- "generated_at": "2026-10-04T10:23:22.071260+00:00"
+ "generated_at": "2026-10-04T14:09:09.056619+00:00"
 }
