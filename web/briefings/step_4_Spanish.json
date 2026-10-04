@@ -1,0 +1,69 @@
+{
+ "step": 4,
+ "time": "2026-08-08T06:00:00-07:00",
+ "language": "Spanish",
+ "model": "gemini-3.5-flash-lite",
+ "area": null,
+ "facts": {
+  "place": "Summerland, British Columbia (Bald Range wildfire)",
+  "time_of_this_snapshot_pacific": "Saturday August 8, 6:00 AM",
+  "hours_since_first_satellite_detection": 13.2,
+  "satellite_fire_detections_so_far": 2911,
+  "road_segments_likely_affected": 391,
+  "road_names_most_affected": [
+   "Princeton-Summerland Road",
+   "Okanagan Highway",
+   "Garnet Valley Road",
+   "Prairie Valley Road",
+   "Bathville Road"
+  ],
+  "estimated_residents_cut_off_from_all_exits": 1440,
+  "estimated_minimum_drive_minutes_longest_sample": 21.2,
+  "estimated_minimum_drive_minutes_average_sample": 14.1,
+  "drive_time_note": "free-flow minimum, no congestion, from 74 sample points in Summerland",
+  "areas_cut_off_so_far": [
+   {
+    "area": "near Morrow Avenue",
+    "estimated_residents": 120,
+    "hours_after_first_detection_when_cut_off": 9.4,
+    "estimated_minimum_drive_minutes": 17.1
+   },
+   {
+    "area": "near Sanborn Street",
+    "estimated_residents": 60,
+    "hours_after_first_detection_when_cut_off": 10.5,
+    "estimated_minimum_drive_minutes": 14.0
+   },
+   {
+    "area": "near McLarty Place",
+    "estimated_residents": 50,
+    "hours_after_first_detection_when_cut_off": 9.4,
+    "estimated_minimum_drive_minutes": 17.8
+   }
+  ]
+ },
+ "briefing": {
+  "summary": "El sábado 8 de agosto a las 6:00 AM, el incendio forestal Bald Range cerca de Summerland, British Columbia muestra 2911 detecciones satelitales en un periodo de 13.2 horas. Se estiman 391 tramos de carretera afectados, incluyendo Princeton-Summerland Road, Okanagan Highway, Garnet Valley Road, Prairie Valley Road y Bathville Road, con 1440 residentes estimados sin acceso a salidas y tiempos de conducción mínimos estimados que van desde un promedio de 14.1 hasta 21.2 minutos.",
+  "steps": [
+   "Mantenerse informado sobre el estado actual del área",
+   "Preparar artículos esenciales y documentos importantes con anticipación",
+   "Revisar planes familiares para estar listos ante cualquier cambio"
+  ],
+  "what_to_bring": [
+   "Agua potable y alimentos no perecederos",
+   "Medicamentos y un botiquín de primeros auxilios",
+   "Documentos de identidad y dinero en efectivo"
+  ],
+  "pets": [
+   "Preparar comida y agua adicional para los animales",
+   "Asegurar correas, transportadoras y placas de identificación",
+   "Incluir historiales médicos de las mascotas"
+  ],
+  "caveats": [
+   "Estas son estimaciones ilustrativas basadas en datos públicos de incendios por satélite, carreteras de OpenStreetMap y población modelada, no una guía oficial.",
+   "Los tiempos de conducción son mínimos estimados sin congestión vehicular.",
+   "Consulte siempre al BC Wildfire Service, EmergencyInfoBC y las órdenes de evacuación locales para tomar decisiones reales."
+  ]
+ },
+ "generated_at": "2026-10-04T10:24:45.253214+00:00"
+}

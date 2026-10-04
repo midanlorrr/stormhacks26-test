@@ -1,0 +1,63 @@
+{
+ "step": 3,
+ "time": "2026-08-08T03:00:00-07:00",
+ "language": "Spanish",
+ "model": "gemini-3.5-flash-lite",
+ "area": null,
+ "facts": {
+  "place": "Summerland, British Columbia (Bald Range wildfire)",
+  "time_of_this_snapshot_pacific": "Saturday August 8, 3:00 AM",
+  "hours_since_first_satellite_detection": 10.2,
+  "satellite_fire_detections_so_far": 1250,
+  "road_segments_likely_affected": 278,
+  "road_names_most_affected": [
+   "Okanagan Highway",
+   "Princeton-Summerland Road",
+   "Garnet Valley Road",
+   "Bathville Road",
+   "Cartwright Avenue"
+  ],
+  "estimated_residents_cut_off_from_all_exits": 1080,
+  "estimated_minimum_drive_minutes_longest_sample": 21.2,
+  "estimated_minimum_drive_minutes_average_sample": 14.1,
+  "drive_time_note": "free-flow minimum, no congestion, from 74 sample points in Summerland",
+  "areas_cut_off_so_far": [
+   {
+    "area": "near Morrow Avenue",
+    "estimated_residents": 120,
+    "hours_after_first_detection_when_cut_off": 9.4,
+    "estimated_minimum_drive_minutes": 17.1
+   },
+   {
+    "area": "near McLarty Place",
+    "estimated_residents": 50,
+    "hours_after_first_detection_when_cut_off": 9.4,
+    "estimated_minimum_drive_minutes": 17.8
+   }
+  ]
+ },
+ "briefing": {
+  "summary": "El incendio forestal Bald Range cerca de Summerland, British Columbia ha registrado 1250 detecciones satelitales en 10.2 horas. Se estima que 1080 residentes podrian estar sin salida, afectando a 278 segmentos viales como Okanagan Highway, Princeton-Summerland Road, Garnet Valley Road, Bathville Road y Cartwright Avenue. El tiempo minimo estimado de manejo es de 14.1 minutos en promedio y hasta 21.2 minutos en la muestra mas larga.",
+  "steps": [
+   "Monitorear las condiciones actuales del area y mantener la calma",
+   "Preparar un plan familiar en caso de necesitar trasladarse",
+   "Revisar vehiculos y asegurar suficiente combustible"
+  ],
+  "what_to_bring": [
+   "Documentos personales importantes",
+   "Agua potable y alimentos no perecederos",
+   "Medicamentos y un botiquin de primeros auxilios"
+  ],
+  "pets": [
+   "Mantener a las mascotas cerca y bajo control",
+   "Preparar comida, agua y transportadoras para los animales",
+   "Identificar lugares seguros para las mascotas"
+  ],
+  "caveats": [
+   "Estos son estimados ilustrativos basados en datos publicos de detecciones satelitales, vias de OpenStreetMap y poblacion modelada, no son una guia oficial",
+   "Los tiempos de manejo son minimos estimados sin congestion basados en 74 puntos de muestra en Summerland",
+   "Consulte siempre al BC Wildfire Service, EmergencyInfoBC y las ordenes de evacuacion locales para tomar decisiones reales"
+  ]
+ },
+ "generated_at": "2026-10-04T10:24:14.319349+00:00"
+}

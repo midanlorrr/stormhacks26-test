@@ -1,0 +1,49 @@
+{
+ "step": 1,
+ "time": "2026-08-07T21:00:00-07:00",
+ "language": "Spanish",
+ "model": "gemini-3.5-flash-lite",
+ "area": null,
+ "facts": {
+  "place": "Summerland, British Columbia (Bald Range wildfire)",
+  "time_of_this_snapshot_pacific": "Friday August 7, 9:00 PM",
+  "hours_since_first_satellite_detection": 4.2,
+  "satellite_fire_detections_so_far": 43,
+  "road_segments_likely_affected": 6,
+  "road_names_most_affected": [
+   "Marsh Lane",
+   "Bathville Road, Isintok-McNulty Forest Service Road",
+   "Princeton-Summerland Road"
+  ],
+  "estimated_residents_cut_off_from_all_exits": 0,
+  "estimated_minimum_drive_minutes_longest_sample": 21.2,
+  "estimated_minimum_drive_minutes_average_sample": 14.1,
+  "drive_time_note": "free-flow minimum, no congestion, from 74 sample points in Summerland",
+  "areas_cut_off_so_far": []
+ },
+ "briefing": {
+  "summary": "El viernes 7 de agosto a las 9:00 PM, el incendio forestal de Bald Range cerca de Summerland, British Columbia, registra 43 detecciones satelitales tras 4.2 horas desde la primera detección. Hay 6 segmentos viales afectados, incluyendo Marsh Lane, Bathville Road, Isintok-McNulty Forest Service Road y Princeton-Summerland Road. Se estima que 0 residentes están cortados de todas las salidas, con un tiempo mínimo de manejo estimado de 14.1 minutos en promedio y hasta 21.2 minutos en la muestra más larga.",
+  "steps": [
+   "Mantenerse informado sobre la situación actual del incendio y las condiciones del camino",
+   "Preparar un plan familiar en caso de que las condiciones cambien",
+   "Revisar el vehículo y asegurarse de tener suficiente combustible"
+  ],
+  "what_to_bring": [
+   "Documentos importantes de identidad",
+   "Medicamentos necesarios y un botiquín de primeros auxilios",
+   "Agua y alimentos no perecederos",
+   "Dispositivos de comunicación y cargadores"
+  ],
+  "pets": [
+   "Preparar comida y agua adicional para las mascotas",
+   "Tener transportadoras y correas listas",
+   "Llevar consigo registros médicos y de vacunación de los animales"
+  ],
+  "caveats": [
+   "Estas son estimaciones ilustrativas basadas en datos públicos de detecciones de incendios por satélite, carreteras de OpenStreetMap y población modelada, no una guía oficial.",
+   "Los tiempos de manejo son mínimos estimados sin congestión y provienen de 74 puntos de muestra en Summerland.",
+   "Para tomar decisiones reales, confíe en BC Wildfire Service, EmergencyInfoBC y las órdenes de evacuación locales."
+  ]
+ },
+ "generated_at": "2026-10-04T10:23:12.363026+00:00"
+}

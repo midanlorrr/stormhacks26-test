@@ -1,0 +1,69 @@
+{
+ "step": 4,
+ "time": "2026-08-08T06:00:00-07:00",
+ "language": "English",
+ "model": "gemini-3.5-flash-lite",
+ "area": null,
+ "facts": {
+  "place": "Summerland, British Columbia (Bald Range wildfire)",
+  "time_of_this_snapshot_pacific": "Saturday August 8, 6:00 AM",
+  "hours_since_first_satellite_detection": 13.2,
+  "satellite_fire_detections_so_far": 2911,
+  "road_segments_likely_affected": 391,
+  "road_names_most_affected": [
+   "Princeton-Summerland Road",
+   "Okanagan Highway",
+   "Garnet Valley Road",
+   "Prairie Valley Road",
+   "Bathville Road"
+  ],
+  "estimated_residents_cut_off_from_all_exits": 1440,
+  "estimated_minimum_drive_minutes_longest_sample": 21.2,
+  "estimated_minimum_drive_minutes_average_sample": 14.1,
+  "drive_time_note": "free-flow minimum, no congestion, from 74 sample points in Summerland",
+  "areas_cut_off_so_far": [
+   {
+    "area": "near Morrow Avenue",
+    "estimated_residents": 120,
+    "hours_after_first_detection_when_cut_off": 9.4,
+    "estimated_minimum_drive_minutes": 17.1
+   },
+   {
+    "area": "near Sanborn Street",
+    "estimated_residents": 60,
+    "hours_after_first_detection_when_cut_off": 10.5,
+    "estimated_minimum_drive_minutes": 14.0
+   },
+   {
+    "area": "near McLarty Place",
+    "estimated_residents": 50,
+    "hours_after_first_detection_when_cut_off": 9.4,
+    "estimated_minimum_drive_minutes": 17.8
+   }
+  ]
+ },
+ "briefing": {
+  "summary": "As of Saturday August 8, 6:00 AM, satellite data for the Bald Range wildfire near Summerland, British Columbia shows 2911 fire detections over 13.2 hours. About 1440 residents are estimated to be cut off from all exits, affecting 391 road segments including Princeton-Summerland Road, Okanagan Highway, Garnet Valley Road, Prairie Valley Road, and Bathville Road. Estimated minimum drive times range from an average of 14.1 minutes to a longest sample of 21.2 minutes.",
+  "steps": [
+   "Keep informed about changing conditions in the local area.",
+   "Review a personal plan for travel and communication.",
+   "Check on neighbors and family members to ensure they are aware of the situation."
+  ],
+  "what_to_bring": [
+   "Important personal documents and identification",
+   "Medications and a basic first aid kit",
+   "Water, non-perishable food, and phone chargers"
+  ],
+  "pets": [
+   "Keep pets close and inside where they are easy to find.",
+   "Pack pet food, water, carriers, and leash supplies.",
+   "Ensure pets have proper identification tags."
+  ],
+  "caveats": [
+   "These are illustrative estimates from public data including satellite fire detections, OpenStreetMap roads, and modelled population, not official guidance.",
+   "Drive times are estimated minimums with no congestion, based on 74 sample points in Summerland.",
+   "Rely on the BC Wildfire Service, EmergencyInfoBC, and local evacuation orders for real decisions."
+  ]
+ },
+ "generated_at": "2026-10-04T10:24:24.710621+00:00"
+}

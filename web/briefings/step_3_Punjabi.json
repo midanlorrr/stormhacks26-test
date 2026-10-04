@@ -1,0 +1,61 @@
+{
+ "step": 3,
+ "time": "2026-08-08T03:00:00-07:00",
+ "language": "Punjabi",
+ "model": "gemini-3.5-flash-lite",
+ "area": null,
+ "facts": {
+  "place": "Summerland, British Columbia (Bald Range wildfire)",
+  "time_of_this_snapshot_pacific": "Saturday August 8, 3:00 AM",
+  "hours_since_first_satellite_detection": 10.2,
+  "satellite_fire_detections_so_far": 1250,
+  "road_segments_likely_affected": 278,
+  "road_names_most_affected": [
+   "Okanagan Highway",
+   "Princeton-Summerland Road",
+   "Garnet Valley Road",
+   "Bathville Road",
+   "Cartwright Avenue"
+  ],
+  "estimated_residents_cut_off_from_all_exits": 1080,
+  "estimated_minimum_drive_minutes_longest_sample": 21.2,
+  "estimated_minimum_drive_minutes_average_sample": 14.1,
+  "drive_time_note": "free-flow minimum, no congestion, from 74 sample points in Summerland",
+  "areas_cut_off_so_far": [
+   {
+    "area": "near Morrow Avenue",
+    "estimated_residents": 120,
+    "hours_after_first_detection_when_cut_off": 9.4,
+    "estimated_minimum_drive_minutes": 17.1
+   },
+   {
+    "area": "near McLarty Place",
+    "estimated_residents": 50,
+    "hours_after_first_detection_when_cut_off": 9.4,
+    "estimated_minimum_drive_minutes": 17.8
+   }
+  ]
+ },
+ "briefing": {
+  "summary": "ਸਮਰਲੈਂਡ, ਬ੍ਰਿਟਿਸ਼ ਕੋਲੰਬੀਆ ਵਿੱਚ ਬਾਲਡ ਰੇਂਜ ਜੰਗਲੀ ਅੱਗ ਦੇ ਸਬੰਧ ਵਿੱਚ, ਪਹਿਲੀ ਸੈਟੇਲਾਈਟ ਖੋਜ ਤੋਂ 10.2 ਘੰਟੇ ਬੀਤ ਚੁੱਕੇ ਹਨ ਅਤੇ 1250 ਸੈਟੇਲਾਈਟ ਅੱਗ ਦੀਆਂ ਖੋਜਾਂ ਦਰਜ ਕੀਤੀਆਂ ਗਈਆਂ ਹਨ। 278 ਸੜਕੀ ਹਿੱਸੇ ਪ੍ਰਭਾਵਿਤ ਹੋ ਸਕਦੇ ਹਨ ਅਤੇ 1080 ਨਿਵਾਸੀਆਂ ਦੇ ਸਾਰੇ ਬਾਹਰ ਜਾਣ ਦੇ ਰਸਤੇ ਕੱਟੇ ਜਾਣ ਦਾ ਅਨੁਮਾਨ ਹੈ।",
+  "steps": [
+   "ਜ਼ਰੂਰੀ ਦਸਤਾਵੇਜ਼ ਅਤੇ ਦਵਾਈਆਂ ਤਿਆਰ ਰੱਖੋ",
+   "ਆਪਣੀ ਗੱਡੀ ਵਿੱਚ ਬਾਲਣ ਪੂਰਾ ਰੱਖੋ",
+   "ਅਧਿਕਾਰਤ ਅਪਡੇਟਸ 'ਤੇ ਨਜ਼ਰ ਰੱਖੋ"
+  ],
+  "what_to_bring": [
+   "ਪਾਣੀ ਅਤੇ ਭੋਜਨ",
+   "ਪਛਾਣ ਪੱਤਰ ਅਤੇ ਜ਼ਰੂਰੀ ਕਾਗਜ਼ਾਤ",
+   "प्राथमिक ਸਹਾਇਤਾ ਬਾਕਸ"
+  ],
+  "pets": [
+   "ਪਾਲਤੂ ਜਾਨਵਰਾਂ ਲਈ ਭੋਜਨ ਅਤੇ ਪਾਣੀ ਤਿਆਰ ਰੱਖੋ",
+   "ਜਾਨਵਰਾਂ ਨੂੰ ਸੁਰੱਖਿਅਤ ਜਗ੍ਹਾ 'ਤੇ ਰੱਖਣ ਦਾ ਪ੍ਰਬੰਧ ਕਰੋ"
+  ],
+  "caveats": [
+   "ਇਹ ਜਨਤਕ ਡੇਟਾ ਤੋਂ ਸਿਰਫ਼ ਉਦਾਹਰਣਕ ਅਨੁਮਾਨ ਹਨ, ਅਧਿਕਾਰਤ ਮਾਰਗਦਰਸ਼ਨ ਨਹੀਂ, ਅਤੇ ਡਰਾਈਵ ਸਮਾਂ ਬਿਨਾਂ ਭੀੜ ਦੇ ਘੱਟੋ-ਘੱਟ ਅਨੁਮਾਨ ਹਨ",
+   "ਅਸਲ ਫੈਸਲਿਆਂ ਲਈ BC Wildfire Service, EmergencyInfoBC ਅਤੇ ਸਥਾਨਕ ਨਿਕਾਸੀ ਆਦੇਸ਼ਾਂ 'ਤੇ ਭਰੋਸਾ ਕਰੋ"
+  ]
+ },
+ "generated_at": "2026-10-04T10:24:02.297525+00:00"
+}

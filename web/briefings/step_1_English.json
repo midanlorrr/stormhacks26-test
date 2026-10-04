@@ -1,0 +1,47 @@
+{
+ "step": 1,
+ "time": "2026-08-07T21:00:00-07:00",
+ "language": "English",
+ "model": "gemini-3.5-flash-lite",
+ "area": null,
+ "facts": {
+  "place": "Summerland, British Columbia (Bald Range wildfire)",
+  "time_of_this_snapshot_pacific": "Friday August 7, 9:00 PM",
+  "hours_since_first_satellite_detection": 4.2,
+  "satellite_fire_detections_so_far": 43,
+  "road_segments_likely_affected": 6,
+  "road_names_most_affected": [
+   "Marsh Lane",
+   "Bathville Road, Isintok-McNulty Forest Service Road",
+   "Princeton-Summerland Road"
+  ],
+  "estimated_residents_cut_off_from_all_exits": 0,
+  "estimated_minimum_drive_minutes_longest_sample": 21.2,
+  "estimated_minimum_drive_minutes_average_sample": 14.1,
+  "drive_time_note": "free-flow minimum, no congestion, from 74 sample points in Summerland",
+  "areas_cut_off_so_far": []
+ },
+ "briefing": {
+  "summary": "As of Friday August 7, 9:00 PM, satellite data has recorded 43 fire detections over 4.2 hours near Summerland, British Columbia, linked to the Bald Range wildfire. The activity likely affects 6 road segments, including Marsh Lane, Bathville Road, Isintok-McNulty Forest Service Road, and Princeton-Summerland Road. The estimated number of residents cut off from all exits is 0. Based on 74 sample points, estimated minimum drive times range from an average of 14.1 minutes to a longest sample of 21.2 minutes.",
+  "steps": [
+   "Keep informed about changing conditions in the area",
+   "Review routes and transportation options",
+   "Prepare vehicles with adequate fuel"
+  ],
+  "what_to_bring": [
+   "Important documents and identification",
+   "Medications and first aid supplies",
+   "Basic provisions such as water and non-perishable food"
+  ],
+  "pets": [
+   "Keep pets secure and close at hand",
+   "Pack pet food, water, and carriers"
+  ],
+  "caveats": [
+   "These are illustrative estimates from public data including satellite fire detections, OpenStreetMap roads, and modelled population, not official guidance.",
+   "Drive times are estimated minimums with no congestion.",
+   "Rely on the BC Wildfire Service, EmergencyInfoBC and local evacuation orders for real decisions."
+  ]
+ },
+ "generated_at": "2026-10-04T10:22:49.586728+00:00"
+}

@@ -3,6 +3,7 @@
 const slider = document.getElementById("slider");
 const playBtn = document.getElementById("play");
 let steps = [];          // contents of steps.json
+let briefings = [];      // list from briefings/index.json (made by data_prep/07_briefings.py)
 let areas = [];          // features of areas.geojson (1 km squares with estimated residents)
 let timer = null;        // setInterval id while playing
 
@@ -73,6 +74,7 @@ map.on("load", async () => {
              "circle-color": ["match", ["get", "kind"], "exit", "#1b7f3b", "#5b6b8a"],
              "circle-stroke-color": "#fff", "circle-stroke-width": 1 } });
 
+  await loadBriefings();
   slider.max = steps.length - 1;
   slider.addEventListener("input", () => show(Number(slider.value)));
   playBtn.addEventListener("click", togglePlay);
@@ -95,8 +97,66 @@ function show(i) {
   document.getElementById("s-roads").textContent = s.roads_affected;
   document.getElementById("s-res").textContent = "~" + s.residents_cut_off.toLocaleString("en-CA");
   showAreas(i);
+  showBriefing(i);
   document.getElementById("s-longest").textContent = s.longest_drive_min == null ? "n/a" : "~" + Math.round(s.longest_drive_min) + " min";
   document.getElementById("s-mean").textContent = s.mean_drive_min == null ? "n/a" : "~" + Math.round(s.mean_drive_min) + " min";
+}
+
+// ----- Briefings: pre-generated files, so the demo needs no API key or internet -----
+async function loadBriefings() {
+  const select = document.getElementById("lang");
+  select.addEventListener("change", () => showBriefing(Number(slider.value)));
+  try {
+    const res = await fetch("briefings/index.json");
+    if (!res.ok) return;
+    briefings = await res.json();
+  } catch (err) {
+    return;
+  }
+  const languages = [...new Set(briefings.map((b) => b.language))];
+  for (const lang of languages) select.add(new Option(lang, lang));
+  select.disabled = languages.length === 0;
+}
+
+// Show the latest pre-generated briefing at or before the current step, in the chosen language
+async function showBriefing(i) {
+  const box = document.getElementById("briefing");
+  const lang = document.getElementById("lang").value;
+  const options = briefings.filter((b) => b.language === lang && b.step <= i && !b.file.includes("_near-"));
+  if (options.length === 0) {
+    if (briefings.length > 0) box.innerHTML = '<p class="small">No briefing yet for this time. Briefings exist for later steps.</p>';
+    return;
+  }
+  const pick = options[options.length - 1];
+  let data;
+  try {
+    data = await (await fetch("briefings/" + pick.file)).json();
+  } catch (err) {
+    box.textContent = "Could not load the briefing.";
+    return;
+  }
+  if (Number(slider.value) !== i) return;      // the slider moved while we were loading
+  box.innerHTML = "";
+  const note = document.createElement("p");
+  note.className = "small";
+  note.textContent = "Written by " + data.model + " from the estimates above, for " +
+    new Date(data.time).toLocaleString("en-CA", { timeZone: "America/Vancouver", weekday: "short", hour: "numeric", minute: "2-digit" }) +
+    " PDT. Not official guidance.";
+  box.appendChild(note);
+  const summary = document.createElement("p");
+  summary.textContent = data.briefing.summary;           // textContent: AI text is never treated as HTML
+  box.appendChild(summary);
+  for (const [title, key] of [["Steps", "steps"], ["What to bring", "what_to_bring"], ["Pets", "pets"], ["Caveats", "caveats"]]) {
+    const h = document.createElement("h3");
+    h.textContent = title;
+    const ul = document.createElement("ul");
+    for (const item of data.briefing[key]) {
+      const li = document.createElement("li");
+      li.textContent = item;
+      ul.appendChild(li);
+    }
+    box.append(h, ul);
+  }
 }
 
 // List the areas cut off so far, largest first. Time is measured from the first detection.

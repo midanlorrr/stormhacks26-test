@@ -33,6 +33,10 @@
     <p class="small">Time = from the first satellite detection to when most residents of a 1 km square lost every route to an exit.
       &ldquo;Drive&rdquo; = estimated minimum drive time to an exit before the fire.</p>
 
+    <h2>Briefing <span class="est">AI-written, illustrative</span></h2>
+    <select id="lang" aria-label="Briefing language" disabled></select>
+    <div id="briefing"><p class="small">No briefings found. Run data_prep/07_briefings.py (see README).</p></div>
+
     <ul class="legend">
       <li><span class="dot fire"></span> Fire detection (NASA FIRMS)</li>
       <li><span class="line cut"></span> Road within 100 m of a detection (likely affected, treated as impassable)</li>

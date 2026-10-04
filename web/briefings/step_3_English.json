@@ -1,0 +1,64 @@
+{
+ "step": 3,
+ "time": "2026-08-08T03:00:00-07:00",
+ "language": "English",
+ "model": "gemini-3.5-flash-lite",
+ "area": null,
+ "facts": {
+  "place": "Summerland, British Columbia (Bald Range wildfire)",
+  "time_of_this_snapshot_pacific": "Saturday August 8, 3:00 AM",
+  "hours_since_first_satellite_detection": 10.2,
+  "satellite_fire_detections_so_far": 1250,
+  "road_segments_likely_affected": 278,
+  "road_names_most_affected": [
+   "Okanagan Highway",
+   "Princeton-Summerland Road",
+   "Garnet Valley Road",
+   "Bathville Road",
+   "Cartwright Avenue"
+  ],
+  "estimated_residents_cut_off_from_all_exits": 1080,
+  "estimated_minimum_drive_minutes_longest_sample": 21.2,
+  "estimated_minimum_drive_minutes_average_sample": 14.1,
+  "drive_time_note": "free-flow minimum, no congestion, from 74 sample points in Summerland",
+  "areas_cut_off_so_far": [
+   {
+    "area": "near Morrow Avenue",
+    "estimated_residents": 120,
+    "hours_after_first_detection_when_cut_off": 9.4,
+    "estimated_minimum_drive_minutes": 17.1
+   },
+   {
+    "area": "near McLarty Place",
+    "estimated_residents": 50,
+    "hours_after_first_detection_when_cut_off": 9.4,
+    "estimated_minimum_drive_minutes": 17.8
+   }
+  ]
+ },
+ "briefing": {
+  "summary": "As of Saturday August 8, 3:00 AM, the Bald Range wildfire near Summerland, British Columbia has been tracked for 10.2 hours with 1250 satellite fire detections so far. Approximately 1080 residents are estimated to be cut off from all exits, affecting 278 road segments including Okanagan Highway, Princeton-Summerland Road, Garnet Valley Road, Bathville Road, and Cartwright Avenue. Estimated minimum drive times range from an average sample of 14.1 minutes to a longest sample of 21.2 minutes.",
+  "steps": [
+   "Keep emergency supplies ready",
+   "Monitor local conditions",
+   "Review travel routes in advance"
+  ],
+  "what_to_bring": [
+   "Water and non-perishable food",
+   "Important documents",
+   "Medications and first aid supplies",
+   "Flashlights and extra batteries"
+  ],
+  "pets": [
+   "Keep pet carriers ready",
+   "Pack enough pet food and water",
+   "Keep identification and leashes nearby"
+  ],
+  "caveats": [
+   "These are illustrative estimates from public data, satellite fire detections, OpenStreetMap roads, and modelled population, not official guidance.",
+   "Drive times are estimated minimums with no congestion.",
+   "Rely on the BC Wildfire Service, EmergencyInfoBC, and local evacuation orders for real decisions."
+  ]
+ },
+ "generated_at": "2026-10-04T10:23:52.191459+00:00"
+}

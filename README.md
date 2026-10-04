@@ -28,6 +28,7 @@ pip install -r requirements.txt
 | 4 | `python data_prep/03_analysis.py` | Marks affected roads, estimates residents cut off and drive times, writes the files in `web/data/`. |
 | 5 | `python data_prep/04_check_perimeter.py` | Compares our data with the official BCWS perimeter (optional, see below). |
 | 6 | `python data_prep/06_sensitivity_hwy97.py` | Optional test: reruns the end-of-replay numbers with the whole official Highway 97 closure treated as impassable. Does not change the main results. |
+| 7 | `python data_prep/07_briefings.py` | Generates plain-language briefings with Gemini (needs `GEMINI_API_KEY` in `.env`; the page reads the saved files in `web/briefings/`). Use `--dry-run` first (no API call). A normal run makes ONE call; `--all` makes about 12, and the free tier allows about 20 per day per model. |
 
 Downloads are cached in `data_raw/`, so reruns do not download again. The exported files in `web/data/` are committed, so you can view the map without running steps 1–4.
 
@@ -75,3 +76,11 @@ What this does and does not show:
 
 ## Data sources
 NASA FIRMS (VIIRS and MODIS active fire), WorldPop (population, CC BY 4.0: Bondarenko et al., WorldPop, University of Southampton, DOI 10.5258/SOTON/WP00839), OpenStreetMap (roads, via osmnx), BC Wildfire Service (perimeter, for checking only), DriveBC (one closure, compared by hand).
+
+## To do
+- Briefings: add the official evacuation-order timing (whole District of Summerland ordered out just after midnight on Aug 8, per CBC) as a fact, without turning it into an instruction, then regenerate. Today the briefings do not know about the order, so wording like "prepare belongings in advance" can read oddly after midnight.
+- Briefings: regenerate Punjabi for steps 2 and 4 (the first attempts came back in Latin letters and were removed), and have a native Punjabi and Spanish speaker review the text.
+- Briefings: the free Gemini tier allows about 20 calls per day per model; keep test runs to one call until things are confirmed.
+- ElevenLabs spoken briefings: tabled for now.
+- Highway 97: confirm when the official closure began and whether evacuees could use it (see `06_sensitivity_hwy97.py`).
+- Layer 2 fire-spread hindcast: design only, see `docs/superpowers/specs/`.

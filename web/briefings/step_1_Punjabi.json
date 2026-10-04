@@ -1,0 +1,47 @@
+{
+ "step": 1,
+ "time": "2026-08-07T21:00:00-07:00",
+ "language": "Punjabi",
+ "model": "gemini-3.5-flash-lite",
+ "area": null,
+ "facts": {
+  "place": "Summerland, British Columbia (Bald Range wildfire)",
+  "time_of_this_snapshot_pacific": "Friday August 7, 9:00 PM",
+  "hours_since_first_satellite_detection": 4.2,
+  "satellite_fire_detections_so_far": 43,
+  "road_segments_likely_affected": 6,
+  "road_names_most_affected": [
+   "Marsh Lane",
+   "Bathville Road, Isintok-McNulty Forest Service Road",
+   "Princeton-Summerland Road"
+  ],
+  "estimated_residents_cut_off_from_all_exits": 0,
+  "estimated_minimum_drive_minutes_longest_sample": 21.2,
+  "estimated_minimum_drive_minutes_average_sample": 14.1,
+  "drive_time_note": "free-flow minimum, no congestion, from 74 sample points in Summerland",
+  "areas_cut_off_so_far": []
+ },
+ "briefing": {
+  "summary": "ਸਮਰਲੈਂਡ, ਬ੍ਰਿਟਿਸ਼ ਕੋਲੰਬੀਆ ਵਿੱਚ ਬਾਲਡ ਰੇਂਜ ਜੰਗਲੀ ਅੱਗ ਦੇ ਸੰਬੰਧ ਵਿੱਚ ਸ਼ੁੱਕਰਵਾਰ ਅਗਸਤ 7, 9:00 PM 'ਤੇ ਇਹ ਸਥਿਤੀ ਹੈ। ਪਹਿਲੀ ਸੈਟੇਲਾਈਟ ਖੋਜ ਤੋਂ ਬਾਅਦ 4.2 ਘੰਟੇ ਬੀਤ ਚੁੱਕੇ ਹਨ ਅਤੇ ਹੁਣ ਤੱਕ 43 ਸੈਟੇਲਾਈਟ ਅੱਗ ਦੀਆਂ ਖੋਜਾਂ ਹੋਈਆਂ ਹਨ। ਮਾਰਸ਼ ਲੇਨ, ਬਾਥਵਿਲ ਰੋਡ, ਇਸਿਨਟੋਕ-ਮੈਕਨਲਟੀ ਫਾਰੈਸਟ ਸਰਵਿਸ ਰੋਡ, ਅਤੇ ਪ੍ਰਿੰਸਟਨ-ਸਮਰਲੈਂਡ ਰੋਡ ਸਮੇਤ 6 ਸੜਕੀ ਹਿੱਸੇ ਪ੍ਰਭਾਵਿਤ ਹੋਣ ਦੀ ਸੰਭਾਵਨਾ ਹੈ। ਸਾਰੇ ਨਿਕਾਸ ਤੋਂ ਕੱਟੇ ਗਏ ਅੰਦਾਜ਼ਨ ਨਿਵਾਸੀਆਂ ਦੀ ਗਿਣਤੀ 0 ਹੈ। ਸਮਰਲੈਂਡ ਵਿੱਚ 74 ਨਮੂਨਾ ਬਿੰਦੂਆਂ ਤੋਂ ਸਭ ਤੋਂ ਲੰਬੇ ਨਮੂਨੇ ਲਈ ਅੰਦਾਜ਼ਨ ਘੱਟੋ-ਘੱਟ ਡਰਾਈਵਿੰਗ ਮਿੰਟ 21.2 ਹਨ ਅਤੇ ਔਸਤ ਨਮੂਨੇ ਲਈ ਇਹ 14.1 ਮਿੰਟ ਹਨ।",
+  "steps": [
+   "ਜ਼ਰੂਰੀ ਕਾਗਜ਼ਾਤ ਅਤੇ ਨਿੱਜੀ ਦਸਤਾਵੇਜ਼ ਤਿਆਰ ਰੱਖੋ",
+   "ਆਪਣੇ ਵਾਹਨ ਵਿੱਚ ਬਾਲਣ ਪੂਰਾ ਰੱਖੋ",
+   "ਸਥਾਨਕ ਹਾਲਾਤਾਂ ਬਾਰੇ ਜਾਣਕਾਰੀ ਬਣਾਈ ਰੱਖੋ"
+  ],
+  "what_to_bring": [
+   "ਪੀਣ ਵਾਲਾ ਪਾਣੀ ਅਤੇ ਭੋਜਨ",
+   "ਜ਼ਰੂਰੀ ਦਵਾਈਆਂ",
+   "ਟਾਰਚ ਅਤੇ ਫਸਟ ਏਡ ਬਾਕਸ"
+  ],
+  "pets": [
+   "ਪਾਲਤੂ ਜਾਨਵਰਾਂ ਲਈ ਕਾਫ਼ੀ ਭੋਜਨ ਅਤੇ ਪਾਣੀ ਰੱਖੋ",
+   "ਜਾਨਵਰਾਂ ਨੂੰ ਸੁਰੱਖਿਅਤ ਰੱਖਣ ਲਈ ਬਕਸੇ ਜਾਂ ਪੱਟੇ ਤਿਆਰ ਰੱਖੋ"
+  ],
+  "caveats": [
+   "ਇਹ ਸੈਟੇਲਾਈਟ ਅੱਗ ਦੀਆਂ ਖੋਜਾਂ, ਓਪਨ ਸਟ੍ਰੀਟ ਮੈਪ ਸੜਕਾਂ ਅਤੇ ਮਾਡਲ ਕੀਤੀ ਆਬਾਦੀ ਦੇ ਜਨਤਕ ਡੇਟਾ ਤੋਂ ਸਿਰਫ਼ ਉਦਾਹਰਣਾਤਮਕ ਅੰਦਾਜ਼ੇ ਹਨ, ਕੋਈ ਅਧਿਕਾਰਤ ਮਾਰਗਦਰਸ਼ਨ ਨਹੀਂ।",
+   "ਡਰਾਈਵ ਦੇ ਸਮੇਂ ਬਿਨਾਂ ਕਿਸੇ ਭੀੜ ਦੇ ਅੰਦਾਜ਼ਨ ਘੱਟੋ-ਘੱਟ ਹਨ।",
+   "ਅਸਲ ਫ਼ੈਸਲਿਆਂ ਲਈ ਕਿਰਪਾ ਕਰਕੇ BC Wildfire Service, EmergencyInfoBC ਅਤੇ ਸਥਾਨਕ ਨਿਕਾਸ ਆਦੇਸ਼ਾਂ 'ਤੇ ਭਰੋਸਾ ਕਰੋ।"
+  ]
+ },
+ "generated_at": "2026-10-04T10:23:00.469106+00:00"
+}
