@@ -3,15 +3,77 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Summerland Wildfire Evacuation Replay</title>
+  <title>Evacusense: Summerland wildfire replay</title>
+  <link rel="icon" type="image/svg+xml" href="img/evacusense-icon.svg">
+  <meta name="theme-color" content="#0b0f14">
   <link rel="stylesheet" href="vendor/maplibre-gl.css">
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="loading landing">
   <div id="map"></div>
 
+  <!-- Loading screen: shown until the map and the data are ready -->
+  <div id="loading" role="status">
+    <img src="img/evacusense-icon.svg" alt="" width="64" height="64">
+    <p id="loading-text">Loading map and data&hellip;</p>
+  </div>
+
+  <!-- Landing: shown until you press Start or Skip intro -->
+  <section id="landing">
+    <div class="landing-inner">
+      <div class="landing-brand"><img src="img/evacusense-icon.svg" alt="" width="52" height="52"><span>Evacusense</span></div>
+      <h1 class="landing-title">Summerland wildfire replay</h1>
+      <p class="landing-lead">Replay how the Bald Range wildfire (Aug 7&ndash;10, 2026) closed in on Summerland, BC: real NASA satellite
+        fire detections over real roads, with estimates of who could be cut off.</p>
+      <div class="landing-actions">
+        <button id="start" type="button" disabled>Watch the Summerland replay</button>
+        <button id="how-btn" type="button">How it works</button>
+      </div>
+      <a href="#" id="skip">Skip intro</a>
+    </div>
+    <p id="credits">Data and imagery: NASA FIRMS fire detections &middot; Copernicus Sentinel-2 imagery by EOX &middot;
+      &copy; OpenStreetMap contributors &middot; WorldPop (University of Southampton)</p>
+  </section>
+
+  <!-- How it works: opened from the landing page -->
+  <div id="how" hidden>
+    <div class="how-card" role="dialog" aria-modal="true" aria-labelledby="how-title">
+      <h2 id="how-title">How it works</h2>
+      <p>Evacusense lays real satellite fire detections over the real road network, step by step (every 3 hours), and
+        estimates which roads and how many residents were likely cut off from every exit.</p>
+      <h3>Data</h3>
+      <ul>
+        <li>Fire detections: NASA FIRMS (VIIRS and MODIS satellites)</li>
+        <li>Satellite imagery: Copernicus Sentinel-2 cloudless, from EOX (2025 version, so it shows the land before the fire)</li>
+        <li>Roads and places: OpenStreetMap</li>
+        <li>Population: WorldPop 100 m grid (2025 estimate, modelled, not a census)</li>
+        <li>Briefings: written by an AI model from the numbers above</li>
+      </ul>
+      <h3>How well it matches</h3>
+      <p>Checked against the official BC Wildfire Service fire perimeter: <strong>97%</strong> of detections fall inside it, and
+        <strong>87%</strong> of its area has a detection within 1 km. Road closures and drive times are <em>not</em> validated.</p>
+      <h3>Limits</h3>
+      <ul>
+        <li>Satellites only see fire when they pass overhead, hours apart.</li>
+        <li>&ldquo;Likely affected&rdquo; means within 100 m of a detection. It is not an official closure list.</li>
+        <li>Drive times are estimated minimums (free-flow, no congestion) from sample points.</li>
+        <li>The official Highway 97 closure was longer than what the map marks. No detections were found near Peachland.</li>
+        <li>The AI briefings have not been reviewed by native speakers.</li>
+      </ul>
+      <p class="disclaimer"><strong>Not official guidance.</strong> This is an illustrative planning tool built from public data.
+        For real evacuations follow BC Wildfire Service, EmergencyInfoBC and local evacuation orders.</p>
+      <button id="how-close" type="button">Close</button>
+    </div>
+  </div>
+
   <aside id="panel">
-    <h1>Summerland wildfire replay</h1>
+    <header class="brand">
+      <img src="img/evacusense-icon.svg" alt="" width="32" height="32">
+      <div>
+        <h1>Evacusense</h1>
+        <p class="tagline">Summerland wildfire replay</p>
+      </div>
+    </header>
     <p class="sub">Satellite fire detections, Aug 7&ndash;10, 2026 (Pacific time)</p>
     <p id="basemap-note" class="small" hidden>Satellite imagery could not load, so the Streets map is showing. Press Satellite to try again.</p>
 

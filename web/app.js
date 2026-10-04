@@ -7,10 +7,13 @@ let briefings = [];      // list from briefings/index.json (made by data_prep/07
 let areas = [];          // features of areas.geojson (1 km squares with estimated residents)
 let timer = null;        // setInterval id while playing
 
+const SUMMERLAND = [-119.67, 49.6];     // lng, lat
+const REPLAY_PADDING = { left: 360, top: 0, right: 0, bottom: 0 };   // keeps Summerland clear of the side panel
+
 const map = new maplibregl.Map({
   container: "map",
-  center: [-119.78, 49.63],
-  zoom: 10.5,
+  center: [-125, 40],                     // landing: zoomed-out globe, roughly over North America
+  zoom: 1.6,
   // Basemap: dimmed Sentinel-2 cloudless satellite imagery (EOX). If its tiles fail, we switch to a plain OpenStreetMap fallback.
   style: {
     version: 8,
@@ -42,6 +45,23 @@ const map = new maplibregl.Map({
   },
 });
 map.addControl(new maplibregl.NavigationControl(), "top-right");
+
+// ----- Landing: a globe in the right ~55% of the screen, with a pulsing marker on Summerland -----
+// Globe docs: https://maplibre.org/maplibre-gl-js/docs/examples/display-a-globe-with-a-vector-map/
+function landingPadding() {
+  return innerWidth > 900 ? { left: Math.round(innerWidth * 0.45), top: 0, right: 0, bottom: 0 }
+                          : { top: Math.round(innerHeight * 0.5), left: 0, right: 0, bottom: 0 };   // narrow screens: text on top
+}
+map.setPadding(landingPadding());
+map.on("style.load", () => {
+  map.setProjection({ type: "globe" });
+  // A thin dark atmosphere around the globe that fades out as you zoom in
+  map.setSky({ "sky-color": "#0b0f14", "horizon-color": "#3a2616",
+               "atmosphere-blend": ["interpolate", ["linear"], ["zoom"], 0, 1, 5, 1, 7, 0] });
+});
+const pulse = document.createElement("div");
+pulse.className = "pulse";
+const summerlandMarker = new maplibregl.Marker({ element: pulse }).setLngLat(SUMMERLAND).addTo(map);
 
 // ----- Basemap toggle: Satellite / Streets (top-right, under the zoom buttons) -----
 let satelliteErrors = 0;
@@ -266,7 +286,7 @@ map.on("load", async () => {
       load("points.geojson"), load("routes.geojson"), load("areas.geojson"), load("road_labels.geojson"), load("pois.geojson"),
     ]);
   } catch (err) {
-    document.getElementById("clock").textContent = "Error: " + err.message +
+    document.getElementById("loading-text").textContent = "Error: " + err.message +
       " (run the page through a local server, see README)";
     return;
   }
@@ -301,7 +321,44 @@ map.on("load", async () => {
   slider.addEventListener("input", () => show(Number(slider.value)));
   playBtn.addEventListener("click", togglePlay);
   show(0);
+
+  setReplayVisible(false);               // fires, roads and labels stay hidden until the replay starts
+  map.once("idle", setReady);            // everything loaded and drawn
+  setTimeout(setReady, 20000);           // ...or give up waiting after 20 s, so one slow tile never blocks Start
 });
+
+// ----- Landing page states: "loading" -> "landing" -> "replay" (a class on <body> drives the CSS) -----
+const REPLAY_LAYERS = ["roads-casing", "roads", "roads-affected-glow", "roads-affected", "route-casing", "route", "fires", "points",
+                       "pois", "pois-labels", "pois-labels-schools", "labels-local", "labels-major", "labels-always", "roads-hit"];
+
+function setReplayVisible(visible) {
+  for (const id of REPLAY_LAYERS) {
+    if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", visible ? "visible" : "none");
+  }
+}
+
+function setReady() {
+  document.body.classList.remove("loading");
+  document.getElementById("start").disabled = false;
+}
+
+// Leave the landing page and show the replay. (Step 4 adds the fly-in; for now this jumps straight there.)
+function enterReplay() {
+  document.body.classList.replace("landing", "replay");
+  setReplayVisible(true);
+  summerlandMarker.remove();
+  map.jumpTo({ center: SUMMERLAND, zoom: 10, pitch: 45, bearing: -20, padding: REPLAY_PADDING });
+}
+
+document.getElementById("start").addEventListener("click", enterReplay);
+document.getElementById("skip").addEventListener("click", (e) => { e.preventDefault(); enterReplay(); });
+
+// "How it works" panel
+const how = document.getElementById("how");
+document.getElementById("how-btn").addEventListener("click", () => { how.hidden = false; document.getElementById("how-close").focus(); });
+document.getElementById("how-close").addEventListener("click", () => { how.hidden = true; });
+how.addEventListener("click", (e) => { if (e.target === how) how.hidden = true; });          // click outside the card
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") how.hidden = true; });
 
 // Update the map and side panel for one time step
 function show(i) {
