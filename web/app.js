@@ -103,6 +103,7 @@ function selectDataTab(name) {
   moveTabIndicator();
   if (name === "burn") enterBurn();
   else exitBurn(true);
+  if (window.setRoutesActive) window.setRoutesActive(name === "routes");        // the route replay draws on the map only while its tab is open
 }
 
 // A small bar that slides to the selected tab
@@ -869,7 +870,8 @@ function showPanel(i) {
   const high = s.residents_cut_off, low = s.residents_cut_off_low ?? high;      // 100 m rule = high estimate, 50 m rule = low estimate
   tweenValues(document.getElementById("s-res"), low === high ? [high] : [low, high], (v) => v.length === 1 ? fmt(v[0]) : fmt(v[0]) + "\u2013" + fmt(v[1]));
   updateTimeStates(i);
-  if (window.updateInspect) window.updateInspect();                           // keep an open inspect card in step with the replay
+  if (window.updateInspect) window.updateInspect();
+  if (window.updateRoutes) window.updateRoutes();                             // and the route replay                           // keep an open inspect card in step with the replay
   showAreas(i);
   showBriefing(i);
   document.getElementById("s-longest").textContent = s.longest_drive_min == null ? "n/a" : Math.round(s.longest_drive_min) + " min";

@@ -9,7 +9,7 @@ const TOUR_STEPS = [
   { target: "#pane-summary", fit: "text", title: "What is counted", before: () => window.selectDataTab?.("summary"),
     text: "Fire detections are hot spots seen by satellites. Roads affected are road segments within 100 m of a detection, treated as closed. Residents cut off is an estimated range (50 m to 100 m rule): people with no drivable route to any exit. \"est.\" means estimated." },
   { target: ".es-tabs", fit: "text", title: "Data tabs", before: () => window.selectDataTab?.("moments"),
-    text: "Use the tabs on the side. Summary: the headline counts. Moments: real events and the model's milestones (click one to jump there). Briefing: AI-written summary. Areas: 1 km squares that were cut off. Drive: estimated minimum drive to an exit. Burn scar: before and after satellite images with a draggable divider. About: how the figures are made." },
+    text: "Use the tabs on the side. Summary: the headline counts. Moments: real events and the model's milestones (click one to jump there). Briefing: AI-written summary. Areas: 1 km squares that were cut off. Drive: estimated minimum drive to an exit. Routes: watch a route to an exit change in a what-if scenario. Burn scar: before and after satellite images with a draggable divider. About: how the figures are made." },
   { target: "#legend", title: "Map key",
     text: "Orange dots are fire detections, red lines are affected roads, and the pale blue line is the longest estimated drive out. Zoom in for road names and places." },
   { target: "#pane-briefing", fit: "text", title: "Briefing", before: () => window.selectDataTab?.("briefing"),

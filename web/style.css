@@ -457,3 +457,44 @@ body.inspecting #legend { opacity: 0; visibility: hidden; pointer-events: none; 
 
 /* the button inside a clicked road popup */
 .road-popup-inspect { margin-top: 8px; width: 100%; padding: 6px 10px; background: transparent; }
+
+/* =============== Route replay tab =============== */
+.rr-scenarios { border: 0; margin: 6px 0 8px; padding: 0; min-width: 0; }
+.rr-scenarios legend { padding: 0; margin-bottom: 4px; }
+.es-radio { display: flex; align-items: flex-start; gap: 8px; margin: 4px 0; font-size: 12px; line-height: 1.35; cursor: pointer; }
+.es-radio input { position: absolute; opacity: 0; width: 0; height: 0; }
+.es-radio-dot { width: 12px; height: 12px; flex: none; margin-top: 2px; border: 1px solid var(--es-muted); border-radius: 50%; position: relative; transition: border-color 0.15s; }
+.es-radio-dot::after { content: ""; position: absolute; inset: 2px; border-radius: 50%; background: var(--es-text); transform: scale(0); transition: transform 0.15s; }
+.es-radio input:checked + .es-radio-dot { border-color: var(--es-text); }
+.es-radio input:checked + .es-radio-dot::after { transform: scale(1); }
+.es-radio input:focus-visible + .es-radio-dot { outline: 2px solid var(--es-fire); outline-offset: 2px; }
+.rr-label { margin: 8px 0 4px; }
+.rr-list { display: flex; flex-direction: column; gap: 1px; }
+.rr-origin { text-align: left; padding: 4px 8px; font: 400 12px var(--es-font); color: var(--es-text-soft); background: none; border: 0; border-left: 2px solid transparent; border-radius: 0; cursor: pointer; }
+.rr-origin:hover { color: var(--es-text); background: rgba(236, 235, 232, 0.05); }
+.rr-origin[aria-pressed="true"] { color: var(--es-text); border-left-color: var(--es-text); background: rgba(236, 235, 232, 0.08); }
+.rr-origin:focus-visible { outline: 2px solid var(--es-fire); outline-offset: -2px; }
+.rr-status { margin: 10px 0 2px; padding: 8px 0; border-top: 1px solid var(--es-line); }
+.rr-when { font: 400 10px var(--es-mono); letter-spacing: 0.06em; color: var(--es-muted); }
+.rr-what { font: 600 15px var(--es-font); margin-top: 2px; }
+.rr-none .rr-what { color: var(--es-muted); font-weight: 400; }
+.rr-diff { font-size: 11px; color: var(--es-text-soft); margin-top: 2px; }
+.rr-chart { width: 100%; height: auto; display: block; }
+.rr-grid { stroke: var(--es-line); stroke-width: 1; }
+.rr-axis { fill: var(--es-muted); font: 400 9px var(--es-mono); }
+.rr-linepath { fill: none; stroke: var(--es-route-exit); stroke-width: 2; stroke-linejoin: round; }
+.rr-now { stroke: var(--es-text-soft); stroke-width: 1; }
+.rr-dot { fill: var(--es-route-exit); stroke: var(--es-bg); stroke-width: 2; }
+.rr-dot-none { fill: var(--es-bg); stroke: var(--es-muted); stroke-width: 1.5; }
+.rr-noroute { fill: rgba(236, 235, 232, 0.06); stroke: var(--es-line-strong); stroke-dasharray: 3 3; }
+.rr-closure { stroke: var(--es-muted); stroke-dasharray: 3 3; }
+.rr-caption { margin-top: 2px; }
+.rr-wording { margin-top: 10px; }
+
+/* a more compact route tab, so the chart is visible without scrolling */
+.rr-scenarios { margin: 0 0 4px; }
+.es-radio { margin: 2px 0; font-size: 11.5px; }
+.rr-label { margin: 6px 0 2px; }
+.rr-origin { padding: 2px 8px; font-size: 11.5px; line-height: 1.3; }
+.rr-status { margin: 6px 0 0; padding: 6px 0 2px; }
+.rr-what { font-size: 14px; }

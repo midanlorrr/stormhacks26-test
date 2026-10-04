@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Evacusense: wildfire effects replay</title>
+  <title>Evacusense</title>
   <link rel="icon" type="image/svg+xml" href="img/evacusense-icon.svg">
   <meta name="theme-color" content="#0a0b0d">
   <link rel="stylesheet" href="vendor/maplibre-gl.css">
@@ -91,6 +91,7 @@
         <button class="es-tab" role="tab" id="tab-briefing" data-tab="briefing" aria-selected="false" aria-controls="pane-briefing" tabindex="-1" type="button">Briefing</button>
         <button class="es-tab" role="tab" id="tab-areas" data-tab="areas" aria-selected="false" aria-controls="pane-areas" tabindex="-1" type="button">Areas <span id="areas-count" class="es-tab-count">0</span></button>
         <button class="es-tab" role="tab" id="tab-drive" data-tab="drive" aria-selected="false" aria-controls="pane-drive" tabindex="-1" type="button">Drive</button>
+        <button class="es-tab" role="tab" id="tab-routes" data-tab="routes" aria-selected="false" aria-controls="pane-routes" tabindex="-1" type="button">Routes</button>
         <button class="es-tab" role="tab" id="tab-burn" data-tab="burn" aria-selected="false" aria-controls="pane-burn" tabindex="-1" type="button">Burn scar</button>
         <button class="es-tab" role="tab" id="tab-about" data-tab="about" aria-selected="false" aria-controls="pane-about" tabindex="-1" type="button">About</button>
       </div>
@@ -136,6 +137,23 @@
           <div class="es-row"><span>Longest</span><span><span id="s-longest" class="es-est">&ndash;</span><span class="es-est-tag">est.</span></span></div>
           <div class="es-row"><span>Average</span><span><span id="s-mean" class="es-est">&ndash;</span><span class="es-est-tag">est.</span></span></div>
           <p class="es-note">Free-flow, no congestion, from 74 sample points in the example area.</p>
+        </div>
+        <div id="pane-routes" class="es-pane" role="tabpanel" aria-labelledby="tab-routes" hidden>
+          <h3 class="es-pane-title">Route replay</h3>
+          <fieldset class="rr-scenarios">
+            <legend class="es-label">Scenario</legend>
+            <label class="es-radio"><input type="radio" name="rr-scenario" value="fire" checked><span class="es-radio-dot" aria-hidden="true"></span>Fire detections only</label>
+            <label class="es-radio"><input type="radio" name="rr-scenario" value="closure"><span class="es-radio-dot" aria-hidden="true"></span>What if the official Hwy 97 closure were impassable</label>
+          </fieldset>
+          <div class="es-label rr-label">Starting point</div>
+          <div id="rr-list" class="rr-list"><p class="es-note">Loading&hellip;</p></div>
+          <div id="rr-status" class="rr-status" aria-live="polite"></div>
+          <svg id="rr-chart" class="rr-chart" viewBox="0 0 240 96" role="img" aria-label="Estimated minimum drive time over the replay"></svg>
+          <p class="es-note rr-caption">estimated minimum drive time (free-flow, no congestion)</p>
+          <p class="es-note rr-wording">Pick a starting point to see the fastest route to an exit at each moment in one &ldquo;what if&rdquo; scenario. These are routes a driver <em>could</em> take in each scenario, not routes people took. The real closure conditions are unknown.
+            The closure is applied from Aug 8, 12:45 pm PDT, the first documented time (the first 3-hour step to include it is 3 pm).
+            Combining the closure with the fire marks would seal everyone in, so that combination is not shown.
+            Illustrative estimate from public data, not official guidance.</p>
         </div>
         <div id="pane-burn" class="es-pane" role="tabpanel" aria-labelledby="tab-burn" hidden>
           <h3 class="es-pane-title">Burn scar</h3>
@@ -233,5 +251,6 @@
   <script src="tour.js"></script>
   <script src="app.js"></script>
   <script src="inspect.js"></script>
+  <script src="routes.js"></script>
 </body>
 </html>
