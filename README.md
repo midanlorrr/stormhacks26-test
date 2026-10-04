@@ -77,7 +77,7 @@ What this does and does not show:
 - **Source label:** the CBC text we saved is labelled "Aug 7 9:15pm" but describes events through 8 am Saturday, so the label is probably wrong; check the original page before citing it.
 
 ## Data sources
-NASA FIRMS (VIIRS and MODIS active fire), WorldPop (population, CC BY 4.0: Bondarenko et al., WorldPop, University of Southampton, DOI 10.5258/SOTON/WP00839), OpenStreetMap (roads, via osmnx), BC Wildfire Service (perimeter, for checking only), DriveBC (one closure, compared by hand).
+NASA FIRMS (VIIRS and MODIS active fire), WorldPop (population, CC BY 4.0: Bondarenko et al., WorldPop, University of Southampton, DOI 10.5258/SOTON/WP00839), OpenStreetMap (roads, via osmnx), Noto Sans map label fonts (SIL Open Font License; glyph files in `web/fonts/` from the MapLibre demo font server), BC Wildfire Service (perimeter, for checking only), DriveBC (one closure, compared by hand).
 
 ## To do
 - Briefings: add the official evacuation-order timing (whole District of Summerland ordered out just after midnight on Aug 8, per CBC) as a fact, without turning it into an instruction, then regenerate. Today the briefings do not know about the order, so wording like "prepare belongings in advance" can read oddly after midnight.

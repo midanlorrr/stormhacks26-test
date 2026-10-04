@@ -7,6 +7,7 @@ import networkx as nx
 import osmnx as ox
 import pandas as pd
 from shapely.geometry import Point
+from shapely.ops import linemerge
 
 import config
 
@@ -190,12 +191,29 @@ f_out.drop(columns="time_pacific").to_file(OUT / "fires.geojson", driver="GeoJSO
 # Roads: OSM stores each two-way road as two edges; keep one per pair (the earliest time)
 edges["pair"] = [str(sorted([u, v])) for u, v in zip(edges.u, edges.v)]
 r = edges.sort_values("affected_time", na_position="last").drop_duplicates("pair").copy()
-r["name"] = r["name"].astype(str).replace("nan", "")
-r["highway"] = r["highway"].astype(str)
+# OSM tags can be a list (a road with two values) or missing; keep one plain text value for the map
+def plain(v):
+    if isinstance(v, list):
+        v = v[0] if v else ""
+    return "" if v is None or str(v) == "nan" else str(v)
+for col in ("name", "highway", "ref"):
+    r[col] = r[col].apply(plain)
 r["affected_step"] = r["affected_time"].apply(lambda x: step_index(x, steps) if pd.notna(x) else None)
 r["affected_time"] = r["affected_time"].apply(lambda x: x.isoformat() if pd.notna(x) else None)
-gpd.GeoDataFrame(r[["name", "highway", "affected_time", "affected_step", "geometry"]], crs=UTM).to_crs(4326).to_file(
+gpd.GeoDataFrame(r[["name", "highway", "ref", "affected_time", "affected_step", "geometry"]], crs=UTM).to_crs(4326).to_file(
     OUT / "roads.geojson", driver="GeoJSON", COORDINATE_PRECISION=5)
+
+# Labels for the roads the map always names (Highway 97 and two others). OSM chops a road into many short pieces,
+# which are too short for a text label to fit, so merge each road's pieces into longer lines.
+ALWAYS_LABELLED = ["Princeton-Summerland Road", "Prairie Valley Road"]      # keep in sync with web/app.js
+named = r[r["ref"].isin(["BC 97", "97"]) | r["name"].isin(ALWAYS_LABELLED)].copy()
+named["label"] = named.apply(lambda row: "Highway 97" if row["ref"] in ("BC 97", "97") else row["name"], axis=1)
+label_rows = []
+for label, grp in named.groupby("label"):
+    merged = linemerge(list(grp.geometry))
+    # simplify(30 m): smooth out tiny zigzags, since text can only follow fairly straight lines (labels only; the road lines are untouched)
+    label_rows += [{"label": label, "geometry": g.simplify(30)} for g in (merged.geoms if hasattr(merged, "geoms") else [merged])]
+gpd.GeoDataFrame(label_rows, crs=UTM).to_crs(4326).to_file(OUT / "road_labels.geojson", driver="GeoJSON", COORDINATE_PRECISION=5)
 
 pts = gpd.GeoDataFrame({"kind": ["exit"] * len(exits) + ["origin"] * len(origins)},
                        geometry=list(nodes.loc[exits + origins].geometry), crs=UTM)

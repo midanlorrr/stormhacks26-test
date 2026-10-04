@@ -14,6 +14,8 @@ const map = new maplibregl.Map({
   // Basemap: dimmed Sentinel-2 cloudless satellite imagery (EOX). If its tiles fail, we switch to a plain OpenStreetMap fallback.
   style: {
     version: 8,
+    // Label fonts are read from web/fonts (Noto Sans, downloaded once), so labels work offline
+    glyphs: location.href.replace(/[^/]*$/, "") + "fonts/{fontstack}/{range}.pbf",
     sources: {
       satellite: {
         type: "raster",
@@ -44,11 +46,152 @@ map.addControl(new maplibregl.NavigationControl(), "top-right");
 // If the satellite tiles keep failing (for example, no internet), show the OpenStreetMap fallback instead
 let satelliteErrors = 0;
 map.on("error", (e) => {
-  if (e.sourceId !== "satellite" || ++satelliteErrors !== 3) return;
+  if (e.sourceId !== "satellite") {           // not a satellite-tile problem: show it instead of hiding it
+    console.error(e.error);
+    return;
+  }
+  if (++satelliteErrors !== 3) return;
   map.setLayoutProperty("basemap-satellite", "visibility", "none");
   map.setLayoutProperty("basemap-fallback-osm", "visibility", "visible");
   document.getElementById("basemap-note").hidden = false;
 });
+
+// ----- Roads -----
+// "typed" = styled by road type with dark casing and a red glow; "original" = the earlier plain grey + red look
+const ROAD_STYLE = "typed";
+
+// A road's tier, from its OSM tags: Highway 97 (ref), main roads, or local streets
+const isHwy97 = ["match", ["get", "ref"], ["BC 97", "97"], true, false];
+const isMain = ["match", ["get", "highway"],
+  ["motorway", "motorway_link", "trunk", "trunk_link", "primary", "primary_link", "secondary", "secondary_link", "tertiary", "tertiary_link"],
+  true, false];
+// Pick a value by tier; widths grow with zoom
+const byTier = (hwy, main, local) => ["case", isHwy97, hwy, isMain, main, local];
+const widthAtZoom = (z9, z15) => ["interpolate", ["linear"], ["zoom"], 9, z9, 15, z15];
+
+function addRoadLayers() {
+  if (ROAD_STYLE === "original") {            // earlier look: easy to switch back to
+    map.addLayer({ id: "roads", type: "line", source: "roads",
+      paint: { "line-color": "#777", "line-width": ["interpolate", ["linear"], ["zoom"], 9, 0.5, 14, 2] } });
+    map.addLayer({ id: "roads-affected", type: "line", source: "roads",
+      filter: ["<=", ["coalesce", ["get", "affected_step"], 999], 0],
+      paint: { "line-color": "#d11", "line-width": ["interpolate", ["linear"], ["zoom"], 9, 1.5, 14, 4] } });
+    map.addLayer({ id: "route", type: "line", source: "routes", filter: ["==", ["get", "step"], 0],
+      paint: { "line-color": "#1565c0", "line-width": 4 } });
+    return;
+  }
+  const round = { "line-cap": "round", "line-join": "round" };
+  // 1. dark casing under every road, so lines stay readable on satellite
+  map.addLayer({ id: "roads-casing", type: "line", source: "roads", layout: round,
+    paint: { "line-color": "#05080c", "line-opacity": 0.85,
+             "line-width": ["interpolate", ["linear"], ["zoom"], 9, byTier(3.5, 2.2, 1.4), 15, byTier(10, 6.5, 4.5)] } });
+  // 2. the roads: Highway 97 brightest and thickest, main roads medium, local streets thin and dim
+  map.addLayer({ id: "roads", type: "line", source: "roads", layout: round,
+    paint: { "line-color": byTier("#f4f1e8", "#c3c9d2", "#7f8794"),
+             "line-width": ["interpolate", ["linear"], ["zoom"], 9, byTier(2, 1, 0.4), 15, byTier(6, 3.5, 1.8)] } });
+  // 3. red glow, then the red line, for roads likely affected by the current step
+  map.addLayer({ id: "roads-affected-glow", type: "line", source: "roads", layout: round,
+    filter: ["<=", ["coalesce", ["get", "affected_step"], 999], 0],
+    paint: { "line-color": "#ff2a2a", "line-opacity": 0.45, "line-blur": 5,
+             "line-width": ["interpolate", ["linear"], ["zoom"], 9, byTier(7, 5, 4), 15, byTier(18, 14, 11)] } });
+  map.addLayer({ id: "roads-affected", type: "line", source: "roads", layout: round,
+    filter: ["<=", ["coalesce", ["get", "affected_step"], 999], 0],
+    paint: { "line-color": "#ff3b3b",
+             "line-width": ["interpolate", ["linear"], ["zoom"], 9, byTier(2.5, 1.8, 1.4), 15, byTier(6.5, 4.5, 3.5)] } });
+  // 4. exit route in pale cyan, with a dark casing
+  map.addLayer({ id: "route-casing", type: "line", source: "routes", layout: round, filter: ["==", ["get", "step"], 0],
+    paint: { "line-color": "#05080c", "line-width": 8, "line-opacity": 0.8 } });
+  map.addLayer({ id: "route", type: "line", source: "routes", layout: round, filter: ["==", ["get", "step"], 0],
+    paint: { "line-color": "#8ff0ff", "line-width": 4 } });
+}
+
+// ----- Road popups: hover to peek, click to pin -----
+const ROAD_TYPES = {
+  motorway: "Motorway", trunk: "Major highway", primary: "Primary road", secondary: "Secondary road",
+  tertiary: "Tertiary road", residential: "Residential street", unclassified: "Minor road",
+  living_street: "Living street", road: "Road", escape: "Escape lane",
+};
+
+const fmtTime = (iso) => new Date(iso).toLocaleString("en-CA", {
+  timeZone: "America/Vancouver", weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit",
+}) + " PDT";
+
+// Build the popup content from a road's properties (DOM text, never HTML, so odd characters in names are safe)
+function roadPopupContent(p) {
+  const box = document.createElement("div");
+  box.className = "road-popup";
+  const add = (tag, text, cls) => {
+    const el = document.createElement(tag);
+    el.textContent = text;
+    if (cls) el.className = cls;
+    box.appendChild(el);
+  };
+  const isHwy = p.ref === "BC 97" || p.ref === "97";
+  add("strong", isHwy ? "Highway 97" + (p.name ? " (" + p.name + ")" : "") : p.name || "Unnamed road");
+  const type = (ROAD_TYPES[p.highway.replace("_link", "")] || p.highway) + (p.highway.endsWith("_link") ? " ramp" : "");
+  add("div", type + (p.ref && !isHwy ? " · " + p.ref : ""));
+  const now = Number(slider.value);
+  if (p.affected_step == null) {
+    add("div", "Not marked as affected (no satellite detection within 100 m).");
+  } else if (p.affected_step <= now) {
+    add("div", "Likely affected since " + fmtTime(p.affected_time) + ".", "affected");
+  } else {
+    add("div", "Not yet affected at this time; likely affected from " + fmtTime(p.affected_time) + ".");
+  }
+  add("div", "Estimate from satellite detections, not an official closure.", "small");
+  return box;
+}
+
+// Where roads overlap (a highway and its ramps), show the most important one: Highway 97, then main roads, then local streets
+function pickRoad(features) {
+  const rank = (p) => (p.ref === "BC 97" || p.ref === "97" ? 0 : p.highway.endsWith("_link") ? 3 :
+    ["motorway", "trunk", "primary", "secondary", "tertiary"].includes(p.highway) ? 1 : 2);
+  return features.map((f) => f.properties).sort((a, b) => rank(a) - rank(b))[0];
+}
+
+function addRoadPopups() {
+  // An invisible, wider copy of the roads, so thin lines are easy to hover and click
+  map.addLayer({ id: "roads-hit", type: "line", source: "roads",
+    paint: { "line-width": 14, "line-opacity": 0 } });
+  const popup = new maplibregl.Popup({ closeButton: false, closeOnClick: false, offset: 12, maxWidth: "260px" });
+  let pinned = false;                         // a clicked popup stays until you click empty map
+
+  map.on("mousemove", "roads-hit", (e) => {
+    map.getCanvas().style.cursor = "pointer";
+    if (!pinned) popup.setLngLat(e.lngLat).setDOMContent(roadPopupContent(pickRoad(e.features))).addTo(map);
+  });
+  map.on("mouseleave", "roads-hit", () => {
+    map.getCanvas().style.cursor = "";
+    if (!pinned) popup.remove();
+  });
+  map.on("click", (e) => {
+    const hit = map.queryRenderedFeatures(e.point, { layers: ["roads-hit"] });
+    pinned = hit.length > 0;
+    if (pinned) popup.setLngLat(e.lngLat).setDOMContent(roadPopupContent(pickRoad(hit))).addTo(map);
+    else popup.remove();
+  });
+}
+
+// ----- Road name labels (follow the line; off-white with a dark halo) -----
+const hasName = ["!=", ["get", "name"], ""];
+const isMajor = ["match", ["get", "highway"],
+  ["motorway", "motorway_link", "trunk", "trunk_link", "primary", "primary_link", "secondary", "secondary_link"], true, false];
+// Highway 97, Princeton-Summerland Road and Prairie Valley Road are labelled at every zoom, from road_labels.geojson.
+// Here we only stop the normal layers from repeating those names.
+const isAlways = ["any", isHwy97, ["match", ["get", "name"], ["Princeton-Summerland Road", "Prairie Valley Road"], true, false]];
+
+function addRoadLabels() {
+  const label = (id, filter, minzoom, font, size, field, source = "roads") => map.addLayer({
+    id, type: "symbol", source, minzoom, ...(filter ? { filter } : {}),
+    layout: { "symbol-placement": "line", "symbol-spacing": 300, "text-field": field, "text-font": [font],
+              "text-size": ["interpolate", ["linear"], ["zoom"], 9, size - 2, 15, size + 2], "text-letter-spacing": 0.03 },
+    paint: { "text-color": "#f1efe6", "text-halo-color": "#05080c", "text-halo-width": 1.8, "text-halo-blur": 0.5 },
+  });
+  // Added from least to most important: layers added later are placed first, so they win label collisions
+  label("labels-local", ["all", hasName, ["!", isMajor], ["!", isAlways]], 13, "Noto Sans Regular", 11, ["get", "name"]);
+  label("labels-major", ["all", hasName, isMajor, ["!", isAlways]], 10.5, "Noto Sans Regular", 12, ["get", "name"]);
+  label("labels-always", null, 8, "Noto Sans Bold", 12, ["get", "label"], "road-labels");   // merged lines, no filter needed
+}
 
 // Read a JSON file and stop with a visible message if it fails
 async function load(name) {
@@ -58,11 +201,11 @@ async function load(name) {
 }
 
 map.on("load", async () => {
-  let fires, roads, points, routes, areaData;
+  let fires, roads, points, routes, areaData, roadLabels;
   try {
-    [steps, fires, roads, points, routes, areaData] = await Promise.all([
+    [steps, fires, roads, points, routes, areaData, roadLabels] = await Promise.all([
       load("steps.json"), load("fires.geojson"), load("roads.geojson"),
-      load("points.geojson"), load("routes.geojson"), load("areas.geojson"),
+      load("points.geojson"), load("routes.geojson"), load("areas.geojson"), load("road_labels.geojson"),
     ]);
   } catch (err) {
     document.getElementById("clock").textContent = "Error: " + err.message +
@@ -73,20 +216,13 @@ map.on("load", async () => {
   areas = areaData.features.map((f) => f.properties).filter((p) => p.cut_step != null);
 
   map.addSource("roads", { type: "geojson", data: roads });
+  map.addSource("road-labels", { type: "geojson", data: roadLabels });
   map.addSource("fires", { type: "geojson", data: fires });
   map.addSource("routes", { type: "geojson", data: routes });
   map.addSource("points", { type: "geojson", data: points });
 
-  // Roads: grey base, red once likely affected. affected_step is null for roads never affected.
-  map.addLayer({ id: "roads", type: "line", source: "roads",
-    paint: { "line-color": "#777", "line-width": ["interpolate", ["linear"], ["zoom"], 9, 0.5, 14, 2] } });
-  map.addLayer({ id: "roads-affected", type: "line", source: "roads",
-    filter: ["<=", ["coalesce", ["get", "affected_step"], 999], 0],
-    paint: { "line-color": "#d11", "line-width": ["interpolate", ["linear"], ["zoom"], 9, 1.5, 14, 4] } });
-
-  map.addLayer({ id: "route", type: "line", source: "routes",
-    filter: ["==", ["get", "step"], 0],
-    paint: { "line-color": "#1565c0", "line-width": 4 } });
+  addRoadLayers();
+  addRoadPopups();
 
   map.addLayer({ id: "fires", type: "circle", source: "fires",
     filter: ["<=", ["get", "step"], 0],
@@ -97,6 +233,8 @@ map.on("load", async () => {
     paint: { "circle-radius": ["match", ["get", "kind"], "exit", 7, 3],
              "circle-color": ["match", ["get", "kind"], "exit", "#1b7f3b", "#5b6b8a"],
              "circle-stroke-color": "#fff", "circle-stroke-width": 1 } });
+
+  addRoadLabels();
 
   await loadBriefings();
   slider.max = steps.length - 1;
@@ -110,8 +248,11 @@ function show(i) {
   const s = steps[i];
   slider.value = i;
   map.setFilter("fires", ["<=", ["get", "step"], i]);
-  map.setFilter("roads-affected", ["<=", ["coalesce", ["get", "affected_step"], 999], i]);
+  const affected = ["<=", ["coalesce", ["get", "affected_step"], 999], i];   // roads likely affected by step i
+  map.setFilter("roads-affected", affected);
+  if (map.getLayer("roads-affected-glow")) map.setFilter("roads-affected-glow", affected);
   map.setFilter("route", ["==", ["get", "step"], i]);
+  if (map.getLayer("route-casing")) map.setFilter("route-casing", ["==", ["get", "step"], i]);
 
   document.getElementById("clock").textContent = new Date(s.time).toLocaleString("en-CA", {
     timeZone: "America/Vancouver", weekday: "short", month: "short", day: "numeric",

@@ -47,3 +47,7 @@ h2 { font-size: 14px; margin: 10px 0 4px; }
 #briefing { font-size: 12px; margin-bottom: 8px; }
 #briefing h3 { font-size: 12px; margin: 8px 0 2px; }
 #briefing ul { margin: 0; padding-left: 18px; }
+
+.road-popup { font-size: 12px; line-height: 1.4; }
+.road-popup .affected { color: #c01818; font-weight: 600; }
+.road-popup .small { font-size: 11px; color: #666; margin-top: 3px; }
