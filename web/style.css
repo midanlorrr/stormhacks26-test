@@ -52,8 +52,8 @@ body:not(.landing) #landing { opacity: 0; visibility: hidden; pointer-events: no
 .how-card .es-btn { margin-top: 18px; }
 
 /* ----- Replay: panel, controls and legend appear once the replay has started ----- */
-#panel, #legend, .maplibregl-ctrl-top-right { transition: opacity 0.4s ease; }
-body:not(.replay) #panel, body:not(.replay) #legend, body:not(.replay) .maplibregl-ctrl-top-right {
+#panel, #legend, #timebar, #panel-open, .maplibregl-ctrl-top-right { transition: opacity 0.4s ease; }
+body:not(.replay) #panel, body:not(.replay) #legend, body:not(.replay) #timebar, body:not(.replay) #panel-open, body:not(.replay) .maplibregl-ctrl-top-right {
   opacity: 0; visibility: hidden; pointer-events: none; }
 
 #panel { overflow: hidden; }                       /* only the middle block scrolls, so the disclaimer stays in view */
@@ -182,20 +182,7 @@ body.flying #map { pointer-events: none; }
 .es-src { display: inline-block; margin-left: 4px; padding: 0 5px; font: 400 9px/1.6 var(--es-mono); letter-spacing: 0.08em; text-transform: uppercase;
           color: var(--es-muted); border: 1px solid var(--es-line-strong); border-radius: var(--es-radius); vertical-align: 1px; }
 
-/* ----- Briefing callout on the map, joined to Summerland by a thin line ----- */
-#callout { position: fixed; right: 24px; top: 160px; width: 340px; max-height: calc(100vh - 360px); min-height: 0; z-index: 7;
            display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; }
-#callout-line { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 6; pointer-events: none; }
-#callout-line line { stroke: var(--es-text-soft); stroke-width: 1; }
-#callout-line circle { fill: var(--es-text); stroke: var(--es-bg); stroke-width: 2; }
-body:not(.replay) #callout, body:not(.replay) #callout-line { opacity: 0; visibility: hidden; pointer-events: none; }
-.callout-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-.callout-head .es-label { font-size: 10px; letter-spacing: 0.1em; }
-.callout-head .es-select { font-size: 12px; padding: 2px 8px; }
-.callout-toggle { padding: 0 4px; width: 22px; height: 22px; background: none; border: 0; border-radius: var(--es-radius); color: var(--es-muted); font-size: 12px; }
-.callout-toggle:hover { color: var(--es-text); background: rgba(236, 235, 232, 0.08); }
-#callout-body { overflow-y: auto; min-height: 0; scrollbar-width: thin; scrollbar-color: var(--es-line-strong) transparent; }
-#callout.is-collapsed #callout-body { display: none; }
 .callout-summary { margin: 0 0 8px; font-size: 13px; line-height: 1.5; color: var(--es-text); }
 .callout-more { margin: 8px 0; }
 .callout-more summary { cursor: pointer; font: 400 11px var(--es-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--es-muted); }
@@ -203,10 +190,6 @@ body:not(.replay) #callout, body:not(.replay) #callout-line { opacity: 0; visibi
 .callout-more h3 { font: 400 11px var(--es-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--es-muted); margin: 12px 0 4px; }
 .callout-more ul { margin: 0; padding-left: 18px; font-size: 12px; line-height: 1.5; color: var(--es-text-soft); }
 
-@media (max-width: 700px) {                       /* narrow screens: the callout sits at the top, without the line */
-  #callout { left: 12px; right: 12px; top: 12px; width: auto; max-height: 40vh; }
-  #callout-line { display: none; }
-}
 
 /* ----- Panel header: brand on the left, small buttons on the right ----- */
 .es-panel-head { display: flex; align-items: center; justify-content: space-between; }
@@ -242,13 +225,6 @@ body:not(.replay) #callout, body:not(.replay) #callout-line { opacity: 0; visibi
 .es-stat-row .es-est-tag { margin-left: 4px; }
 
 /* ----- Briefing: draggable by its title bar, closable, with a button to open it again ----- */
-.callout-head { cursor: grab; touch-action: none; user-select: none; }
-.callout-head:active { cursor: grabbing; }
-#callout.is-closed { display: none; }
-.callout-open { position: fixed; right: 24px; top: 160px; z-index: 7; padding: 6px 12px; background: #0c0e12; }
-.callout-open[hidden] { display: none; }
-body:not(.replay) .callout-open { display: none; }
-.callout-toggle { font-size: 18px; line-height: 1; }
 
 /* ----- Guided tour ----- */
 #tour { position: fixed; inset: 0; z-index: 80; pointer-events: none; }      /* only the dark panels, outline and card catch clicks */
@@ -295,8 +271,54 @@ body:not(.replay) .callout-open { display: none; }
 .es-moment { padding: 5px 0; }
 
 /* Briefing stands out from the map: opaque, brighter edge and a bold top bar (no shadow, no orange) */
-#callout { background: #12161c; border: 1px solid var(--es-text-soft); border-top: 3px solid var(--es-text); }
-.callout-head { padding-bottom: 8px; border-bottom: 1px solid var(--es-line-strong); }
-.callout-head .es-label { font-size: 11px; color: var(--es-text); }
 .callout-summary { font-size: 14px; }
-.callout-open { border: 1px solid var(--es-text-soft); color: var(--es-text); }
+
+/* ----- Time bar along the bottom (date, time, play, playhead); the side panel sits above it and can be hidden ----- */
+:root { --es-bar-h: 104px; --es-bar-bottom: 34px; }                 /* the map credit line stays visible below the bar */
+#timebar { position: fixed; left: 24px; right: 24px; bottom: var(--es-bar-bottom); height: var(--es-bar-h); z-index: 6;
+           display: flex; align-items: center; gap: 28px; padding: 0 24px; }
+#tour-time { flex: none; width: 270px; }
+#timebar .es-date { font-size: 40px; }
+#timebar .es-controls { flex: 1; min-width: 0; align-items: center; }
+#timebar .es-slider-block { margin-top: 0; }
+#panel.es-sidebar { bottom: calc(var(--es-bar-bottom) + var(--es-bar-h) + 12px); transition: transform 0.35s ease, opacity 0.35s ease; }
+#panel.is-collapsed { transform: translateX(-110%); opacity: 0; visibility: hidden; pointer-events: none; }
+#panel-open { position: fixed; left: 24px; top: 24px; z-index: 6; padding: 8px 14px; background: #0c0e12; border-color: var(--es-text-soft); color: var(--es-text); }
+#panel-open[hidden] { display: none; }
+#legend { bottom: calc(var(--es-bar-bottom) + var(--es-bar-h) + 12px); }
+#tour-time { width: 380px; }
+#tour-time .es-label { white-space: nowrap; }
+#timebar .es-date-row { justify-content: flex-start; gap: 18px; }
+#timebar .es-date { white-space: nowrap; }
+
+/* ----- Smaller time bar, markers for key moments and briefings, briefing tab ----- */
+:root { --es-bar-h: 84px; }
+#timebar { gap: 22px; padding: 0 20px; }
+#tour-time { width: 300px; }
+#timebar .es-label { font-size: 9px; }
+#timebar .es-date { font-size: 28px; }
+#timebar .es-clock { font-size: 18px; }
+#timebar .es-date-row { gap: 12px; margin-top: 2px; }
+#timebar .es-play { width: 36px; height: 36px; }
+.es-marks { position: relative; height: 22px; }
+.es-mark { position: absolute; width: 16px; height: 10px; margin-left: -8px; padding: 0; border: 0; background: none; cursor: pointer; }
+.es-mark::before { content: ""; position: absolute; left: 50%; top: 0; transform: translateX(-50%); background: var(--es-text-soft); }
+.es-mark--moment { top: 0; }
+.es-mark--moment::before { width: 2px; height: 10px; }
+.es-mark--briefing { top: 12px; }
+.es-mark--briefing::before { top: 1px; width: 6px; height: 6px; background: var(--es-bg); border: 1px solid var(--es-text); transform: translateX(-50%) rotate(45deg); }
+.es-mark:hover::before, .es-mark:focus-visible::before { background: var(--es-text); }
+.es-mark:focus-visible { outline: 2px solid var(--es-fire); outline-offset: 0; }
+#mark-tip { position: fixed; z-index: 9; max-width: 260px; padding: 8px 10px; pointer-events: none; transform: translate(-50%, -100%);
+            background: #0c0e12; border: 1px solid var(--es-text-soft); border-radius: var(--es-radius); font-size: 12px; line-height: 1.4; }
+#mark-tip[hidden] { display: none; }
+#mark-tip .tip-time { display: block; font: 400 10px var(--es-mono); letter-spacing: 0.08em; color: var(--es-muted); margin-bottom: 2px; }
+.es-brief-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 0 0 6px; }
+.es-brief-head .es-select { font-size: 12px; padding: 2px 8px; }
+.callout-summary { font-size: 13px; line-height: 1.5; }
+
+/* ----- Summary tab: the counts stack (big number on top) so they fit the narrower tab area ----- */
+#pane-summary .es-stat-row { flex-direction: column; align-items: flex-start; gap: 4px; padding: 12px 0; }
+#pane-summary .es-number { font-size: 30px; }
+#pane-summary #crosscheck-note { margin-top: 14px; }
+.es-data { border-top: 0; padding-top: 0; }

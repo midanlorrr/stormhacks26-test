@@ -76,57 +76,53 @@
       <span class="es-panel-actions">
         <button id="tour-btn" class="es-link" type="button" title="Show the guided tour again">Tour</button>
         <button id="intro-btn" class="es-link" type="button" title="Go back to the intro globe">Intro</button>
+        <button id="panel-hide" class="es-link" type="button" title="Hide this panel to see more of the map">Hide</button>
       </span>
     </div>
     <p id="example-panel" class="es-example es-example--small"></p>
     <p id="basemap-note" class="es-note" hidden>Satellite imagery could not load, so the Streets map is showing. Press Satellite to try again.</p>
 
-    <div id="tour-time">
-      <div class="es-label">Replay date and time &middot; Pacific &middot; 2026</div>
-      <div class="es-date-row"><span id="clock-date" class="es-date">&ndash;</span><span id="clock" class="es-clock">&ndash;</span></div>
-    </div>
-
-    <div id="tour-controls" class="es-controls">
-      <button id="play" class="es-play" type="button" data-state="paused">Play</button>
-      <div class="es-slider-block">
-        <div class="es-slider-wrap">
-          <div id="slider-ticks" class="es-ticks"></div>
-          <div id="slider-fill" class="es-slider-fill"></div>
-          <input id="slider" class="es-slider-native" type="range" min="0" max="0" value="0" step="1" aria-label="Time step">
-        </div>
-        <div id="slider-days" class="es-days"></div>
-      </div>
-    </div>
-
-    <div id="tour-stats" class="es-stat-list">
-      <div class="es-stat-row">
-        <div><div class="es-stat-title">Fire detections</div><div class="es-stat-desc">Hot spots seen by satellites</div></div>
-        <span id="s-fires" class="es-number">&ndash;</span>
-      </div>
-      <div class="es-stat-row">
-        <div><div class="es-stat-title">Roads affected</div><div class="es-stat-desc">Segments within 100 m of a detection</div></div>
-        <span class="es-number"><span id="s-roads" class="es-est">&ndash;</span><span class="es-est-tag">est.</span></span>
-      </div>
-      <div class="es-stat-row">
-        <div><div class="es-stat-title">Residents cut off</div><div class="es-stat-desc">Range: no drivable route out</div></div>
-        <span class="es-number"><span id="s-res" class="es-est">&ndash;</span><span class="es-est-tag">est.</span></span>
-      </div>
-    </div>
-
-    <p id="crosscheck-note" class="es-note" hidden></p>
-
     <section id="tour-data" class="es-data" aria-label="Data">
       <div class="es-tabs" role="tablist" aria-orientation="vertical" aria-label="Data">
         <span class="es-tabs-title">Data</span>
-        <button class="es-tab" role="tab" id="tab-moments" data-tab="moments" aria-selected="true" aria-controls="pane-moments" type="button">Moments</button>
+        <button class="es-tab" role="tab" id="tab-summary" data-tab="summary" aria-selected="true" aria-controls="pane-summary" type="button">Summary</button>
+        <button class="es-tab" role="tab" id="tab-moments" data-tab="moments" aria-selected="false" aria-controls="pane-moments" tabindex="-1" type="button">Moments</button>
+        <button class="es-tab" role="tab" id="tab-briefing" data-tab="briefing" aria-selected="false" aria-controls="pane-briefing" tabindex="-1" type="button">Briefing</button>
         <button class="es-tab" role="tab" id="tab-areas" data-tab="areas" aria-selected="false" aria-controls="pane-areas" tabindex="-1" type="button">Areas <span id="areas-count" class="es-tab-count">0</span></button>
         <button class="es-tab" role="tab" id="tab-drive" data-tab="drive" aria-selected="false" aria-controls="pane-drive" tabindex="-1" type="button">Drive</button>
         <button class="es-tab" role="tab" id="tab-about" data-tab="about" aria-selected="false" aria-controls="pane-about" tabindex="-1" type="button">About</button>
       </div>
       <div class="es-panes">
-        <div id="pane-moments" class="es-pane" role="tabpanel" aria-labelledby="tab-moments">
+        <div id="pane-summary" class="es-pane" role="tabpanel" aria-labelledby="tab-summary">
+          <h3 class="es-pane-title">At this moment</h3>
+          <div id="tour-stats" class="es-stat-list">
+            <div class="es-stat-row">
+              <div><div class="es-stat-title">Fire detections</div><div class="es-stat-desc">Hot spots seen by satellites</div></div>
+              <span id="s-fires" class="es-number">&ndash;</span>
+            </div>
+            <div class="es-stat-row">
+              <div><div class="es-stat-title">Roads affected</div><div class="es-stat-desc">Segments within 100 m of a detection</div></div>
+              <span class="es-number"><span id="s-roads" class="es-est">&ndash;</span><span class="es-est-tag">est.</span></span>
+            </div>
+            <div class="es-stat-row">
+              <div><div class="es-stat-title">Residents cut off</div><div class="es-stat-desc">Range: no drivable route out</div></div>
+              <span class="es-number"><span id="s-res" class="es-est">&ndash;</span><span class="es-est-tag">est.</span></span>
+            </div>
+          </div>
+
+          <p id="crosscheck-note" class="es-note" hidden></p>
+        </div>
+        <div id="pane-moments" class="es-pane" role="tabpanel" aria-labelledby="tab-moments" hidden>
           <h3 class="es-pane-title">Key moments</h3>
           <div id="moments-list"></div>
+        </div>
+        <div id="pane-briefing" class="es-pane" role="tabpanel" aria-labelledby="tab-briefing" hidden>
+          <h3 class="es-pane-title">Briefing</h3>
+          <div class="es-brief-head">
+            <span class="es-label">AI-written, not official</span>
+            <select id="lang" class="es-select" aria-label="Briefing language" disabled></select>
+          </div>
+          <div id="briefing" class="es-body"><p class="es-note">No briefings found. Run data_prep/07_briefings.py (see README).</p></div>
         </div>
         <div id="pane-areas" class="es-pane" role="tabpanel" aria-labelledby="tab-areas" hidden>
           <h3 class="es-pane-title">Areas cut off</h3>
@@ -159,6 +155,28 @@
   </aside>
 
   <!-- Map legend, bottom-right -->
+  <!-- Time bar along the bottom: big date and time, play, and the playhead -->
+  <div id="timebar" class="es-panel" aria-label="Replay time">
+      <div id="tour-time">
+        <div class="es-label">Replay date and time &middot; Pacific &middot; 2026</div>
+        <div class="es-date-row"><span id="clock-date" class="es-date">&ndash;</span><span id="clock" class="es-clock">&ndash;</span></div>
+      </div>
+
+      <div id="tour-controls" class="es-controls">
+        <button id="play" class="es-play" type="button" data-state="paused">Play</button>
+        <div class="es-slider-block">
+          <div id="slider-marks" class="es-marks" aria-label="Key moments and briefings"></div>
+        <div class="es-slider-wrap">
+            <div id="slider-ticks" class="es-ticks"></div>
+            <div id="slider-fill" class="es-slider-fill"></div>
+            <input id="slider" class="es-slider-native" type="range" min="0" max="0" value="0" step="1" aria-label="Time step">
+          </div>
+          <div id="slider-days" class="es-days"></div>
+        </div>
+      </div>
+  </div>
+  <button id="panel-open" class="es-link" type="button" hidden>Panel</button>
+
   <div id="legend" class="es-legend">
     <div><span class="es-swatch es-swatch--fire"></span>Fire detection</div>
     <div><span class="es-swatch es-swatch--road"></span>Affected road</div>
@@ -167,21 +185,7 @@
     <div class="es-legend-note">Places appear when zoomed in</div>
   </div>
 
-  <!-- Briefing callout: pinned to Summerland on the map with a thin line -->
-  <svg id="callout-line" aria-hidden="true"><line x1="0" y1="0" x2="0" y2="0"></line><circle r="4" cx="0" cy="0"></circle></svg>
-  <button id="callout-open" class="es-link callout-open" type="button" hidden>Briefing</button>
-  <aside id="callout" class="es-panel" aria-label="Briefing">
-    <div id="callout-head" class="callout-head" title="Drag to move">
-      <span class="es-label">Briefing &middot; AI-written, not official</span>
-      <span class="es-section-meta">
-        <select id="lang" class="es-select" aria-label="Briefing language" disabled></select>
-        <button id="callout-close" class="callout-toggle" type="button" aria-label="Close the briefing" title="Close">&times;</button>
-      </span>
-    </div>
-    <div id="callout-body">
-      <div id="briefing" class="es-body"><p class="es-note">No briefings found. Run data_prep/07_briefings.py (see README).</p></div>
-    </div>
-  </aside>
+  <div id="mark-tip" role="tooltip" hidden></div>
 
   <script src="vendor/maplibre-gl.js"></script>
   <script src="tour.js"></script>

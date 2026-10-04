@@ -52,9 +52,9 @@ The look follows the Evacusense design handoff (direction 4a "Graphite") kept in
 
 ## Using the page
 - **Start the replay** (or **Skip intro**) flies to Summerland and opens a short guided tour. The replay does not play until you press Play.
-- Drag the playhead to move through time (this pauses playback). Click a line in **Key moments** to jump to that time.
-- **Tour** (top of the panel) shows the tour again; **Intro** goes back to the globe.
-- The briefing box can be dragged by its title bar and closed with the cross; the **Briefing** button brings it back.
+- The date, time, Play button and playhead sit in a bar along the bottom. Drag the playhead to move through time (this pauses playback). Click a line in **Key moments** to jump to that time.
+- **Tour** (top of the side panel) shows the tour again; **Intro** goes back to the globe; **Hide** collapses the panel (the **Panel** button brings it back).
+- The side panel is a set of tabs: **Summary** (the headline counts at the current moment), Moments, Briefing, Areas, Drive and About. The **Briefing** tab shows the AI-written briefing (pick the language at the top). On the bottom bar, bars above the line are key moments and diamonds are times with a briefing; hover for details, click to jump there.
 - During the replay the map is limited to about 100 km around Summerland (a flat map, not the globe).
 
 ## Known limits

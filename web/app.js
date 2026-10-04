@@ -22,7 +22,8 @@ const SUMMERLAND = EXAMPLE.center;
 const REPLAY_BOUNDS = EXAMPLE.bounds;
 const REPLAY_MIN_ZOOM = 7.5;
 let tourShown = false;           // the guided tour opens by itself the first time only
-const REPLAY_PADDING = { left: 440, top: 0, right: 0, bottom: 0 };   // keeps Summerland clear of the side panel (24 + 380 px + space)
+const REPLAY_PADDING = { left: 440, top: 0, right: 0, bottom: 120 };   // keeps Summerland clear of the side panel (24 + 380 px + space) and the time bar
+const REPLAY_PADDING_NO_PANEL = { left: 0, top: 0, right: 0, bottom: 120 };
 
 const map = new maplibregl.Map({
   container: "map",
@@ -446,6 +447,7 @@ for (const type of ["mousedown", "touchstart", "wheel"]) map.on(type, stopSpin);
 // Start: fade out the landing overlay and fly to Summerland. Skip (or reduced motion): jump there.
 function startReplay(animate) {
   stopSpin();
+  showSidePanel(true);                                            // always start with the side panel open
   document.getElementById("start").disabled = true;               // no double clicks
   document.body.classList.replace("landing", "flying");           // fades the landing overlay out; the map ignores the mouse while flying
   setReplayVisible(true);                                         // switch the data layers on now: MapLibre only prepares visible layers,
@@ -467,7 +469,6 @@ function arriveAtSummerland() {
   map.setProjection({ type: "mercator" });                        // the map limit below does not work on the globe, and at zoom 10 the two look alike
   map.setMinZoom(REPLAY_MIN_ZOOM);                                // keep the view within about 100 km of Summerland
   map.setMaxBounds(REPLAY_BOUNDS);
-  placeCallout();
   show(0);                                                        // the replay waits for the user to press Play
   if (!tourShown) {
     tourShown = true;
@@ -479,6 +480,7 @@ function arriveAtSummerland() {
 function goToIntro() {
   stop();
   endTour();
+  showSidePanel(true);
   document.body.classList.replace("replay", "landing");
   document.getElementById("start").disabled = false;
   setReplayVisible(false);
@@ -495,6 +497,18 @@ function goToIntro() {
   }
 }
 document.getElementById("intro-btn").addEventListener("click", goToIntro);
+
+// ----- Hide / show the side panel (the time bar stays) -----
+const sidePanel = document.getElementById("panel");
+const panelOpenButton = document.getElementById("panel-open");
+function showSidePanel(open) {
+  sidePanel.classList.toggle("is-collapsed", !open);
+  panelOpenButton.hidden = open;
+  if (document.body.classList.contains("replay")) map.easeTo({ padding: open ? REPLAY_PADDING : REPLAY_PADDING_NO_PANEL, duration: 500 });
+}
+window.showSidePanel = showSidePanel;                                       // the tour opens it again if needed
+document.getElementById("panel-hide").addEventListener("click", () => showSidePanel(false));
+panelOpenButton.addEventListener("click", () => showSidePanel(true));
 document.getElementById("tour-btn").addEventListener("click", startTour);
 
 document.getElementById("start").addEventListener("click", () => startReplay(true));
@@ -575,6 +589,7 @@ async function loadBriefings() {
   const languages = [...new Set(briefings.map((b) => b.language))];
   for (const lang of languages) select.add(new Option(lang, lang));
   select.disabled = languages.length === 0;
+  addBriefingMarks();                                       // the diamonds on the playbar (nothing happens until the steps are loaded too)
 }
 
 // Show the latest pre-generated briefing at or before the current step, in the chosen language
@@ -627,65 +642,6 @@ async function showBriefing(i) {
   box.append(summary, more, note);
 }
 
-// ----- Briefing callout: sits on the map and is joined to Summerland by a thin line -----
-const callout = document.getElementById("callout");
-const calloutLine = document.getElementById("callout-line");
-
-function placeCallout() {
-  if (!document.body.classList.contains("replay") || callout.classList.contains("is-closed")) return;
-  const point = map.project(SUMMERLAND);                                  // where Summerland is on screen right now
-  const box = callout.getBoundingClientRect();
-  const onScreen = point.x > 0 && point.y > 0 && point.x < innerWidth && point.y < innerHeight;
-  calloutLine.style.visibility = onScreen ? "visible" : "hidden";
-  const line = calloutLine.querySelector("line");
-  line.setAttribute("x1", box.left);                                      // the line starts at the callout's left edge, near the top
-  line.setAttribute("y1", box.top + 20);
-  line.setAttribute("x2", point.x);
-  line.setAttribute("y2", point.y);
-  const dot = calloutLine.querySelector("circle");
-  dot.setAttribute("cx", point.x);
-  dot.setAttribute("cy", point.y);
-}
-map.on("move", placeCallout);
-window.addEventListener("resize", placeCallout);
-new ResizeObserver(placeCallout).observe(callout);                         // the callout grows when "More" opens
-
-const calloutOpenButton = document.getElementById("callout-open");
-function openCallout() {
-  callout.classList.remove("is-closed");
-  calloutOpenButton.hidden = true;
-  placeCallout();
-}
-function closeCallout() {
-  callout.classList.add("is-closed");
-  calloutOpenButton.hidden = false;
-  calloutLine.style.visibility = "hidden";
-}
-window.openCallout = openCallout;                                          // the tour opens it too
-document.getElementById("callout-close").addEventListener("click", closeCallout);
-calloutOpenButton.addEventListener("click", openCallout);
-
-// Drag the briefing by its title bar; the thin line follows
-const calloutHead = document.getElementById("callout-head");
-calloutHead.addEventListener("pointerdown", (e) => {
-  if (e.target.closest("select, button") || innerWidth <= 700) return;
-  const box = callout.getBoundingClientRect();
-  const offsetX = e.clientX - box.left, offsetY = e.clientY - box.top;
-  calloutHead.setPointerCapture(e.pointerId);
-  const move = (ev) => {
-    callout.style.left = Math.max(0, Math.min(innerWidth - box.width, ev.clientX - offsetX)) + "px";
-    callout.style.top = Math.max(0, Math.min(innerHeight - 48, ev.clientY - offsetY)) + "px";
-    callout.style.right = "auto";
-    placeCallout();
-  };
-  const up = () => {
-    calloutHead.removeEventListener("pointermove", move);
-    calloutHead.removeEventListener("pointerup", up);
-  };
-  calloutHead.addEventListener("pointermove", move);
-  calloutHead.addEventListener("pointerup", up);
-});
-
 // ----- Cross-check note under the headline numbers -----
 async function showCrosscheck() {
   const note = document.getElementById("crosscheck-note");
@@ -729,12 +685,60 @@ function buildTimeline(moments) {
       ticks.appendChild(tick);
     }
   });
-  for (const m of moments) {
+  const marks = document.getElementById("slider-marks");
+  marks.replaceChildren();
+  for (const m of moments) {                                                  // a bar above the line for every key moment
     const fraction = Math.max(0, Math.min(1, (new Date(m.time).getTime() - first) / span));
-    const tick = document.createElement("span");
-    tick.className = "es-tick es-tick--moment";
-    tick.style.left = left(fraction);
-    ticks.appendChild(tick);
+    const found = steps.findIndex((st) => new Date(st.time) >= new Date(m.time));
+    addMark(marks, "moment", left(fraction), found === -1 ? last : found, "moments", whenText(m.time), m.text + " (" + m.source + ")");
+  }
+  addBriefingMarks();
+}
+
+// Time as "Aug 8 00:00" (Pacific)
+function whenText(time) {
+  const d = new Date(time);
+  return d.toLocaleDateString("en-CA", { timeZone: "America/Vancouver", month: "short", day: "numeric" }) + " " +
+    d.toLocaleTimeString("en-GB", { timeZone: "America/Vancouver", hour: "2-digit", minute: "2-digit", hour12: false });
+}
+
+// One small clickable mark on the playbar. Hover or focus shows what it is; a click jumps there and opens the matching tab.
+const markTip = document.getElementById("mark-tip");
+function addMark(parent, kind, leftCss, step, tab, time, text) {
+  const mark = document.createElement("button");
+  mark.type = "button";
+  mark.className = "es-mark es-mark--" + kind;
+  mark.style.left = leftCss;
+  mark.setAttribute("aria-label", time + ": " + text);
+  const showTip = () => {
+    markTip.replaceChildren();
+    const t = document.createElement("span");
+    t.className = "tip-time";
+    t.textContent = time;
+    markTip.append(t, document.createTextNode(text));
+    markTip.hidden = false;
+    const box = mark.getBoundingClientRect();
+    markTip.style.left = Math.max(140, Math.min(innerWidth - 140, box.left + box.width / 2)) + "px";
+    markTip.style.top = box.top - 8 + "px";
+  };
+  mark.addEventListener("mouseenter", showTip);
+  mark.addEventListener("focus", showTip);
+  mark.addEventListener("mouseleave", () => { markTip.hidden = true; });
+  mark.addEventListener("blur", () => { markTip.hidden = true; });
+  mark.addEventListener("click", () => { stop(); show(step); selectDataTab(tab); showSidePanel(true); });
+  parent.appendChild(mark);
+}
+
+// A diamond for every step that has a briefing (below the key-moment bars). Safe to call more than once.
+function addBriefingMarks() {
+  const marks = document.getElementById("slider-marks");
+  if (!marks || steps.length === 0) return;
+  marks.querySelectorAll(".es-mark--briefing").forEach((el) => el.remove());
+  const last = steps.length - 1;
+  for (const step of [...new Set(briefings.map((b) => b.step))].sort((a, b) => a - b)) {
+    if (!steps[step]) continue;
+    addMark(marks, "briefing", "calc(7px + (100% - 14px) * " + step / last + ")", step, "briefing", whenText(steps[step].time),
+            "AI-written briefing for this time. Click to read it.");
   }
 }
 

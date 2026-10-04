@@ -5,15 +5,15 @@ const TOUR_STEPS = [
   { target: "#tour-time", title: "Date and time",
     text: "The replay moves through the fire in 3-hour steps. The big date and time show the moment you are looking at. All counts are up to that moment." },
   { target: "#tour-controls", title: "Playback",
-    text: "Press play to watch it unfold, or drag the playhead. Dragging pauses playback. The marks on the line are key moments, and the day names sit underneath." },
-  { target: "#tour-stats", title: "What is counted",
+    text: "Press play to watch it unfold, or drag the playhead. Dragging pauses playback. Above the line, bars are key moments and diamonds are times with an AI-written briefing. Hover one for details, click to jump there." },
+  { target: "#tour-stats", title: "What is counted", before: () => window.selectDataTab?.("summary"),
     text: "Fire detections are hot spots seen by satellites. Roads affected are road segments within 100 m of a detection, treated as closed. Residents cut off is an estimated range (50 m to 100 m rule): people with no drivable route to any exit. \"est.\" means estimated." },
   { target: "#tour-data", title: "Data tabs", before: () => window.selectDataTab?.("moments"),
-    text: "Use the tabs on the side. Moments: real events and the model's milestones (click one to jump there). Areas: 1 km squares that were cut off. Drive: estimated minimum drive to an exit. About: how the figures are made." },
+    text: "Use the tabs on the side. Summary: the headline counts. Moments: real events and the model's milestones (click one to jump there). Briefing: AI-written summary. Areas: 1 km squares that were cut off. Drive: estimated minimum drive to an exit. About: how the figures are made." },
   { target: "#legend", title: "Map key",
     text: "Orange dots are fire detections, red lines are affected roads, and the pale blue line is the longest estimated drive out. Zoom in for road names and places." },
-  { target: "#callout", title: "Briefing",
-    text: "A plain-language briefing written by an AI model from these figures only. Drag it by its title, close it with the cross, and switch language. It is not official guidance." },
+  { target: "#tour-data", title: "Briefing", before: () => window.selectDataTab?.("briefing"),
+    text: "A plain-language briefing written by an AI model from these figures only. Pick the language at the top. It is not official guidance." },
   { target: "#play", title: "Your turn",
     text: "Press play when you are ready. You can reopen this tour any time from the Tour button." },
 ];
@@ -62,8 +62,8 @@ function showTourStep(i) {
   tourIndex = Math.max(0, Math.min(TOUR_STEPS.length - 1, i));
   const step = TOUR_STEPS[tourIndex];
   const last = tourIndex === TOUR_STEPS.length - 1;
+  if (document.querySelector(step.target)?.closest("#panel")) window.showSidePanel?.(true);      // steps inside the side panel need it open
   step.before?.();                                                                // e.g. open the right tab
-  if (step.target === "#callout") window.openCallout?.();                          // make sure the briefing is on screen
   tourEl.querySelector(".tour-count").textContent = "Step " + (tourIndex + 1) + " of " + TOUR_STEPS.length;
   tourEl.querySelector(".tour-title").textContent = step.title;
   tourEl.querySelector(".tour-text").textContent = step.text;
