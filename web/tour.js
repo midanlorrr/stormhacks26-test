@@ -7,7 +7,7 @@ const TOUR_STEPS = [
   { target: "#tour-controls", title: "Playback",
     text: "Press play to watch it unfold, or drag the playhead. Dragging pauses playback. The marks on the line are key moments, and the day names sit underneath." },
   { target: "#tour-stats", title: "What is counted",
-    text: "Fire detections are hot spots seen by satellites. Roads affected are road segments within 100 m of a detection, treated as closed. Residents cut off have no drivable route to any exit. \"est.\" means estimated." },
+    text: "Fire detections are hot spots seen by satellites. Roads affected are road segments within 100 m of a detection, treated as closed. Residents cut off is an estimated range (50 m to 100 m rule): people with no drivable route to any exit. \"est.\" means estimated." },
   { target: "#tour-data", title: "Data tabs", before: () => window.selectDataTab?.("moments"),
     text: "Use the tabs on the side. Moments: real events and the model's milestones (click one to jump there). Areas: 1 km squares that were cut off. Drive: estimated minimum drive to an exit. About: how the figures are made." },
   { target: "#legend", title: "Map key",

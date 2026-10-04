@@ -293,3 +293,10 @@ body:not(.replay) .callout-open { display: none; }
 .es-date-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-top: 4px; }
 .es-date-row .es-date { margin-top: 0; }
 .es-moment { padding: 5px 0; }
+
+/* Briefing stands out from the map: opaque, brighter edge and a bold top bar (no shadow, no orange) */
+#callout { background: #12161c; border: 1px solid var(--es-text-soft); border-top: 3px solid var(--es-text); }
+.callout-head { padding-bottom: 8px; border-bottom: 1px solid var(--es-line-strong); }
+.callout-head .es-label { font-size: 11px; color: var(--es-text); }
+.callout-summary { font-size: 14px; }
+.callout-open { border: 1px solid var(--es-text-soft); color: var(--es-text); }

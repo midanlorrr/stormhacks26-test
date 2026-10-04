@@ -89,6 +89,17 @@ What this does and does not show:
 - **Not used as model input:** none of these facts drive the model. They are only for checking it.
 - **Source:** the CBC article was published Aug 8 at 9:15 pm PT and describes events through 8 am that morning. Its order times are the news outlet's account, not an official notice; confirm against an RDOS or District of Summerland notice before relying on them.
 
+## Prize tracks
+
+| Track | How this project fits |
+|---|---|
+| ALEASAT | Reads open satellite archives (NASA FIRMS VIIRS/MODIS fire detections) and checks the result against the official BC Wildfire Service perimeter: 97% of detections fall inside it and 87% of its area is within 1 km of a detection. Aimed at disaster relief. |
+| Gemini | Briefings are written by Gemini only from numbers our code computed. A code check (`07_briefings.py`) rejects any invented or rounded number, and the files are pre-generated so the demo needs no key. |
+| Enactus UNSDG | Climate action and resilient communities: shows how a wildfire cuts off roads and neighbourhoods, in English, Punjabi and Spanish. |
+| Beginner | Built by a team of beginners. Estimates are labelled "est.", and `CAVEATS.md` lists what is and is not validated. |
+| IATSU Best Design | Dark "Graphite" design system, globe fly-in, guided tour, and a briefing pinned to the map. See `design/`. |
+| SSSS Python | The whole data pipeline is Python (`data_prep/01` to `08`): pandas, geopandas, osmnx, networkx, rasterio and the Gemini SDK. The page itself is plain JavaScript. |
+
 ## Data sources
 NASA FIRMS (VIIRS and MODIS active fire), WorldPop (population, CC BY 4.0: Bondarenko et al., WorldPop, University of Southampton, DOI 10.5258/SOTON/WP00839), OpenStreetMap (roads, via osmnx), Noto Sans map label fonts (SIL Open Font License; glyph files in `web/fonts/` from the MapLibre demo font server), Sora and JetBrains Mono interface fonts (SIL Open Font License; `web/fonts/ui/`), BC Wildfire Service (perimeter, for checking only), DriveBC (one closure, compared by hand).
 

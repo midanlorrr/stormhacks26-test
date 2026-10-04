@@ -11,7 +11,7 @@ Everything below applies to this project as of Oct 4, 2026. Read this before quo
 - Satellites only see fire when they pass overhead, hours apart. The replay shows **when detections appeared**, not how the fire moved between passes. True road or area effects may have happened earlier than shown.
 - All detections are **near-real-time (NRT)** data. The higher-quality standard-processing data was empty for these dates.
 - A detection is a pixel (375 m for VIIRS, 1 km for MODIS) with location error, not a precise fire line.
-- Start time sources disagree: BCWS records discovery at 4:29 pm Aug 7, the first satellite detection is 4:48 pm, and a spokesperson quoted in the news said 5:30 pm. We cannot reconcile them.
+- Start time: three sources give three times, and we cannot reconcile them. (1) BCWS records discovery at 4:29 pm Aug 7. (2) The first satellite detection in our FIRMS data is **4:48 pm**; this is the time the page and the briefings use, always worded as the "first satellite detection". (3) A Regional District spokesperson quoted by CBC said "first detected" at 5:30 pm; we do not use it.
 - Fire size from detection pixels is only a rough footprint (about 32 km² at 8:30 pm Aug 7, about 133 km² at 8 am Aug 8, against news figures of 50 and 95 km²). The earlier area estimate in the data script was removed as unreliable.
 
 ## Roads and "likely affected"
